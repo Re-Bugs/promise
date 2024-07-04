@@ -51,5 +51,16 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
 # Ignore contents of the etc/ignore folder
 etc/ignore/
