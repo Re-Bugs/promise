@@ -5,7 +5,7 @@
 
 ## 팀명 : 약속(藥束)
 
-![IMG_0805](/Users/seungwook/Dev/Project/promise/images/README/IMG_0805.JPG)
+![IMG_0805](./images/README/IMG_0805.JPG)
 
 |      | 이름   | 역할                  |
 | ---- | ------ | --------------------- |
@@ -76,7 +76,7 @@
 
 ## 시스템 아키텍쳐
 
-![Architecture](/Users/seungwook/Dev/Project/promise/images/README/Architecture.png)
+![Architecture](./images/README/Architecture-20240913194248169.png)
 
 **웹 서비스는 SSR(Server Side Rendering) 방식**
 
