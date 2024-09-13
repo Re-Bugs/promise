@@ -82,13 +82,13 @@
 
 ## 기술 스택
 
-| 분류           | 기술                                 |
-| -------------- | ------------------------------------ |
-| 서버 환경      | Ubuntu 24.04                         |
-| Back-End       | Spring Boot                          |
-| Database       | MySQL, Redis                         |
-| Front-End      | Android Native(Kotlin)               |
-| User Interface | Figma                                |
-| API            | Google Cloud Platform Vision API     |
-| Data Set       | 공공 데이터 포털(건강보험심사평가원) |
+| 분류           | 기술                                               |
+| -------------- | -------------------------------------------------- |
+| 서버 환경      | Ubuntu 24.04                                       |
+| Back-End       | Spring Boot, Spring Data JPA, Query DSL, Thymeleaf |
+| Database       | MySQL, Redis                                       |
+| Front-End      | Android Native(Kotlin)                             |
+| User Interface | Figma                                              |
+| API            | Google Cloud Platform Vision API                   |
+| Data Set       | 공공 데이터 포털(건강보험심사평가원)               |
 
