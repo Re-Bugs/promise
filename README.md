@@ -76,7 +76,7 @@
 
 ## 시스템 아키텍쳐
 
-![Architecture](./images/README/Architecture-20240913194248169.png)
+![Architecture](./images/README/Architecture.png)
 
 **웹 서비스는 SSR(Server Side Rendering) 방식**
 
