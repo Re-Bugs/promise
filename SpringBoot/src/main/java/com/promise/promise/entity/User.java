@@ -1,12 +1,19 @@
 package com.promise.promise.entity;
 
+import com.promise.promise.entity.enumeration.NotificationValue;
+import com.promise.promise.entity.enumeration.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
 import org.hibernate.validator.constraints.Range;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Getter
 @Entity
 @Table(name = "users")
-public class Users {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -15,7 +22,7 @@ public class Users {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(name = "user_id", length = 20)
+    @Column(name = "user_id", unique = true, length = 20)
     private String userId;
 
     @Column(name = "user_password", length = 30)
@@ -27,7 +34,7 @@ public class Users {
     @Range(min = 1, max = 130)
     private byte age;
 
-    @Column(name = "nick_name", length = 10)
+    @Column(name = "nick_name", unique = true, length = 10)
     private String nickName;
 
     @NotNull
@@ -35,8 +42,13 @@ public class Users {
     @Column(name = "notification_value")
     private NotificationValue notificationValue;
 
-    @Column(name = "bottle_id")
+    @Column(name = "bottle_id", unique = true)
     private String bottleId;
 
     private String zipcode;
+
+    //User와 Notification은 1:N 관계
+    //한 명의 사용자는 여러 알림을 받을 수 있다.
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY) //연관관계 주인이 아님, 지연로딩
+    private List<Notification> notifications = new ArrayList<>();
 }
