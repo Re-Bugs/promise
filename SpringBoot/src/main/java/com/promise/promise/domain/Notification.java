@@ -1,6 +1,6 @@
-package com.promise.promise.entity;
+package com.promise.promise.domain;
 
-import com.promise.promise.entity.enumeration.DailyDose;
+import com.promise.promise.domain.enumeration.DailyDose;
 import jakarta.persistence.*;
 import lombok.Getter;
 

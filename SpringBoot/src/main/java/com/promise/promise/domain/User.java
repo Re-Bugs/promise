@@ -1,10 +1,10 @@
-package com.promise.promise.entity;
+package com.promise.promise.domain;
 
-import com.promise.promise.entity.enumeration.NotificationValue;
-import com.promise.promise.entity.enumeration.Role;
+import com.promise.promise.domain.enumeration.NotificationValue;
+import com.promise.promise.domain.enumeration.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
+import lombok.*;
 import org.hibernate.validator.constraints.Range;
 
 import java.util.ArrayList;
@@ -13,6 +13,9 @@ import java.util.List;
 @Getter
 @Entity
 @Table(name = "users")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,6 +23,7 @@ public class User {
 
     @NotNull
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role role;
 
     @Column(name = "user_id", unique = true, length = 20)

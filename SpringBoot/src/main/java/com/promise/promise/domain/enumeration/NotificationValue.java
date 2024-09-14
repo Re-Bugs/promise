@@ -1,4 +1,4 @@
-package com.promise.promise.entity.enumeration;
+package com.promise.promise.domain.enumeration;
 
 public enum NotificationValue {
     BOTTLE, APP, MIX, NONE

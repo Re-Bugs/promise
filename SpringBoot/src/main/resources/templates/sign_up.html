@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>회원가입</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h2>회원가입</h2>
+    <form th:action="@{/login/sign_up}" method="post" th:object="${user}">
+        <div class="form-group">
+            <label for="userId">아이디</label>
+            <input type="text" id="userId" th:field="*{userId}" placeholder="아이디 입력">
+        </div>
+        <div class="form-group">
+            <label for="password">비밀번호</label>
+            <input type="password" id="password" th:field="*{userPassword}" placeholder="비밀번호 입력">
+        </div>
+        <div class="form-group">
+            <label for="name">이름</label>
+            <input type="text" id="name" th:field="*{name}" placeholder="이름 입력">
+        </div>
+        <div class="form-group">
+            <label for="age">나이</label>
+            <input type="number" id="age" th:field="*{age}" placeholder="나이 입력">
+        </div>
+        <div class="form-group">
+            <label for="nickName">닉네임</label>
+            <input type="text" id="nickName" th:field="*{nickName}" placeholder="닉네임 입력">
+        </div>
+        <div class="form-group">
+            <label for="notificationValue">알림 값</label>
+            <select id="notificationValue" th:field="*{notificationValue}">
+                <option value="APP">앱</option>
+                <option value="BOTTLE">약통</option>
+                <option value="MIX">혼합</option>
+                <option value="NONE">없음</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="bottleId">약통 아이디</label>
+            <input type="text" id="bottleId" th:field="*{bottleId}" placeholder="약통 아이디 입력">
+        </div>
+        <div class="form-group">
+            <label for="zipcode">우편번호</label>
+            <input type="text" id="zipcode" th:field="*{zipcode}" placeholder="우편번호 입력">
+        </div>
+        <button type="submit">가입하기</button>
+    </form>
+</div>
+</body>
+</html>
