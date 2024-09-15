@@ -36,6 +36,11 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// Google Cloud Vision API 클라이언트 라이브러리
+	implementation 'com.google.cloud:google-cloud-vision:3.34.0'
+	implementation 'org.jsoup:jsoup:1.14.1'
+	implementation 'com.google.code.gson:gson:2.8.6'
 }
 
 tasks.named('test') {

@@ -2,7 +2,8 @@ package com.promise.promise.service;
 
 import com.promise.promise.domain.User;
 import com.promise.promise.repository.UserRepository;
-import com.promise.promise.web.controller.login.LoginDTO;
+import com.promise.promise.web.DTO.LoginDTO;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -31,5 +32,10 @@ public class UserService {
     public Optional<User> findByUserId(String userId)
     {
         return userRepository.findByUserId(userId);
+    }
+
+    public boolean isNickNameExists(@NotBlank(message = "닉네임은 필수 항목입니다.") String nickName)
+    {
+        return userRepository.existsByNickName(nickName);
     }
 }

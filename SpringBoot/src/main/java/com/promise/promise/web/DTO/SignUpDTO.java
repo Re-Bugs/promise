@@ -1,27 +1,27 @@
-package com.promise.promise.web.controller.login;
+package com.promise.promise.web.DTO;
 
 import com.promise.promise.domain.enumeration.NotificationValue;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
 public class SignUpDTO {
 
-    @NotBlank(message = "사용자 ID는 필수 항목입니다.")
+    @Size(min = 3, message = "아이디가 너무 짧습니다.")
+    @NotBlank(message = "아이디는 필수 항목입니다.")
     private String userId;
 
+    @Size(min = 8, message = "비밀번호가 너무 짧습니다.")
     @NotBlank(message = "비밀번호는 필수 항목입니다.")
     private String userPassword;
 
-    @NotBlank(message = "이름은 필수 항목입니다.")
+    @Size(min = 2, max = 5, message = "이름의 길이가 잘못되었습니다.")
+    @NotBlank(message = "이름을 입력해주세요.")
     private String name;
 
-    @Min(value = 1, message = "나이는 1 이상이어야 합니다.")
-    @Max(value = 130, message = "나이는 130 이하여야 합니다.")
+    @Min(value = 14, message = "14세 이상 회원가입 가능합니다.")
+    @Max(value = 130, message = "잘못된 값을 입력했습니다.")
     private byte age;
 
     @NotBlank(message = "닉네임은 필수 항목입니다.")
@@ -31,5 +31,6 @@ public class SignUpDTO {
     private NotificationValue notificationValue;
 
     private String bottleId;
+
     private String zipcode;
 }

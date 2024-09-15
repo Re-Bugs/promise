@@ -61,21 +61,30 @@
             font-size: 14px;
             color: #777;
         }
+        .error-message {
+            color: red;
+        }
+        .success-message {
+            color: green;
+        }
     </style>
 </head>
 
 <body>
 <div class="login-container">
-    <h2>Login</h2>
+    <h2>로그인</h2>
+    <div th:if="${message}" class="success-message" th:text="${message}"></div>
+    <div th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></div>
     <form th:action="@{/login}" th:object="${loginDTO}" method="post">
         <div class="form-group">
-            <input type="text" th:field="*{userId}" placeholder="Username" required />
+            <input type="text" th:field="*{userId}" placeholder="아이디" required />
         </div>
         <div class="form-group">
-            <input type="password" th:field="*{password}" placeholder="Password" required />
+            <input type="password" th:field="*{password}" placeholder="비밀번호" required />
         </div>
-        <button type="submit" class="login-button">Login</button>
-        <a href="#" class="forgot-password">Forgot password?</a>
+        <button type="submit" class="login-button">로그인</button>
+        <a href="#" class="forgot-password">비밀번호를 잊어버렸나요?</a>
+        <a href="/login/sign_up" class="forgot-password">아직 회원가입을 하지 않으셨나요?</a>
     </form>
 </div>
 </body>
