@@ -17,12 +17,6 @@ public class Medicine {
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
-    @Column(name = "primary_code", nullable = false, unique = true, length = 13)
-    private String primaryCode;
-
-    @Column(name = "standard_code", nullable = false, unique = true, length = 13)
-    private String standardCode;
-
     @Column(name = "product_code", unique = true, length = 9)
     private String productCode;
 

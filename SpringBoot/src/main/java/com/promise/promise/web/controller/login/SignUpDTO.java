@@ -8,8 +8,7 @@ import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
+@Getter @Setter
 public class SignUpDTO {
 
     @NotBlank(message = "사용자 ID는 필수 항목입니다.")

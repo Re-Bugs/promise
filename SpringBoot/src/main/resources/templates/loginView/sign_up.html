@@ -38,7 +38,9 @@
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
+            box-sizing: border-box; /* 패딩과 함께 너비를 포함 */
         }
+
         button {
             width: 100%;
             padding: 10px;
@@ -47,6 +49,7 @@
             color: white;
             border-radius: 5px;
             cursor: pointer;
+            box-sizing: border-box; /* 버튼에도 패딩과 함께 너비 포함 */
         }
         button:hover {
             background-color: #45a049;
@@ -79,6 +82,10 @@
             <input type="text" id="nickName" th:field="*{nickName}" placeholder="닉네임 입력">
         </div>
         <div class="form-group">
+            <label for="zipcode">우편번호</label>
+            <input type="text" id="zipcode" th:field="*{zipcode}" placeholder="우편번호 입력">
+        </div>
+        <div class="form-group">
             <label for="notificationValue">알림 값</label>
             <select id="notificationValue" th:field="*{notificationValue}">
                 <option value="APP">앱</option>
@@ -90,10 +97,6 @@
         <div class="form-group">
             <label for="bottleId">약통 아이디</label>
             <input type="text" id="bottleId" th:field="*{bottleId}" placeholder="약통 아이디 입력">
-        </div>
-        <div class="form-group">
-            <label for="zipcode">우편번호</label>
-            <input type="text" id="zipcode" th:field="*{zipcode}" placeholder="우편번호 입력">
         </div>
         <button type="submit">가입하기</button>
     </form>

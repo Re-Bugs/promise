@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            padding-right: 15px; /* 오른쪽에 여유 공간을 추가 */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box; /* padding을 포함해 너비 계산 */
+        }
+
+        .login-button {
+            background-color: #4CAF50; /* 회원가입 버튼과 같은 녹색 */
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            width: 100%;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .login-button:hover {
+            background-color: #45a049; /* hover 시 더 어두운 녹색 */
+        }
+
+        .forgot-password {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+<div class="login-container">
+    <h2>Login</h2>
+    <form th:action="@{/login}" th:object="${loginDTO}" method="post">
+        <div class="form-group">
+            <input type="text" th:field="*{userId}" placeholder="Username" required />
+        </div>
+        <div class="form-group">
+            <input type="password" th:field="*{password}" placeholder="Password" required />
+        </div>
+        <button type="submit" class="login-button">Login</button>
+        <a href="#" class="forgot-password">Forgot password?</a>
+    </form>
+</div>
+</body>
+</html>
