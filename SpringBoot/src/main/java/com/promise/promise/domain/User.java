@@ -35,7 +35,6 @@ public class User {
     @Column(name = "name", nullable = false, length = 30)
     private String name;
 
-    @Range(min = 1, max = 130)
     private byte age;
 
     @Column(name = "nick_name", unique = true, length = 10)
@@ -46,7 +45,7 @@ public class User {
     @Column(name = "notification_value")
     private NotificationValue notificationValue;
 
-    @Column(name = "bottle_id", unique = true)
+    @Column(name = "bottle_id", unique = true, length = 5)
     private String bottleId;
 
     private String zipcode;

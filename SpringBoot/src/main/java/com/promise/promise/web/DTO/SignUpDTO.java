@@ -4,6 +4,7 @@ import com.promise.promise.domain.enumeration.NotificationValue;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.checkerframework.common.aliasing.qual.Unique;
 
 @Getter @Setter
 public class SignUpDTO {
@@ -25,6 +26,8 @@ public class SignUpDTO {
     private byte age;
 
     @NotBlank(message = "닉네임은 필수 항목입니다.")
+    @Unique
+    @Size(min = 2, max = 5, message = "닉네임의 길이는 2 ~ 5 글자입니다.")
     private String nickName;
 
     @NotNull(message = "알림 설정은 필수 항목입니다.")

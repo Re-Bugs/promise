@@ -59,19 +59,16 @@ public class VisionController {
             for (MedicineDTO medicineDTO : validDtoList) {
                 // Notification 객체 생성 및 설정
                 Notification.NotificationBuilder notificationBuilder = Notification.builder();
-
-                // user_id 설정
                 notificationBuilder.user(user);
 
                 // medicine_id 설정 (medicineId를 사용하여 Medicine 조회)
                 Medicine medicine = visionService.getMedicineById(medicineDTO.getMedicineId())
                         .orElseThrow(() -> new IllegalArgumentException("해당 ID의 약물이 존재하지 않습니다: " + medicineDTO.getMedicineId()));
-
                 notificationBuilder.medicine(medicine);
 
                 // daily_dose 설정
                 String dailyDosageTimes = medicineDTO.getDailyDosageTimes();
-                log.info("Daily dosage times: {}", dailyDosageTimes); // 로그 추가
+                log.info("Daily dosage times: {}", dailyDosageTimes);
 
                 // 숫자 문자열을 Enum 값으로 변환하여 저장
                 if ("1".equals(dailyDosageTimes)) {
@@ -86,29 +83,7 @@ public class VisionController {
 
                 // morning, afternoon, evening 설정
                 List<String> mealTimes = medicineDTO.getMealTimes();
-
-                // 각 식사 시간을 분리하여 처리
-                for (String mealTime : mealTimes) {
-                    // 식사 시간이 콤마로 구분되어 있는 경우 이를 분리
-                    String[] meals = mealTime.split(",");
-
-                    // 기본값 설정
-                    notificationBuilder.morning(false);
-                    notificationBuilder.afternoon(false);
-                    notificationBuilder.evening(false);
-
-                    for (String meal : meals) {
-                        if (meal.trim().equals("아침")) {
-                            notificationBuilder.morning(true);
-                        }
-                        if (meal.trim().equals("점심")) {
-                            notificationBuilder.afternoon(true);
-                        }
-                        if (meal.trim().equals("저녁")) {
-                            notificationBuilder.evening(true);
-                        }
-                    }
-                }
+                setNotificationTimes(notificationBuilder, mealTimes);
 
                 // 생성일 설정 (현재 날짜)
                 notificationBuilder.createdAt(LocalDate.now());
@@ -134,6 +109,29 @@ public class VisionController {
             log.error("OCR error = {}", e.getMessage());
         }
         return "redirect:/notification";
+    }
+
+    // Notification 설정
+    private void setNotificationTimes(Notification.NotificationBuilder notificationBuilder, List<String> mealTimes) {
+        // 기본값 설정
+        notificationBuilder.morning(false);
+        notificationBuilder.afternoon(false);
+        notificationBuilder.evening(false);
+
+        // 식사 시간을 분리하여 플래그 설정
+        for (String mealTime : mealTimes) {
+            String[] meals = mealTime.split(",");
+            for (String meal : meals) {
+                meal = meal.trim();  // 공백 제거
+                if (meal.equals("아침")) {
+                    notificationBuilder.morning(true);
+                } else if (meal.equals("점심")) {
+                    notificationBuilder.afternoon(true);
+                } else if (meal.equals("저녁")) {
+                    notificationBuilder.evening(true);
+                }
+            }
+        }
     }
 
     // 약품 코드의 개수를 기준으로 MedicationDTO 리스트 생성
