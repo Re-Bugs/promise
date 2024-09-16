@@ -1,10 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>OCR Result</title>
 </head>
 <body>
-
+<h1>약품 정보</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <th>제품명</th>
+        <th>카테고리</th>
+        <th>총 투약일수</th>
+        <th>하루 복용 횟수</th>
+        <th>식사 시간</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="medicineDTO : ${dtoList}">
+        <td th:text="${medicineDTO.name}"></td>
+        <td th:text="${medicineDTO.category}"></td>
+        <td th:text="${medicineDTO.totalDosageDays}"></td>
+        <td th:text="${medicineDTO.dailyDosageTimes}"></td>
+        <td th:text="${medicineDTO.mealTimes}"></td>
+    </tr>
+    </tbody>
+</table>
 </body>
 </html>

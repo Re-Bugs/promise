@@ -2,14 +2,21 @@ package com.promise.promise.service;
 
 import com.google.cloud.vision.v1.*;
 import com.google.protobuf.ByteString;
+import com.promise.promise.domain.Medicine;
+import com.promise.promise.repository.MedicineRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class VisionService {
+
+    private final MedicineRepository medicineRepository;
 
     public String extractTextFromImage(MultipartFile image) throws Exception {
         return extractText(ByteString.readFrom(image.getInputStream()));
@@ -41,5 +48,14 @@ public class VisionService {
             }
             return stringBuilder.toString();
         }
+    }
+
+    public Optional<Medicine> getMedicineByProductCode(String productCode) {
+        return medicineRepository.findByProductCode(productCode);
+    }
+
+    // ID로 Medicine 객체를 조회하는 메서드
+    public Optional<Medicine> getMedicineById(Long id) {
+        return medicineRepository.findById(id);
     }
 }

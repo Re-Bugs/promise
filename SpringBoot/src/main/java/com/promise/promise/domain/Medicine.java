@@ -23,8 +23,8 @@ public class Medicine {
     @Column(name = "category", length = 20)
     private String category;
 
-    @Column(name = "manufacture", length = 20)
-    private String manufacture;
+    @Column(name = "manufacturer", length = 20)
+    private String manufacturer;
 
     //Medicine 입장에서 Notification은 1:N 관계
     //하나의 약물은 여러 알림에 대응된다.
