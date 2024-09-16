@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -18,6 +19,12 @@ import java.util.Map;
 public class APIUserService {
     private final APIUserRepository apiUserRepository;
 
+    // bottle_id로 유저 찾기
+    public Optional<User> findUserByBottleId(String bottleId) {
+        return apiUserRepository.findByBottleId(bottleId);
+    }
+
+    // 회원 가입 로직 (기존 로직 유지)
     public Map<String, String> signUp(SignUpDTO signUpDTO) {
         Map<String, String> response = new HashMap<>();
         try {
