@@ -12,8 +12,14 @@ import java.util.List;
 public class VisionService {
 
     public String extractTextFromImage(MultipartFile image) throws Exception {
-        ByteString imgBytes = ByteString.readFrom(image.getInputStream());
+        return extractText(ByteString.readFrom(image.getInputStream()));
+    }
 
+    public String extractTextFromFile(MultipartFile file) throws Exception {
+        return extractText(ByteString.copyFrom(file.getBytes()));
+    }
+
+    private String extractText(ByteString imgBytes) throws Exception {
         Image img = Image.newBuilder().setContent(imgBytes).build();
         Feature feat = Feature.newBuilder().setType(Feature.Type.TEXT_DETECTION).build();
         AnnotateImageRequest request = AnnotateImageRequest.newBuilder()
@@ -26,6 +32,7 @@ public class VisionService {
         try (ImageAnnotatorClient client = ImageAnnotatorClient.create()) {
             BatchAnnotateImagesResponse response = client.batchAnnotateImages(requests);
             StringBuilder stringBuilder = new StringBuilder();
+
             for (AnnotateImageResponse res : response.getResponsesList()) {
                 if (res.hasError()) {
                     return "Error: " + res.getError().getMessage();

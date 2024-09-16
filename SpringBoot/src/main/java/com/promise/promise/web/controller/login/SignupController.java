@@ -4,6 +4,7 @@ import com.promise.promise.domain.User;
 import com.promise.promise.domain.enumeration.Role;
 import com.promise.promise.service.UserService;
 import com.promise.promise.web.DTO.SignUpDTO;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +20,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Slf4j
 @Controller
 @RequestMapping("/login")
+@RequiredArgsConstructor
 public class SignupController {
 
     private final UserService userService;
-
-    @Autowired
-    public SignupController(UserService userService) {
-        this.userService = userService;
-    }
 
     @GetMapping(value = "/sign_up")
     public String signUp(Model model) {
