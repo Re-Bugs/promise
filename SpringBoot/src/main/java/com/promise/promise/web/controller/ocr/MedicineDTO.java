@@ -14,8 +14,4 @@ public class MedicineDTO {
     private String totalDosageDays;
     private String dailyDosageTimes;
     private List<String> mealTimes;
-
-    // 추가할 필드
-    private String name;
-    private String category;
 }

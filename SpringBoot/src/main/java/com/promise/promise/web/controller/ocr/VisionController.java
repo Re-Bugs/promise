@@ -1,7 +1,13 @@
 package com.promise.promise.web.controller.ocr;
 
 import com.promise.promise.domain.Medicine;
+import com.promise.promise.domain.Notification;
+import com.promise.promise.domain.User;
+import com.promise.promise.domain.enumeration.DailyDose;
+import com.promise.promise.service.NotificationService;
 import com.promise.promise.service.VisionService;
+import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,9 +27,11 @@ import java.util.regex.Pattern;
 @Slf4j
 @Controller
 @RequestMapping("ocr")
+@RequiredArgsConstructor
 public class VisionController {
 
     private final VisionService visionService;
+    private final NotificationService notificationService;
 
     // 정규식 패턴을 클래스 레벨에서 미리 컴파일하여 재사용
     private static final Pattern NINE_DIGIT_PATTERN = Pattern.compile("\\b\\d{9}\\b");
@@ -32,45 +41,99 @@ public class VisionController {
     private static final Pattern DAY_NUMBER_PATTERN = Pattern.compile("하루\\s*(1|2|3)\\s*[회번]");
     private static final Pattern MEAL_PATTERN = Pattern.compile("(아침|점심|저녁)");
 
-    public VisionController(VisionService visionService) {
-        this.visionService = visionService;
-    }
-
     @GetMapping("/upload")
     public String showUploadForm() {
         return "ocr/upload";
     }
 
     @PostMapping("/extract-text")
-    public String extractTextFromImage(MultipartFile file, Model model, RedirectAttributes redirectAttributes) {
+    public String extractTextFromImage(MultipartFile file, Model model, RedirectAttributes redirectAttributes, HttpSession session) {
         try {
             String extractedText = visionService.extractTextFromImage(file);
             List<MedicationDTO> dtoList = buildMedicationDtoList(extractedText);
+            List<MedicineDTO> validDtoList = filterAndBuildValidDtoList(dtoList, session);
 
-            List<MedicineDTO> validDtoList = filterAndBuildValidDtoList(dtoList);
-            redirectAttributes.addFlashAttribute("dtoList", validDtoList);  // redirect 시 FlashAttribute로 데이터 전달
+            // 세션에서 유저 정보를 가져옴
+            User user = (User) session.getAttribute("user");
+
+            for (MedicineDTO medicineDTO : validDtoList) {
+                // Notification 객체 생성 및 설정
+                Notification.NotificationBuilder notificationBuilder = Notification.builder();
+
+                // user_id 설정
+                notificationBuilder.user(user);
+
+                // medicine_id 설정 (medicineId를 사용하여 Medicine 조회)
+                Medicine medicine = visionService.getMedicineById(medicineDTO.getMedicineId())
+                        .orElseThrow(() -> new IllegalArgumentException("해당 ID의 약물이 존재하지 않습니다: " + medicineDTO.getMedicineId()));
+
+                notificationBuilder.medicine(medicine);
+
+                // daily_dose 설정
+                String dailyDosageTimes = medicineDTO.getDailyDosageTimes();
+                log.info("Daily dosage times: {}", dailyDosageTimes); // 로그 추가
+
+                // 숫자 문자열을 Enum 값으로 변환하여 저장
+                if ("1".equals(dailyDosageTimes)) {
+                    notificationBuilder.dailyDose(DailyDose.one);
+                } else if ("2".equals(dailyDosageTimes)) {
+                    notificationBuilder.dailyDose(DailyDose.two);
+                } else if ("3".equals(dailyDosageTimes)) {
+                    notificationBuilder.dailyDose(DailyDose.three);
+                } else {
+                    throw new IllegalArgumentException("Invalid daily dosage times: " + dailyDosageTimes);
+                }
+
+                // morning, afternoon, evening 설정
+                List<String> mealTimes = medicineDTO.getMealTimes();
+
+                // 각 식사 시간을 분리하여 처리
+                for (String mealTime : mealTimes) {
+                    // 식사 시간이 콤마로 구분되어 있는 경우 이를 분리
+                    String[] meals = mealTime.split(",");
+
+                    // 기본값 설정
+                    notificationBuilder.morning(false);
+                    notificationBuilder.afternoon(false);
+                    notificationBuilder.evening(false);
+
+                    for (String meal : meals) {
+                        if (meal.trim().equals("아침")) {
+                            notificationBuilder.morning(true);
+                        }
+                        if (meal.trim().equals("점심")) {
+                            notificationBuilder.afternoon(true);
+                        }
+                        if (meal.trim().equals("저녁")) {
+                            notificationBuilder.evening(true);
+                        }
+                    }
+                }
+
+                // 생성일 설정 (현재 날짜)
+                notificationBuilder.createdAt(LocalDate.now());
+
+                // 재처방일 설정 (현재 날짜 + totalDosageDays)
+                int totalDosageDays = Integer.parseInt(medicineDTO.getTotalDosageDays());
+                notificationBuilder.renewalDate(LocalDate.now().plusDays(totalDosageDays));
+
+                // 남은 약물 수 설정
+                notificationBuilder.remainingDose((short) totalDosageDays);
+
+                // total 설정 (총 투약일수)
+                notificationBuilder.total((short) totalDosageDays);
+
+                // 알림 객체 저장
+                Notification notification = notificationBuilder.build();
+                notificationService.save(notification);
+            }
+
+            redirectAttributes.addFlashAttribute("dtoList", validDtoList);
         } catch (Exception e) {
             redirectAttributes.addAttribute("errorMessage", "오류가 발생했습니다. 다시 시도해 주세요.");
             log.error("OCR error = {}", e.getMessage());
         }
-        return "redirect:/ocr/result";  // forward 대신 redirect 사용
-    }
-
-    @GetMapping("/result")
-    public String showResult(Model model) {
-        List<MedicineDTO> dtoList = (List<MedicineDTO>) model.getAttribute("dtoList");
-
-        if (dtoList != null && !dtoList.isEmpty()) {
-            for (MedicineDTO dto : dtoList) {
-                Optional<Medicine> medicine = visionService.getMedicineById(dto.getMedicineId());
-                medicine.ifPresent(med -> {
-                    dto.setName(med.getName());
-                    dto.setCategory(med.getCategory());
-                });
-            }
-            model.addAttribute("dtoList", dtoList);
-        }
-        return "ocr/result";
+        return "redirect:/notification";
     }
 
     // 약품 코드의 개수를 기준으로 MedicationDTO 리스트 생성
@@ -105,7 +168,7 @@ public class VisionController {
     }
 
     // MedicationDTO 리스트를 기반으로 값이 누락되지 않은 DTO 객체만 필터링
-    private List<MedicineDTO> filterAndBuildValidDtoList(List<MedicationDTO> dtoList) {
+    private List<MedicineDTO> filterAndBuildValidDtoList(List<MedicationDTO> dtoList, HttpSession session) {
         List<MedicineDTO> validDtoList = new ArrayList<>();
         for (MedicationDTO dto : dtoList) {
             if (isValidDto(dto)) {
@@ -115,11 +178,9 @@ public class VisionController {
                             med.getId(),
                             dto.getTotalDosageDays(),
                             dto.getDailyDosageTimes(),
-                            dto.getMealTimes(),
-                            med.getName(),
-                            med.getCategory()
+                            dto.getMealTimes()
                     );
-                    logDto(medicineDTO);
+                    logDto(medicineDTO, session);
                     validDtoList.add(medicineDTO);
                 });
             }
@@ -134,7 +195,10 @@ public class VisionController {
                 dto.getMealTimes() != null && !dto.getMealTimes().isEmpty();
     }
 
-    private void logDto(MedicineDTO dto) {
+    private void logDto(MedicineDTO dto, HttpSession session) {
+        User user = (User)session.getAttribute("user");
+        log.info("---------------add Medicine---------------");
+        log.info("user Absolute ID: {}", user.getId());
         log.info("Medicine ID: {}", dto.getMedicineId());
         log.info("Total Dosage Days: {}", dto.getTotalDosageDays());
         log.info("Daily Dosage Times: {}", dto.getDailyDosageTimes());

@@ -2,28 +2,56 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>OCR Result</title>
+    <script>
+        // 전체 체크박스 처리 함수
+        function toggle(source) {
+            const checkboxes = document.getElementsByName('selectedMedicine');
+            for (let i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = source.checked;
+            }
+        }
+
+        // 개별 체크박스가 모두 선택되었는지 확인하는 함수
+        function checkIndividual() {
+            const checkboxes = document.getElementsByName('selectedMedicine');
+            const selectAll = document.getElementById('selectAll');
+            let allChecked = true;
+            for (let i = 0; i < checkboxes.length; i++) {
+                if (!checkboxes[i].checked) {
+                    allChecked = false;
+                    break;
+                }
+            }
+            selectAll.checked = allChecked;
+        }
+    </script>
 </head>
 <body>
 <h1>약품 정보</h1>
-<table border="1">
-    <thead>
-    <tr>
-        <th>제품명</th>
-        <th>카테고리</th>
-        <th>총 투약일수</th>
-        <th>하루 복용 횟수</th>
-        <th>식사 시간</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="medicineDTO : ${dtoList}">
-        <td th:text="${medicineDTO.name}"></td>
-        <td th:text="${medicineDTO.category}"></td>
-        <td th:text="${medicineDTO.totalDosageDays}"></td>
-        <td th:text="${medicineDTO.dailyDosageTimes}"></td>
-        <td th:text="${medicineDTO.mealTimes}"></td>
-    </tr>
-    </tbody>
-</table>
+<form method="post" action="/submit-medicines">
+    <table border="1">
+        <thead>
+        <tr>
+            <th><input type="checkbox" id="selectAll" onclick="toggle(this)"/></th>
+            <th>카테고리</th>
+            <th>제품명</th>
+            <th>총 투약일수</th>
+            <th>하루 복용 횟수</th>
+            <th>복용 시간</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="medicineDTO : ${dtoList}">
+            <td><input type="checkbox" name="selectedMedicine" th:value="${medicineDTO.medicineId}" onclick="checkIndividual()"/></td>
+            <td th:text="${medicineDTO.category}"></td>
+            <td th:text="${medicineDTO.name}"></td>
+            <td th:text="${medicineDTO.totalDosageDays}"></td>
+            <td th:text="${medicineDTO.dailyDosageTimes}"></td>
+            <td th:text="${medicineDTO.mealTimes}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <button type="submit">알림 생성</button>
+</form>
 </body>
 </html>

@@ -2,7 +2,7 @@ package com.promise.promise.domain;
 
 import com.promise.promise.domain.enumeration.DailyDose;
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -11,6 +11,9 @@ import java.util.List;
 @Getter
 @Entity
 @Table(name = "notifications")
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,6 +42,7 @@ public class Notification {
     @Column(name = "renewal_date")
     private LocalDate renewalDate;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "daily_dose", nullable = false)
     private DailyDose dailyDose;
 
