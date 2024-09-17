@@ -65,7 +65,7 @@
 </head>
 <body>
 <div class="container">
-  <h1>회원가입 TEST 화면</h1>
+  <h1>TEST를 위한 회원가입</h1>
 
   <!-- 회원가입 폼 -->
   <div class="message" th:if="${message}">
@@ -83,10 +83,12 @@
     <input type="submit" value="회원가입">
   </form>
 
-
+  <br>
+  <br>
+  <br>
 
   <!-- 로그인 폼 -->
-  <h2>로그인 TEST 화면</h2>
+  <h2>TEST를 위한 복용기록 조회</h2>
   <div class="message" th:if="${loginErrorMessage}">
     <p th:text="${loginErrorMessage}"></p>
   </div>
@@ -95,7 +97,7 @@
       <label for="loginBottleId">스마트 약통 코드번호</label>
       <input type="text" id="loginBottleId" name="bottleId" placeholder="약통 코드를 입력해주세요." required>
     </div>
-    <input type="submit" value="로그인">
+    <input type="submit" value="확인">
   </form>
 </div>
 </body>

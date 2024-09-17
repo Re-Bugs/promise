@@ -1,0 +1,13 @@
+services:
+  promise:
+    image: leesw0924/promise
+    platform: linux/amd64
+    ports:
+      - "80:8080"
+    depends_on: []
+    networks:
+      - promise-network
+
+networks:
+  promise-network:
+    driver: bridge

@@ -89,7 +89,7 @@ public class MedicationLogService {
                 }
             }
 
-            return "Your medication history has been updated successfully.";
+            return "success";
         } else {
             log.warn("User not found with bottleId: {}", bottleId);
             return "bottleId not found.";
