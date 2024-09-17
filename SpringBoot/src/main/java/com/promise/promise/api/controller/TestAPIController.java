@@ -2,6 +2,7 @@ package com.promise.promise.api.controller;
 
 import com.promise.promise.api.DTO.SignUpDTO;
 import com.promise.promise.api.service.UserAPIService;
+import com.promise.promise.domain.MedicationLog;
 import com.promise.promise.domain.Notification;
 import com.promise.promise.domain.User;
 import jakarta.validation.Valid;
@@ -62,9 +63,11 @@ public class TestAPIController {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             List<Notification> notifications = userAPIService.findNotificationsByUser(user);  // 사용자 기반으로 알림 조회
+            List<MedicationLog> medicationLogs = userAPIService.findMedicationLogsByUser(user);  // 사용자 기반으로 복용 기록 조회
 
             model.addAttribute("user", user);  // 사용자 정보 전달
             model.addAttribute("notifications", notifications);  // 알림 정보 전달
+            model.addAttribute("medicationLogs", medicationLogs);  // 복용 기록 정보 전달
         } else {
             model.addAttribute("errorMessage", "사용자를 찾을 수 없습니다.");
         }

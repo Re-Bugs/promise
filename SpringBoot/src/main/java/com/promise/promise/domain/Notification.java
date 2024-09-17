@@ -70,4 +70,8 @@ public class Notification {
         this.user = user;
         user.getNotifications().add(this);
     }
+
+    public void setRemainingDose(short remainingDose) {
+        this.remainingDose = remainingDose;
+    }
 }

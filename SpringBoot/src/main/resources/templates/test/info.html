@@ -71,6 +71,27 @@
             </tbody>
         </table>
     </div>
+
+    <h2>Medication Log</h2>
+    <div class="scrollable-table">
+        <table>
+            <thead>
+            <tr>
+                <th>복용 약품</th>
+                <th>복용 시간</th>
+                <th>복용 상태</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="log : ${medicationLogs}">
+                <td th:text="${log.notification.medicine.name}"></td> <!-- 알림에서 약품 이름을 가져옴 -->
+                <td th:text="${#temporals.format(log.time, 'yyyy-MM-dd HH:mm')}"></td>
+                <td th:text="${log.status} ? '복용 완료' : '미복용'"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
 </div>
 
 </body>

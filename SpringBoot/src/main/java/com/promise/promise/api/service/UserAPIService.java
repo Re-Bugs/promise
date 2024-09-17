@@ -1,8 +1,10 @@
 package com.promise.promise.api.service;
 
 import com.promise.promise.api.DTO.SignUpDTO;
+import com.promise.promise.api.repository.MedicationLogRepository;
 import com.promise.promise.api.repository.NotificationAPIRepository;
 import com.promise.promise.api.repository.UserAPIRepository;
+import com.promise.promise.domain.MedicationLog;
 import com.promise.promise.domain.Notification;
 import com.promise.promise.domain.User;
 import com.promise.promise.domain.enumeration.NotificationValue;
@@ -22,6 +24,7 @@ import java.util.Optional;
 public class UserAPIService {
     private final UserAPIRepository userApiRepository;
     private final NotificationAPIRepository notificationAPIRepository;
+    private final MedicationLogRepository medicationLogRepository;
 
     // 모든 유저 정보 가져오기
     public List<User> getAllUsers() {
@@ -46,6 +49,11 @@ public class UserAPIService {
     // bottle_id로 유저 찾기
     public Optional<User> findUserByBottleId(String bottleId) {
         return userApiRepository.findByBottleId(bottleId);
+    }
+
+    // User 기반으로 복용 기록 조회
+    public List<MedicationLog> findMedicationLogsByUser(User user) {
+        return medicationLogRepository.findByUser(user);  // 사용자 기반으로 복용 기록 조회
     }
 
     // 회원 가입 로직 (기존 로직 유지)
@@ -103,4 +111,6 @@ public class UserAPIService {
         if(user.isPresent()) return true;
         else return false;
     }
+
+
 }

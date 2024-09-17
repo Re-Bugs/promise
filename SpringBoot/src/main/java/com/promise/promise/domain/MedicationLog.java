@@ -1,13 +1,16 @@
 package com.promise.promise.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Entity
+@Builder
 @Table(name = "medication_log")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class MedicationLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
