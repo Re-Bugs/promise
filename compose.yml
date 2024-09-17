@@ -7,6 +7,8 @@ services:
     depends_on: []
     networks:
       - promise-network
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/home/ubuntu/promise/promise-435018-10ecba9c1524.json
 
 networks:
   promise-network:
