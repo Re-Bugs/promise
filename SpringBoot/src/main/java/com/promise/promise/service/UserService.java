@@ -41,21 +41,4 @@ public class UserService {
     {
         return userRepository.existsByNickName(nickName);
     }
-
-
-
-
-    public String apiSignUp(SignUpDTO signUpDTO) {
-        // 기본값 설정
-        User user = User.builder()
-                .role(Role.user)  // 기본값: user
-                .name(signUpDTO.getName())
-                .notificationValue(NotificationValue.bottle) // 기본값: bottle
-                .bottleId(signUpDTO.getBottleId())
-                .build();
-
-        userRepository.save(user); // DB에 저장
-
-        return "success";
-    }
 }

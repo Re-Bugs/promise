@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up & Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #333;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #555;
+      font-weight: bold;
+    }
+    input[type="text"], input[type="submit"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    input[type="submit"] {
+      background-color: #4CAF50;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    input[type="submit"]:hover {
+      background-color: #45a049;
+    }
+    .message {
+      color: red;
+      text-align: center;
+      margin-top: 10px;
+    }
+    .form-divider {
+      margin: 30px 0;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>회원가입 TEST 화면</h1>
+
+  <!-- 회원가입 폼 -->
+  <div class="message" th:if="${message}">
+    <p th:text="${message}"></p>
+  </div>
+  <form th:action="@{/test}" th:object="${signUpDTO}" method="post">
+    <div class="form-group">
+      <label for="name">이름</label>
+      <input type="text" th:field="*{name}" id="name" placeholder="이름을 입력해주세요." required>
+    </div>
+    <div class="form-group">
+      <label for="bottleId">스마트 약통 코드번호</label>
+      <input type="text" th:field="*{bottleId}" id="bottleId" placeholder="스마트 약통의 고유번호를 입력해주세요." required>
+    </div>
+    <input type="submit" value="회원가입">
+  </form>
+
+
+
+  <!-- 로그인 폼 -->
+  <h2>로그인 TEST 화면</h2>
+  <div class="message" th:if="${loginErrorMessage}">
+    <p th:text="${loginErrorMessage}"></p>
+  </div>
+  <form th:action="@{/test/login}" method="post">
+    <div class="form-group">
+      <label for="loginBottleId">스마트 약통 코드번호</label>
+      <input type="text" id="loginBottleId" name="bottleId" placeholder="약통 코드를 입력해주세요." required>
+    </div>
+    <input type="submit" value="로그인">
+  </form>
+</div>
+</body>
+</html>

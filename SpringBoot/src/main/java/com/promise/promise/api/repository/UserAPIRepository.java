@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface APIUserRepository extends JpaRepository<User, Long> {
+public interface UserAPIRepository extends JpaRepository<User, Long> {
     Optional<User> findByBottleId(String bottleId);  // bottle_id로 사용자 찾기
+
+
 }

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User and Notification Info</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+        }
+        .scrollable-table {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>User Notifications</h1>
+
+    <h2>User Info</h2>
+    <p><strong>Name:</strong> <span th:text="${user.name}"></span></p>
+    <p><strong>Bottle ID:</strong> <span th:text="${user.bottleId}"></span></p>
+
+    <h2>Notification List</h2>
+    <div class="scrollable-table">
+        <table>
+            <thead>
+            <tr>
+                <th>약품 이름</th>
+                <th>하루 몇회</th>
+                <th>남은 약품 수</th>
+                <th>재처방일</th>
+                <th>아침</th>
+                <th>점심</th>
+                <th>저녁</th>
+                <th>추가일</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="notification : ${notifications}">
+                <td th:text="${notification.medicine.name}"></td>
+                <td th:text="${notification.dailyDose}"></td>
+                <td th:text="${notification.remainingDose}"></td>
+                <td th:text="${notification.renewalDate}"></td>
+                <td th:text="${notification.morning} ? 'Yes' : 'No'"></td>
+                <td th:text="${notification.afternoon} ? 'Yes' : 'No'"></td>
+                <td th:text="${notification.evening} ? 'Yes' : 'No'"></td>
+                <td th:text="${#temporals.format(notification.createdAt, 'yyyy-MM-dd')}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

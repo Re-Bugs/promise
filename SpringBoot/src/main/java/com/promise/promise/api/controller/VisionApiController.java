@@ -1,6 +1,6 @@
 package com.promise.promise.api.controller;
 
-import com.promise.promise.api.service.APIUserService;
+import com.promise.promise.api.service.UserAPIService;
 import com.promise.promise.domain.Medicine;
 import com.promise.promise.domain.Notification;
 import com.promise.promise.domain.User;
@@ -31,7 +31,7 @@ public class VisionApiController {
 
     private final VisionService visionService;
     private final NotificationService notificationService;
-    private final APIUserService userService; // 유저를 조회할 서비스 추가
+    private final UserAPIService userService; // 유저를 조회할 서비스 추가
 
     // 정규식 패턴을 클래스 레벨에서 미리 컴파일하여 재사용
     private static final Pattern NINE_DIGIT_PATTERN = Pattern.compile("\\b\\d{9}\\b");
