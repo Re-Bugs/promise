@@ -23,38 +23,37 @@ public class MainAPIController {
     private final UserAPIService userApiService;
 
     @PostMapping("/dosage/{bottleId}")
-    public ResponseEntity<Map<String, String>> updateMedicationStatusByBottleId(@PathVariable String bottleId) {
+    public ResponseEntity<Map<String, String>> updateMedicationStatusByBottleId(@PathVariable String bottleId)
+    {
         String responseMessage = medicationLogService.updateMedicationStatusByBottleId(bottleId);
 
         // JSON 응답을 위한 Map 생성
         Map<String, String> response = new HashMap<>();
         response.put("message", responseMessage);
 
-        if (responseMessage.equals("You already have a history of taking it at that time.")) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(response); // 409 Conflict
-        } else if (responseMessage.equals("bottleId not found.")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response); // 404 Not Found
-        } else {
-            return ResponseEntity.status(HttpStatus.OK).body(response); // 200 OK
-        }
+        if (responseMessage.equals("Duplication Dose")) return ResponseEntity.status(HttpStatus.CONFLICT).body(response); // 409 Conflict
+        else if (responseMessage.equals("bottleId not found.")) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response); // 404 Not Found
+        else return ResponseEntity.status(HttpStatus.OK).body(response); // 200 OK
     }
 
     @GetMapping("/lookup/{bottleId}")
-    public ResponseEntity<Map<String, Object>> getMedicineData(@PathVariable String bottleId) {
+    public ResponseEntity<Map<String, Object>> getMedicineData(@PathVariable String bottleId)
+    {
         Map<String, Object> response = new HashMap<>();
 
         // bottleId로 유저 정보 가져오기
         User user = userApiService.findUserByBottleId(bottleId).orElse(null);
 
-        if (user == null) {
+        if (user == null)
+        {
             response.put("message", "User not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
         // 사용자의 Notification 정보 가져오기
         List<Notification> notifications = userApiService.findNotificationsByUser(user);
-
-        if (notifications.isEmpty()) {
+        if (notifications.isEmpty())
+        {
             response.put("message", "No notifications found for this user");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }

@@ -23,40 +23,12 @@ public class MedicationLogService {
     private final MedicationLogRepository medicationLogRepository;
     private final UserAPIRepository userAPIRepository;
 
-    // 시간대 판단 로직
-    private String determineTimePeriod(LocalDateTime currentTime) {
-        if (currentTime.getHour() >= 4 && currentTime.getHour() <= 10) {
-            return "morning";
-        } else if (currentTime.getHour() > 10 && currentTime.getHour() <= 15) {
-            return "afternoon";
-        } else {
-            return "evening";
-        }
-    }
-
-    // 같은 시간대에 이미 복용 기록이 있는지 확인하는 메서드
-    private boolean hasMedicationLogForSamePeriod(User user, Notification notification, String timePeriod, LocalDateTime currentTime) {
-        LocalDate today = currentTime.toLocalDate();
-        List<MedicationLog> logs = medicationLogRepository.findByUserAndNotificationAndTimeBetween(
-                user,
-                notification,
-                today.atStartOfDay(),
-                today.plusDays(1).atStartOfDay()
-        );
-
-        // 같은 시간대에 복용 기록이 있는지 확인
-        for (MedicationLog log : logs) {
-            if (determineTimePeriod(log.getTime()).equals(timePeriod)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     // bottleId로 유저 찾고 복용 상태 업데이트
-    public String updateMedicationStatusByBottleId(String bottleId) {
+    public String updateMedicationStatusByBottleId(String bottleId)
+    {
         Optional<User> userOptional = userAPIRepository.findByBottleId(bottleId);
-        if (userOptional.isPresent()) {
+        if (userOptional.isPresent())
+        {
             User user = userOptional.get();
             LocalDateTime currentTime = LocalDateTime.now();
             String timePeriod = determineTimePeriod(currentTime);
@@ -64,15 +36,15 @@ public class MedicationLogService {
             // 현재 사용자의 알림만 조회
             List<Notification> notifications = notificationAPIRepository.findByUser(user);
 
-            for (Notification notification : notifications) {
+            for (Notification notification : notifications)
+            {
                 if ((timePeriod.equals("morning") && Boolean.TRUE.equals(notification.getMorning()))
                         || (timePeriod.equals("afternoon") && Boolean.TRUE.equals(notification.getAfternoon()))
-                        || (timePeriod.equals("evening") && Boolean.TRUE.equals(notification.getEvening()))) {
+                        || (timePeriod.equals("evening") && Boolean.TRUE.equals(notification.getEvening())))
+                {
 
                     // 같은 시간대에 복용 기록이 있는지 확인
-                    if (hasMedicationLogForSamePeriod(user, notification, timePeriod, currentTime)) {
-                        return "You already have a history of taking it at that time.";  // 중복 복용 거절 메시지
-                    }
+                    if (hasMedicationLogForSamePeriod(user, notification, timePeriod, currentTime)) return "Duplication Dose";  // 중복 복용 거절 메시지
 
                     // 남은 약물 수 감소
                     notification.setRemainingDose((short) (notification.getRemainingDose() - 1));
@@ -90,9 +62,37 @@ public class MedicationLogService {
             }
 
             return "success";
-        } else {
+        }
+        else
+        {
             log.warn("User not found with bottleId: {}", bottleId);
             return "bottleId not found.";
         }
+    }
+
+    // 시간대 판단 로직
+    private String determineTimePeriod(LocalDateTime currentTime) {
+        if (currentTime.getHour() >= 4 && currentTime.getHour() <= 10) return "morning";
+        else if (currentTime.getHour() > 10 && currentTime.getHour() <= 15) return "afternoon";
+        else return "evening";
+    }
+
+    // 같은 시간대에 이미 복용 기록이 있는지 확인하는 메서드
+    private boolean hasMedicationLogForSamePeriod(User user, Notification notification, String timePeriod, LocalDateTime currentTime)
+    {
+        LocalDate today = currentTime.toLocalDate();
+        List<MedicationLog> logs = medicationLogRepository.findByUserAndNotificationAndTimeBetween(
+                user,
+                notification,
+                today.atStartOfDay(),
+                today.plusDays(1).atStartOfDay()
+        );
+
+        // 같은 시간대에 복용 기록이 있는지 확인
+        for (MedicationLog log : logs)
+        {
+            if (determineTimePeriod(log.getTime()).equals(timePeriod)) return true;
+        }
+        return false;
     }
 }

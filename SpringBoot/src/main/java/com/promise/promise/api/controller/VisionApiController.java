@@ -43,22 +43,21 @@ public class VisionApiController {
 
     // API로 사진 파일을 전송받아 처리, bottleId를 쿼리 파라미터로 받음
     @PostMapping("/extract-text")
-    public ResponseEntity<Map<String, Object>> extractTextFromImage(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("bottleId") String bottleId) {
+    public ResponseEntity<Map<String, Object>> extractTextFromImage(@RequestParam("file") MultipartFile file, @RequestParam("bottleId") String bottleId)
+    {
 
         Map<String, Object> response = new HashMap<>();
         try {
             // bottleId로 사용자 조회
-            User user = userService.findUserByBottleId(bottleId)
-                    .orElseThrow(() -> new IllegalArgumentException("해당 bottleId로 사용자를 찾을 수 없습니다: " + bottleId));
+            User user = userService.findUserByBottleId(bottleId).orElseThrow(() -> new IllegalArgumentException("해당 bottleId로 사용자를 찾을 수 없습니다: " + bottleId));
 
             // 이미지에서 텍스트 추출
             String extractedText = visionService.extractTextFromImage(file);
             List<MedicationDTO> dtoList = buildMedicationDtoList(extractedText);
             List<MedicineDTO> validDtoList = filterAndBuildValidDtoList(dtoList, user);
 
-            for (MedicineDTO medicineDTO : validDtoList) {
+            for (MedicineDTO medicineDTO : validDtoList)
+            {
                 // Notification 객체 생성 및 설정
                 Notification.NotificationBuilder notificationBuilder = Notification.builder();
                 notificationBuilder.user(user);
@@ -73,15 +72,10 @@ public class VisionApiController {
                 log.info("Daily dosage times: {}", dailyDosageTimes);
 
                 // 숫자 문자열을 Enum 값으로 변환하여 저장
-                if ("1".equals(dailyDosageTimes)) {
-                    notificationBuilder.dailyDose(DailyDose.one);
-                } else if ("2".equals(dailyDosageTimes)) {
-                    notificationBuilder.dailyDose(DailyDose.two);
-                } else if ("3".equals(dailyDosageTimes)) {
-                    notificationBuilder.dailyDose(DailyDose.three);
-                } else {
-                    throw new IllegalArgumentException("Invalid daily dosage times: " + dailyDosageTimes);
-                }
+                if ("1".equals(dailyDosageTimes)) notificationBuilder.dailyDose(DailyDose.one);
+                else if ("2".equals(dailyDosageTimes)) notificationBuilder.dailyDose(DailyDose.two);
+                else if ("3".equals(dailyDosageTimes)) notificationBuilder.dailyDose(DailyDose.three);
+                else throw new IllegalArgumentException("Invalid daily dosage times: " + dailyDosageTimes); //1~3 값이 아니면 오류 발생
 
                 // morning, afternoon, evening 설정
                 List<String> mealTimes = medicineDTO.getMealTimes();
@@ -107,32 +101,32 @@ public class VisionApiController {
 
             response.put("status", "success");
             response.put("data", validDtoList);
+
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             response.put("message", "fail");
-            response.put("errorMessage", "오류가 발생했습니다. 다시 시도해 주세요.");
             log.error("OCR error = {}", e.getMessage());
             return ResponseEntity.status(500).body(response);
         }
     }
 
     // Notification 설정
-    private void setNotificationTimes(Notification.NotificationBuilder notificationBuilder, List<String> mealTimes) {
+    private void setNotificationTimes(Notification.NotificationBuilder notificationBuilder, List<String> mealTimes)
+    {
         notificationBuilder.morning(false);
         notificationBuilder.afternoon(false);
         notificationBuilder.evening(false);
 
-        for (String mealTime : mealTimes) {
+        for (String mealTime : mealTimes)
+        {
             String[] meals = mealTime.split(",");
-            for (String meal : meals) {
+            for (String meal : meals)
+            {
                 meal = meal.trim();
-                if (meal.equals("아침")) {
-                    notificationBuilder.morning(true);
-                } else if (meal.equals("점심")) {
-                    notificationBuilder.afternoon(true);
-                } else if (meal.equals("저녁")) {
-                    notificationBuilder.evening(true);
-                }
+                if (meal.equals("아침")) notificationBuilder.morning(true);
+                else if (meal.equals("점심")) notificationBuilder.afternoon(true);
+                else if (meal.equals("저녁")) notificationBuilder.evening(true);
             }
         }
     }
@@ -148,7 +142,8 @@ public class VisionApiController {
         List<MedicationDTO> dtoList = new ArrayList<>();
         int size = nineDigitNumbers.size();
 
-        for (int i = 0; i < size; ++i) {
+        for (int i = 0; i < size; i++)
+        {
             MedicationDTO dto = new MedicationDTO();
             dto.setMedicationCode(nineDigitNumbers.get(i));
 
@@ -163,10 +158,13 @@ public class VisionApiController {
     }
 
     // 필터링된 MedicationDTO 리스트 생성
-    private List<MedicineDTO> filterAndBuildValidDtoList(List<MedicationDTO> dtoList, User user) {
+    private List<MedicineDTO> filterAndBuildValidDtoList(List<MedicationDTO> dtoList, User user)
+    {
         List<MedicineDTO> validDtoList = new ArrayList<>();
-        for (MedicationDTO dto : dtoList) {
-            if (isValidDto(dto)) {
+        for (MedicationDTO dto : dtoList)
+        {
+            if (isValidDto(dto))
+            {
                 Optional<Medicine> medicine = visionService.getMedicineByProductCode(dto.getMedicationCode());
                 medicine.ifPresent(med -> {
                     MedicineDTO medicineDTO = new MedicineDTO(
@@ -184,14 +182,16 @@ public class VisionApiController {
     }
 
     // 기타 메서드
-    private boolean isValidDto(MedicationDTO dto) {
+    private boolean isValidDto(MedicationDTO dto)
+    {
         return dto.getMedicationCode() != null &&
                 dto.getTotalDosageDays() != null &&
                 dto.getDailyDosageTimes() != null &&
                 dto.getMealTimes() != null && !dto.getMealTimes().isEmpty();
     }
 
-    private void logDto(MedicineDTO dto, User user) {
+    private void logDto(MedicineDTO dto, User user)
+    {
         log.info("---------------add Medicine---------------");
         log.info("user Absolute ID: {}", user.getId());
         log.info("Medicine ID: {}", dto.getMedicineId());
@@ -201,67 +201,64 @@ public class VisionApiController {
     }
 
     // 추출 메서드
-    private List<String> extractNineDigitNumbers(String text) {
+    private List<String> extractNineDigitNumbers(String text)
+    {
         List<String> nineDigitNumbers = new ArrayList<>();
         Matcher betweenMatcher = BETWEEN_PATTERN.matcher(text);
-        if (betweenMatcher.find()) {
+        if (betweenMatcher.find())
+        {
             String betweenWords = betweenMatcher.group(1);
             Matcher matcher = NINE_DIGIT_PATTERN.matcher(betweenWords);
-            while (matcher.find()) {
-                nineDigitNumbers.add(matcher.group());
-            }
+            while (matcher.find()) nineDigitNumbers.add(matcher.group());
         }
         return nineDigitNumbers;
     }
 
-    public List<String> extractValidTwoDigitNumbers(String text) {
+    public List<String> extractValidTwoDigitNumbers(String text)
+    {
         List<String> validNumbers = new ArrayList<>();
         Matcher betweenMatcher = BETWEEN_PATTERN.matcher(text);
-        if (betweenMatcher.find()) {
+        if (betweenMatcher.find())
+        {
             String betweenWords = betweenMatcher.group(1);
             Matcher digitMatcher = DIGIT_PATTERN.matcher(betweenWords);
-            while (digitMatcher.find()) {
-                validNumbers.add(digitMatcher.group(1));
-            }
+            while (digitMatcher.find()) validNumbers.add(digitMatcher.group(1));
         }
         return validNumbers;
     }
 
-    public List<String> extractDayAndMealSet(String text) {
+    public List<String> extractDayAndMealSet(String text)
+    {
         List<String> dayAndMealSet = new ArrayList<>();
         Matcher mealSetMatcher = MEAL_SET_PATTERN.matcher(text);
-        while (mealSetMatcher.find()) {
-            dayAndMealSet.add(mealSetMatcher.group());
-        }
+        while (mealSetMatcher.find()) dayAndMealSet.add(mealSetMatcher.group());
         return dayAndMealSet;
     }
 
-    public List<String> extractDayNumber(String text) {
+    public List<String> extractDayNumber(String text)
+    {
         List<String> dayNumbers = new ArrayList<>();
         Matcher dayNumberMatcher = DAY_NUMBER_PATTERN.matcher(text);
-        while (dayNumberMatcher.find()) {
-            dayNumbers.add(dayNumberMatcher.group(1));
-        }
+        while (dayNumberMatcher.find()) dayNumbers.add(dayNumberMatcher.group(1));
         return dayNumbers;
     }
 
-    public List<String> extractMealTimesFromList(List<String> lines) {
+    public List<String> extractMealTimesFromList(List<String> lines)
+    {
         List<String> mealTimes = new ArrayList<>();
-        for (String line : lines) {
+        for (String line : lines)
+        {
             Matcher mealMatcher = MEAL_PATTERN.matcher(line);
             List<String> mealsInLine = new ArrayList<>();
-            while (mealMatcher.find()) {
-                mealsInLine.add(mealMatcher.group(1));
-            }
-            if (!mealsInLine.isEmpty()) {
-                mealTimes.add(String.join(",", mealsInLine));
-            }
+            while (mealMatcher.find()) mealsInLine.add(mealMatcher.group(1));
+            if (!mealsInLine.isEmpty()) mealTimes.add(String.join(",", mealsInLine));
         }
         return mealTimes;
     }
 
     // 기본값 처리를 위한 메서드
-    private String getValueOrDefault(List<String> list, int index, String defaultValue) {
+    private String getValueOrDefault(List<String> list, int index, String defaultValue)
+    {
         return (index < list.size()) ? list.get(index) : defaultValue;
     }
 }

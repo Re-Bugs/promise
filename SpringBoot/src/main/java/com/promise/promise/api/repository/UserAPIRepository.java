@@ -9,6 +9,4 @@ import java.util.Optional;
 @Repository
 public interface UserAPIRepository extends JpaRepository<User, Long> {
     Optional<User> findByBottleId(String bottleId);  // bottle_id로 사용자 찾기
-
-
 }

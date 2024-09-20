@@ -23,18 +23,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserAPIService {
     private final UserAPIRepository userApiRepository;
-    private final NotificationAPIRepository notificationAPIRepository;
     private final MedicationLogRepository medicationLogRepository;
-
-    // 모든 유저 정보 가져오기
-    public List<User> getAllUsers() {
-        return userApiRepository.findAll();
-    }
-
-    // 모든 유저 정보 가져오기
-    public List<Notification> getAllNotifications() {
-        return notificationAPIRepository.findAll();
-    }
 
     // 특정 유저 PK로 유저 찾기
     public Optional<User> findUserById(Long id) {
@@ -104,12 +93,6 @@ public class UserAPIService {
             log.error("회원가입 중 오류 발생: {}", e.getMessage());
             return false;  // 기타 오류 처리
         }
-    }
-
-    public boolean testLogin(String bottleId){
-        Optional<User> user = userApiRepository.findByBottleId(bottleId);
-        if(user.isPresent()) return true;
-        else return false;
     }
 
 
