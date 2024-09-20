@@ -53,7 +53,7 @@
       background-color: #45a049;
     }
     .message {
-      color: red;
+      color: green;
       text-align: center;
       margin-top: 10px;
     }
@@ -61,12 +61,22 @@
       margin: 30px 0;
       text-align: center;
     }
+    .current-time {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: bold;
+      color: #666;
+    }
   </style>
 </head>
 <body>
 <div class="container">
-  <h1>TEST를 위한 회원가입</h1>
+  <!-- 현재 시간 표시 -->
+  <div class="current-time">
+    현재 시간: <span th:text="${localDateTime}"></span>
+  </div>
 
+  <h1>TEST를 위한 약통코드 등록</h1>
   <!-- 회원가입 폼 -->
   <div class="message" th:if="${message}">
     <p th:text="${message}"></p>
@@ -80,7 +90,7 @@
       <label for="bottleId">스마트 약통 코드번호</label>
       <input type="text" th:field="*{bottleId}" id="bottleId" placeholder="스마트 약통의 고유번호를 입력해주세요." required>
     </div>
-    <input type="submit" value="회원가입">
+    <input type="submit" value="등록">
   </form>
 
   <br>

@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,8 +24,9 @@ public class TestAPIController {
     private final UserAPIService userAPIService;
 
     @GetMapping
-    public String testHome(SignUpDTO signUpDTO, Model model) {
+    public String testHome(SignUpDTO signUpDTO, Model model, LocalDateTime localDateTime) {
         model.addAttribute(signUpDTO);
+        model.addAttribute(localDateTime);
         return "test/test";
     }
 
