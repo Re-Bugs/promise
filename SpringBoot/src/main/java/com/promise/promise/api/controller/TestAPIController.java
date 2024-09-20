@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,9 +25,12 @@ public class TestAPIController {
     private final UserAPIService userAPIService;
 
     @GetMapping
-    public String testHome(SignUpDTO signUpDTO, Model model, LocalDateTime localDateTime) {
+    public String testHome(SignUpDTO signUpDTO, Model model) {
+        LocalDateTime currentTime = LocalDateTime.now();
+        String formattedDateTime = currentTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
         model.addAttribute(signUpDTO);
-        model.addAttribute(localDateTime);
+        model.addAttribute("currentDateTime", formattedDateTime); // 문자열로 변환된 시간을 넘김
         return "test/test";
     }
 
