@@ -1,0 +1,40 @@
+package com.promise.promise.controller.api;
+
+import com.promise.promise.DTO.api.SignUpDTO;
+import com.promise.promise.service.api.UserAPIService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api")
+public class SignUpApiController {
+
+    private final UserAPIService userAPIService;
+
+    @PostMapping(value = "/sign_up", produces = "application/json")
+    public ResponseEntity<Map<String, String>> signUp(@Valid @RequestBody SignUpDTO signUpDTO)
+    {
+        Map<String, String> response = userAPIService.signUp(signUpDTO);
+
+        if ("Duplicate bottle code".equals(response.get("message"))) return ResponseEntity.status(409).body(response); // HTTP 409 Conflict
+        else if ("fail".equals(response.get("message"))) return ResponseEntity.status(500).body(response);
+
+        return ResponseEntity.ok(response); // HTTP 200 OK
+    }
+
+    //글로벌 예외처리기
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex)
+    {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error -> errors.put("message", error.getDefaultMessage()));
+        return ResponseEntity.badRequest().body(errors); // HTTP 400 Bad Request
+    }
+}
