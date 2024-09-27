@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.core.view.WindowInsetsCompat
 import com.promise.promise.network.ApiClient
 import com.promise.promise.network.OcrService
@@ -37,7 +38,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -69,6 +69,32 @@ class MainActivity : AppCompatActivity() {
         cameraButton.setOnClickListener {
             openCamera()
         }
+
+        // 네비게이션 바 초기화 및 클릭 이벤트 설정
+        val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+
+        // 처음에 Main 화면이 기본으로 활성화되도록 설정
+        bottomNavigation.selectedItemId = R.id.navigation_home
+
+        bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_home -> {
+                    // Main 화면에서 Home 아이콘이 활성화되도록 설정
+                    true
+                }
+                R.id.navigation_notification -> {
+                    // Notification 화면으로 이동
+                    startActivity(Intent(this, NotificationActivity::class.java))
+                    true
+                }
+                R.id.navigation_setting -> {
+                    // Settings 화면으로 이동
+                    startActivity(Intent(this, SettingsActivity::class.java))
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     // 이전에 저장된 약통코드 불러오는 메서드
@@ -85,15 +111,10 @@ class MainActivity : AppCompatActivity() {
 
     // 갤러리에서 선택된 이미지를 처리하는 콜백
     private val galleryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
+        if (result.resultCode == RESULT_OK) {
             result.data?.data?.let { uri ->
                 selectedImageUri = uri
-                val realPath = getRealPathFromURI(uri) // 실제 파일 경로 변환
-                if (realPath != null) {
-                    sendPrescriptionImage(Uri.fromFile(File(realPath)))
-                } else {
-                    resultLabel.text = "이미지 파일을 찾을 수 없습니다."
-                }
+                sendPrescriptionImage(uri)
             }
         } else {
             resultLabel.text = "이미지 선택이 취소되었습니다."
@@ -129,7 +150,7 @@ class MainActivity : AppCompatActivity() {
 
     // 카메라에서 촬영된 이미지를 처리하는 콜백
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
+        if (result.resultCode == RESULT_OK) {
             selectedImageUri = Uri.fromFile(photoFile)
             sendPrescriptionImage(selectedImageUri)
         } else {
@@ -186,19 +207,5 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, SplashActivity::class.java)
         startActivity(intent)
         finish()
-    }
-
-    // URI에서 실제 파일 경로를 얻는 메서드
-    private fun getRealPathFromURI(uri: Uri): String? {
-        var filePath: String? = null
-        val projection = arrayOf(MediaStore.Images.Media.DATA)
-        val cursor = contentResolver.query(uri, projection, null, null, null)
-        cursor?.use {
-            if (it.moveToFirst()) {
-                val columnIndex = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-                filePath = it.getString(columnIndex)
-            }
-        }
-        return filePath
     }
 }
