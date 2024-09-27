@@ -1,4 +1,4 @@
 package com.promise.promise
 
-class NotificationActivity {
+class HistoryActivity {
 }

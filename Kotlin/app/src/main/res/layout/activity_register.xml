@@ -1,21 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
     android:background="@android:color/white"
-    tools:context="com.example.test.RegisterActivity">
+    tools:context="com.promise.promise.RegisterActivity">
 
     <!-- 앱 이름 -->
-
-    <!-- 안내 문구 -->
-
-    <!-- 이름 입력란 -->
-
-    <!-- 약통코드 입력란 -->
-
     <TextView
         android:id="@+id/appNameTextView"
         android:layout_width="wrap_content"
@@ -25,73 +19,118 @@
         android:textColor="@android:color/black"
         android:textSize="48sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/instructionTextView"
+        android:shadowColor="#AA000000"
+        android:shadowDx="2"
+        android:shadowDy="2"
+        android:shadowRadius="4"
+        app:layout_constraintBottom_toTopOf="@id/subTitleTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.2" />
 
+    <!-- 타이틀 하단 부제목 -->
+    <TextView
+        android:id="@+id/subTitleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="의사와 환자의 약속(藥束)"
+        android:textColor="#888888"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif"
+        app:layout_constraintTop_toBottomOf="@id/appNameTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/promiseImageView"
+        app:layout_constraintVertical_bias="0.0"/>
+
+    <!-- 부제목 밑에 이미지 추가 -->
+    <ImageView
+        android:id="@+id/promiseImageView"
+        android:layout_width="296dp"
+        android:layout_height="171dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/promise"
+        app:layout_constraintBottom_toTopOf="@id/instructionTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/subTitleTextView"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <!-- 안내 문구 -->
     <TextView
         android:id="@+id/instructionTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="200dp"
-        android:text="아래의 입력란에 이름과 약통코드를 입력해주세요."
-        android:textColor="#555555"
+        android:layout_marginTop="32dp"
+        android:text="아래의 입력란에 이름과 약통 코드를 입력해주세요."
+        android:textColor="@color/black"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.68"
+        app:layout_constraintHorizontal_bias="0.511"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appNameTextView" />
+        app:layout_constraintTop_toBottomOf="@id/promiseImageView" />
 
+    <!-- 이름 입력란 -->
     <EditText
         android:id="@+id/nameEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="52dp"
-        android:backgroundTint="#FF6200EE"
-        android:enabled="true"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:hint="여기에 이름을 입력하세요"
-        android:inputType="textPersonName"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/edittext_background"
+        android:hint="이름을 입력하세요"
         android:padding="12dp"
-        android:textColorHint="#0000FF"
         android:textColor="#000000"
+        android:textColorHint="#AAAAAA"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/instructionTextView" />
 
+    <!-- 약통코드 입력란 -->
     <EditText
         android:id="@+id/bottleCodeEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="8dp"
-        android:backgroundTint="#FF6200EE"
-        android:hint="여기에 약통 코드를 입력하세요."
-        android:inputType="text"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/edittext_background"
+        android:hint="약통 코드를 입력하세요"
         android:padding="12dp"
-        android:textColorHint="#0000FF"
         android:textColor="#000000"
+        android:textColorHint="#AAAAAA"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/nameEditText" />
+
+    <!-- "이미 웹에서 가입한 아이디가 있으신가요?" 텍스트 -->
+    <TextView
+        android:id="@+id/alreadyRegisteredTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="이미 웹에서 가입한 아이디가 있으신가요?"
+        android:textColor="#FF6200EE"
+        android:textSize="14sp"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bottleCodeEditText" />
 
     <!-- 회원가입 완료 버튼 -->
     <Button
         android:id="@+id/registerButton"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:backgroundTint="#FF6200EE"
-        android:padding="12dp"
+        android:layout_marginTop="40dp"
+        android:backgroundTint="@color/design_default_color_primary"
         android:text="확인"
         android:textColor="@android:color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/bottleCodeEditText"
-        app:layout_constraintVertical_bias="0.058" />
+        app:layout_constraintTop_toBottomOf="@id/alreadyRegisteredTextView" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

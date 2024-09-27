@@ -4,7 +4,7 @@
     <!-- Notification 메뉴 항목 -->
     <item
         android:id="@+id/navigation_notification"
-        android:icon="@drawable/notification" android:title="알림" />
+        android:icon="@drawable/history" android:title="복용 기록" />
 
     <!-- Home 메뉴 항목 -->
     <item

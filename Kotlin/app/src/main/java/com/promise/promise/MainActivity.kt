@@ -1,6 +1,5 @@
 package com.promise.promise
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -9,13 +8,12 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Button
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.promise.promise.network.ApiClient
 import com.promise.promise.network.OcrService
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -84,7 +82,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.navigation_notification -> {
                     // Notification 화면으로 이동
-                    startActivity(Intent(this, NotificationActivity::class.java))
+                    startActivity(Intent(this, HistoryActivity::class.java))
                     true
                 }
                 R.id.navigation_setting -> {
@@ -114,7 +112,12 @@ class MainActivity : AppCompatActivity() {
         if (result.resultCode == RESULT_OK) {
             result.data?.data?.let { uri ->
                 selectedImageUri = uri
-                sendPrescriptionImage(uri)
+                val realPath = getRealPathFromURI(this, uri)
+                if (realPath != null) {
+                    sendPrescriptionImage(Uri.fromFile(File(realPath)))
+                } else {
+                    resultLabel.text = "이미지 파일 경로를 찾을 수 없습니다."
+                }
             }
         } else {
             resultLabel.text = "이미지 선택이 취소되었습니다."
@@ -181,6 +184,20 @@ class MainActivity : AppCompatActivity() {
                 resultLabel.text = "네트워크 오류: ${t.message}"
             }
         })
+    }
+
+    // Uri에서 실제 파일 경로를 가져오는 메서드
+    private fun getRealPathFromURI(context: Context, uri: Uri): String? {
+        var path: String? = null
+        val projection = arrayOf(MediaStore.Images.Media.DATA)
+        val cursor = context.contentResolver.query(uri, projection, null, null, null)
+        if (cursor != null) {
+            val columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+            cursor.moveToFirst()
+            path = cursor.getString(columnIndex)
+            cursor.close()
+        }
+        return path
     }
 
     // 미디어 스캐너를 호출하여 갤러리에 파일을 표시하도록 하는 메서드

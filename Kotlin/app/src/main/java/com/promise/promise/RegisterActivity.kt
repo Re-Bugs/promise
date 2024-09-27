@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.promise.promise.network.ApiClient
@@ -32,6 +33,13 @@ class RegisterActivity : AppCompatActivity() {
         // EditText에 포커스가 설정되면 키보드를 띄우도록 설정
         showKeyboardOnFocus(nameEditText)
         showKeyboardOnFocus(bottleCodeEditText)
+
+        // "이미 웹에서 가입한 아이디가 있으신가요?" 텍스트 클릭 시 LoginActivity로 이동
+        val alreadyRegisteredTextView = findViewById<TextView>(R.id.alreadyRegisteredTextView)
+        alreadyRegisteredTextView.setOnClickListener {
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     // EditText 선택 시 키보드를 자동으로 띄우는 메서드

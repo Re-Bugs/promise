@@ -16,38 +16,40 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Promise"
-        android:usesCleartextTraffic="true" tools:targetApi="31">
+        android:usesCleartextTraffic="true"
+        tools:targetApi="31">
 
-    <!-- 주요 액티비티 설정 -->
-    <activity
-        android:name=".MainActivity"
-        android:exported="true">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-    </activity>
+        <!-- SplashActivity를 앱의 시작 액티비티로 설정 -->
+        <activity
+            android:name=".SplashActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
-    <!-- 추가 액티비티 설정 -->
-    <activity
-        android:name=".SplashActivity"
-        android:exported="true" />
+        <!-- MainActivity 설정 -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true" />
 
-    <activity
-        android:name=".RegisterActivity"
-        android:exported="true" />
+        <!-- RegisterActivity 설정 -->
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="true" />
 
-    <!-- FileProvider 설정: 사진 촬영 등에서 파일 URI를 공유하기 위해 필요 -->
-    <provider
-        android:name="androidx.core.content.FileProvider"
-        android:authorities="${applicationId}.fileprovider"
-        android:exported="false"
-        android:grantUriPermissions="true">
-        <meta-data
-            android:name="android.support.FILE_PROVIDER_PATHS"
-            android:resource="@xml/file_paths" />
-    </provider>
+        <!-- FileProvider 설정: 사진 촬영 등에서 파일 URI를 공유하기 위해 필요 -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
-</application>
+    </application>
 
-    </manifest>
+</manifest>
