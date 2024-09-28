@@ -1,10 +1,10 @@
-package com.promise.promise.controller.api;
+package com.onlypromise.promise.controller.api;
 
-import com.promise.promise.DTO.api.NotificationDTO;
-import com.promise.promise.service.api.MedicationLogService;
-import com.promise.promise.domain.Notification;
-import com.promise.promise.domain.User;
-import com.promise.promise.service.web.UserService;
+import com.onlypromise.promise.DTO.api.NotificationDTO;
+import com.onlypromise.promise.service.MedicationLogService;
+import com.onlypromise.promise.domain.Notification;
+import com.onlypromise.promise.domain.User;
+import com.onlypromise.promise.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.onlypromise.promise.service.web;
+package com.onlypromise.promise.service;
 
 import com.onlypromise.promise.DTO.api.SignUpDTO;
 import com.onlypromise.promise.domain.MedicationLog;
@@ -6,8 +6,8 @@ import com.onlypromise.promise.domain.Notification;
 import com.onlypromise.promise.domain.User;
 import com.onlypromise.promise.domain.enumeration.NotificationValue;
 import com.onlypromise.promise.domain.enumeration.Role;
-import com.onlypromise.promise.repository.api.MedicationLogRepository;
-import com.onlypromise.promise.repository.web.UserRepository;
+import com.onlypromise.promise.repository.MedicationLogRepository;
+import com.onlypromise.promise.repository.UserRepository;
 import com.onlypromise.promise.DTO.web.LoginDTO;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;

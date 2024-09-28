@@ -1,4 +1,4 @@
-package com.onlypromise.promise.repository.web;
+package com.onlypromise.promise.repository;
 
 import com.onlypromise.promise.domain.Medicine;
 import org.springframework.data.jpa.repository.JpaRepository;

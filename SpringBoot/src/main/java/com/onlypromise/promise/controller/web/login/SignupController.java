@@ -1,9 +1,9 @@
-package com.promise.promise.controller.web.login;
+package com.onlypromise.promise.controller.web.login;
 
-import com.promise.promise.domain.User;
-import com.promise.promise.domain.enumeration.Role;
-import com.promise.promise.service.web.UserService;
-import com.promise.promise.DTO.web.SignUpDTO;
+import com.onlypromise.promise.domain.User;
+import com.onlypromise.promise.domain.enumeration.Role;
+import com.onlypromise.promise.service.UserService;
+import com.onlypromise.promise.DTO.web.SignUpDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;

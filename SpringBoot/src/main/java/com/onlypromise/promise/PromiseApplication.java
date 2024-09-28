@@ -1,4 +1,4 @@
-package com.promise.promise;
+package com.onlypromise.promise;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.boot.SpringApplication;
@@ -14,7 +14,8 @@ public class PromiseApplication {
 	}
 
 	@PostConstruct
-	public void init() {
+	public void init()
+	{
 		// JVM의 기본 시간대를 Asia/Seoul로 설정
 		TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
 	}

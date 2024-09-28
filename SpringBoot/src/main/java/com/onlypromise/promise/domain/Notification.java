@@ -1,6 +1,6 @@
-package com.promise.promise.domain;
+package com.onlypromise.promise.domain;
 
-import com.promise.promise.domain.enumeration.DailyDose;
+import com.onlypromise.promise.domain.enumeration.DailyDose;
 import jakarta.persistence.*;
 import lombok.*;
 

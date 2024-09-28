@@ -1,4 +1,4 @@
-package com.onlypromise.promise.repository.api;
+package com.onlypromise.promise.repository;
 
 import com.onlypromise.promise.domain.MedicationLog;
 import com.onlypromise.promise.domain.Notification;

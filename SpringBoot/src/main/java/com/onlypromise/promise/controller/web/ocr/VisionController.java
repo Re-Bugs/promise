@@ -1,11 +1,11 @@
-package com.promise.promise.controller.web.ocr;
+package com.onlypromise.promise.controller.web.ocr;
 
-import com.promise.promise.domain.Medicine;
-import com.promise.promise.domain.Notification;
-import com.promise.promise.domain.User;
-import com.promise.promise.domain.enumeration.DailyDose;
-import com.promise.promise.service.web.NotificationService;
-import com.promise.promise.service.web.VisionService;
+import com.onlypromise.promise.domain.Medicine;
+import com.onlypromise.promise.domain.Notification;
+import com.onlypromise.promise.domain.User;
+import com.onlypromise.promise.domain.enumeration.DailyDose;
+import com.onlypromise.promise.service.NotificationService;
+import com.onlypromise.promise.service.VisionService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

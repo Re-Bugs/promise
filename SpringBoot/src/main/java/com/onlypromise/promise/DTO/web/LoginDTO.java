@@ -1,4 +1,4 @@
-package com.promise.promise.DTO.web;
+package com.onlypromise.promise.DTO.web;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

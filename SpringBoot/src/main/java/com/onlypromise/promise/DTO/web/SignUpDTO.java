@@ -1,6 +1,6 @@
-package com.promise.promise.DTO.web;
+package com.onlypromise.promise.DTO.web;
 
-import com.promise.promise.domain.enumeration.NotificationValue;
+import com.onlypromise.promise.domain.enumeration.NotificationValue;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;

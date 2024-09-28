@@ -1,14 +1,14 @@
-package com.promise.promise.controller.api;
+package com.onlypromise.promise.controller.api;
 
-import com.promise.promise.domain.Medicine;
-import com.promise.promise.domain.Notification;
-import com.promise.promise.domain.User;
-import com.promise.promise.domain.enumeration.DailyDose;
-import com.promise.promise.service.web.NotificationService;
-import com.promise.promise.service.web.UserService;
-import com.promise.promise.service.web.VisionService;
-import com.promise.promise.controller.web.ocr.MedicationDTO;
-import com.promise.promise.controller.web.ocr.MedicineDTO;
+import com.onlypromise.promise.domain.Medicine;
+import com.onlypromise.promise.domain.Notification;
+import com.onlypromise.promise.domain.User;
+import com.onlypromise.promise.domain.enumeration.DailyDose;
+import com.onlypromise.promise.service.NotificationService;
+import com.onlypromise.promise.service.UserService;
+import com.onlypromise.promise.service.VisionService;
+import com.onlypromise.promise.controller.web.ocr.MedicationDTO;
+import com.onlypromise.promise.controller.web.ocr.MedicineDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

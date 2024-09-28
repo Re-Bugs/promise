@@ -1,7 +1,7 @@
-package com.promise.promise.controller.api;
+package com.onlypromise.promise.controller.api;
 
-import com.promise.promise.DTO.api.SignUpDTO;
-import com.promise.promise.service.web.UserService;
+import com.onlypromise.promise.DTO.api.SignUpDTO;
+import com.onlypromise.promise.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

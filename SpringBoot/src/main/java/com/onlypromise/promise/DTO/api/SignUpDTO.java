@@ -1,7 +1,7 @@
-package com.promise.promise.DTO.api;
+package com.onlypromise.promise.DTO.api;
 
-import com.promise.promise.domain.enumeration.NotificationValue;
-import com.promise.promise.domain.enumeration.Role;
+import com.onlypromise.promise.domain.enumeration.NotificationValue;
+import com.onlypromise.promise.domain.enumeration.Role;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

@@ -1,11 +1,10 @@
-package com.promise.promise.domain;
+package com.onlypromise.promise.domain;
 
-import com.promise.promise.domain.enumeration.NotificationValue;
-import com.promise.promise.domain.enumeration.Role;
+import com.onlypromise.promise.domain.enumeration.NotificationValue;
+import com.onlypromise.promise.domain.enumeration.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.validator.constraints.Range;
 
 import java.util.ArrayList;
 import java.util.List;

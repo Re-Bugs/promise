@@ -1,11 +1,11 @@
-package com.onlypromise.promise.service.api;
+package com.onlypromise.promise.service;
 
-import com.onlypromise.promise.repository.api.MedicationLogRepository;
-import com.onlypromise.promise.repository.api.NotificationAPIRepository;
+import com.onlypromise.promise.repository.MedicationLogRepository;
 import com.onlypromise.promise.domain.MedicationLog;
 import com.onlypromise.promise.domain.Notification;
 import com.onlypromise.promise.domain.User;
-import com.onlypromise.promise.repository.web.UserRepository;
+import com.onlypromise.promise.repository.NotificationRepository;
+import com.onlypromise.promise.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,11 +19,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class MedicationLogService {
-    private final NotificationAPIRepository notificationAPIRepository;
+    private final NotificationRepository notificationRepository;
     private final MedicationLogRepository medicationLogRepository;
     private final UserRepository userRepository;
 
-    // bottleId로 유저 찾고 복용 상태 업데이트
+    // bottleId로 유저 찾고 복용 상태 업데이트(API)
     public String updateMedicationStatusByBottleId(String bottleId)
     {
         Optional<User> userOptional = userRepository.findByBottleId(bottleId);
@@ -34,7 +34,7 @@ public class MedicationLogService {
             String timePeriod = determineTimePeriod(currentTime);
 
             // 현재 사용자의 알림만 조회
-            List<Notification> notifications = notificationAPIRepository.findByUser(user);
+            List<Notification> notifications = notificationRepository.findByUser(user);
 
             for (Notification notification : notifications)
             {
@@ -48,7 +48,7 @@ public class MedicationLogService {
 
                     // 남은 약물 수 감소
                     notification.setRemainingDose((short) (notification.getRemainingDose() - 1));
-                    notificationAPIRepository.save(notification);
+                    notificationRepository.save(notification);
 
                     // 투약 기록 추가 (정상적으로 복용한 경우)
                     MedicationLog medicationLog = MedicationLog.builder()

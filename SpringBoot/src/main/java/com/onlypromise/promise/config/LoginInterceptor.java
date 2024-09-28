@@ -1,4 +1,4 @@
-package com.promise.promise.config;
+package com.onlypromise.promise.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

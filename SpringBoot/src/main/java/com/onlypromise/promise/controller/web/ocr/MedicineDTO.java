@@ -1,4 +1,4 @@
-package com.promise.promise.controller.web.ocr;
+package com.onlypromise.promise.controller.web.ocr;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

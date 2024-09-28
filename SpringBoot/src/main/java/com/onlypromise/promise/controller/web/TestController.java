@@ -1,10 +1,10 @@
-package com.promise.promise.controller.web;
+package com.onlypromise.promise.controller.web;
 
-import com.promise.promise.DTO.api.SignUpDTO;
-import com.promise.promise.domain.MedicationLog;
-import com.promise.promise.domain.Notification;
-import com.promise.promise.domain.User;
-import com.promise.promise.service.web.UserService;
+import com.onlypromise.promise.DTO.api.SignUpDTO;
+import com.onlypromise.promise.domain.MedicationLog;
+import com.onlypromise.promise.domain.Notification;
+import com.onlypromise.promise.domain.User;
+import com.onlypromise.promise.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -47,7 +47,7 @@ public class TestController {
         }
         else
         {
-            redirectAttributes.addFlashAttribute("errorMessage", "중복된 bottle ID가 존재하거나 이름 또는 약통 코드를 확인해주세요.");
+            redirectAttributes.addFlashAttribute("errorMessage", "중복된 약통코드가 존재하거나 이름 또는 약통 코드를 확인해주세요.");
             return "redirect:/test"; // 다시 폼으로 리다이렉트
         }
     }

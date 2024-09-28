@@ -1,9 +1,9 @@
-package com.onlypromise.promise.service.web;
+package com.onlypromise.promise.service;
 
 import com.google.cloud.vision.v1.*;
 import com.google.protobuf.ByteString;
 import com.onlypromise.promise.domain.Medicine;
-import com.onlypromise.promise.repository.web.MedicineRepository;
+import com.onlypromise.promise.repository.MedicineRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

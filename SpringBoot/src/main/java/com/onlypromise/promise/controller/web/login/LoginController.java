@@ -1,8 +1,8 @@
-package com.promise.promise.controller.web.login;
+package com.onlypromise.promise.controller.web.login;
 
-import com.promise.promise.domain.User;
-import com.promise.promise.service.web.UserService;
-import com.promise.promise.DTO.web.LoginDTO;
+import com.onlypromise.promise.domain.User;
+import com.onlypromise.promise.service.UserService;
+import com.onlypromise.promise.DTO.web.LoginDTO;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
