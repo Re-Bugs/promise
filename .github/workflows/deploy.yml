@@ -23,8 +23,8 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Create application.yml from secrets
-      run: echo "${{ secrets.PROMISE_APPLICATION_YML }}" > ./SpringBoot/src/main/resources/application.yml
+    - name: Create application-prod.yml from secrets
+      run: echo "${{ secrets.PROMISE_APPLICATION_YML }}" > ./SpringBoot/src/main/resources/application-prod.yml
 
     - name: Build with Gradle
       run: ./gradlew clean build
