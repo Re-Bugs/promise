@@ -15,6 +15,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
 
 @Slf4j
 @Controller
@@ -59,6 +62,9 @@ public class SignupController {
                 .bottleId(signUpDTO.getBottleId())
                 .zipcode(signUpDTO.getZipcode())
                 .role(Role.user) //role 은 기본적으로 user
+                .morningTime(LocalTime.parse("08:00", DateTimeFormatter.ofPattern("HH:mm")))
+                .afternoonTime(LocalTime.parse("13:00", DateTimeFormatter.ofPattern("HH:mm")))
+                .eveningTime(LocalTime.parse("18:00", DateTimeFormatter.ofPattern("HH:mm")))
                 .build();
 
         if (userService.signUp(user)) {

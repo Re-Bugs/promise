@@ -7,12 +7,14 @@ import com.onlypromise.promise.domain.User;
 import com.onlypromise.promise.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +22,7 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/test")
 @RequiredArgsConstructor
+@Slf4j
 public class TestController {
 
     private final UserService userService;
@@ -88,5 +91,32 @@ public class TestController {
         else model.addAttribute("errorMessage", "사용자를 찾을 수 없습니다.");
 
         return "test/info";  // info 페이지로 이동
+    }
+
+    @PostMapping("/time_update")
+    public String timeUpdate(
+            @RequestParam String morningTime,
+            @RequestParam String afternoonTime,
+            @RequestParam String eveningTime,
+            @RequestParam Long id,
+            RedirectAttributes redirectAttributes
+    ) {
+        log.info("id = {}", id);
+        // 유저를 데이터베이스에서 찾아옴
+        Optional<User> findUser = userService.findUserById(id);
+
+        // 입력된 시간을 LocalTime으로 변환하여 User 객체에 설정
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        User updateUser = findUser.get().toBuilder().morningTime(LocalTime.parse(morningTime, timeFormatter))
+                .afternoonTime(LocalTime.parse(afternoonTime, timeFormatter))
+                .eveningTime(LocalTime.parse(eveningTime, timeFormatter))
+                .build();
+
+        // 변경된 User 객체를 데이터베이스에 저장
+        userService.save(updateUser);
+
+        redirectAttributes.addFlashAttribute("message", "알림 시간이 변경되었습니다.");
+        // 수정이 완료되면 원래 페이지로 리다이렉트
+        return "redirect:/test/info/" + id; // 수정 후 페이지를 리다이렉트
     }
 }

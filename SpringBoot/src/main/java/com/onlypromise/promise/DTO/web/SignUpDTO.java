@@ -1,12 +1,13 @@
 package com.onlypromise.promise.DTO.web;
 
 import com.onlypromise.promise.domain.enumeration.NotificationValue;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.checkerframework.common.aliasing.qual.Unique;
 
-@Getter @Setter
+@Getter
+@Setter
 public class SignUpDTO {
 
     @Size(min = 3, message = "아이디가 너무 짧습니다.")
@@ -26,14 +27,15 @@ public class SignUpDTO {
     private byte age;
 
     @NotBlank(message = "닉네임은 필수 항목입니다.")
-    @Unique
     @Size(min = 2, max = 10, message = "닉네임의 길이는 2 ~ 10 글자입니다.")
     private String nickName;
 
     @NotNull(message = "알림 설정은 필수 항목입니다.")
     private NotificationValue notificationValue;
 
+    @Nullable
     private String bottleId;
 
+    @Nullable
     private String zipcode;
 }

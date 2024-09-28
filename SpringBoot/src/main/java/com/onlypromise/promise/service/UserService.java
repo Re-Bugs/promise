@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +46,9 @@ public class UserService {
                     .name(signUpDTO.getName())
                     .notificationValue(NotificationValue.bottle) // 기본값: bottle
                     .bottleId(signUpDTO.getBottleId())
+                    .morningTime(LocalTime.parse("08:00", DateTimeFormatter.ofPattern("HH:mm")))
+                    .afternoonTime(LocalTime.parse("13:00", DateTimeFormatter.ofPattern("HH:mm")))
+                    .eveningTime(LocalTime.parse("18:00", DateTimeFormatter.ofPattern("HH:mm")))
                     .build();
 
             userRepository.save(user); // DB에 저장
@@ -73,6 +78,9 @@ public class UserService {
                     .name(signUpDTO.getName())
                     .notificationValue(NotificationValue.bottle) // 기본값: bottle
                     .bottleId(signUpDTO.getBottleId())
+                    .morningTime(LocalTime.parse("08:00", DateTimeFormatter.ofPattern("HH:mm")))
+                    .afternoonTime(LocalTime.parse("13:00", DateTimeFormatter.ofPattern("HH:mm")))
+                    .eveningTime(LocalTime.parse("18:00", DateTimeFormatter.ofPattern("HH:mm")))
                     .build();
 
             userRepository.save(user); // DB에 저장

@@ -11,6 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,14 +30,15 @@ public class MainAPIController {
     @PostMapping("/dosage/{bottleId}")
     public ResponseEntity<Map<String, String>> updateMedicationStatusByBottleId(@PathVariable String bottleId)
     {
-        String responseMessage = medicationLogService.updateMedicationStatusByBottleId(bottleId);
+        String responseMessage = medicationLogService.updateMedicationStatus(bottleId);
 
         // JSON 응답을 위한 Map 생성
         Map<String, String> response = new HashMap<>();
         response.put("message", responseMessage);
 
-        if (responseMessage.equals("Duplication Dose")) return ResponseEntity.status(HttpStatus.CONFLICT).body(response); // 409 Conflict
-        else if (responseMessage.equals("bottleId not found.")) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response); // 404 Not Found
+        if (responseMessage.equals("Duplication Dose")) return ResponseEntity.status(HttpStatus.CONFLICT).body(response); // 중복 투약
+        else if(responseMessage.equals("No medication scheduled for this time period.")) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response); // 해당 시간대에 복용해야하는 약물 없음
+        else if (responseMessage.equals("bottleId not found.")) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response); // 잘못된 약통 코드
         else return ResponseEntity.status(HttpStatus.OK).body(response); // 200 OK
     }
 
@@ -97,7 +101,7 @@ public class MainAPIController {
     }
 
     // 알림값 변경 메서드
-    @PostMapping("/notification_value")
+    @PatchMapping("/notification_value")
     public ResponseEntity<Map<String, String>> setNotificationValue(@RequestParam String bottleId, @RequestParam String value) {
         Map<String, String> response = new HashMap<>();
         Optional<User> user = userService.findUserByBottleId(bottleId);
@@ -122,6 +126,76 @@ public class MainAPIController {
             // 잘못된 value 값 처리
             response.put("message", "Invalid Value");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @GetMapping("/alarm")
+    public ResponseEntity<Map<String, String>> getAlarmTime(@RequestParam String bottleId)
+    {
+        Map<String, String> response = new HashMap<>();
+
+        Optional<User> findUser = userService.findUserByBottleId(bottleId);
+        if(findUser.isEmpty())
+        {
+            response.put("message", "User not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        User user = findUser.get();
+
+        response.put("morning", String.valueOf(user.getMorningTime()));
+        response.put("afternoon", String.valueOf(user.getAfternoonTime()));
+        response.put("evening", String.valueOf(user.getEveningTime()));
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PatchMapping("/alarm")
+    public ResponseEntity<Map<String, String>> setAlarmTime(
+            @RequestParam String bottleId,
+            @RequestParam String morningTime,
+            @RequestParam String afternoonTime,
+            @RequestParam String eveningTime
+    )
+    {
+        Map<String, String> response = new HashMap<>();
+
+
+        Optional<User> findUser = userService.findUserByBottleId(bottleId);
+
+        if (findUser.isEmpty())
+        {
+            response.put("message", "User not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        try
+        {
+            // LocalTime 변환 및 업데이트
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+            User updateUser = findUser.get().toBuilder()
+                    .morningTime(LocalTime.parse(morningTime, timeFormatter))
+                    .afternoonTime(LocalTime.parse(afternoonTime, timeFormatter))
+                    .eveningTime(LocalTime.parse(eveningTime, timeFormatter))
+                    .build();
+
+            userService.save(updateUser);
+
+            response.put("message", "success");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        }
+        catch (DateTimeParseException e)
+        {
+            // 시간 형식이 잘못된 경우 처리
+            response.put("message", "Invalid time format. Please use HH:mm format.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        catch (Exception e)
+        {
+            // 기타 예외 처리
+            response.put("message", "An unexpected error occurred.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 

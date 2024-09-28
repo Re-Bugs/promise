@@ -31,6 +31,11 @@
             max-height: 300px;
             overflow-y: auto;
         }
+        .message {
+            color: green;
+            text-align: center;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -41,6 +46,32 @@
     <h2>User Info</h2>
     <p><strong>Name:</strong> <span th:text="${user.name}"></span></p>
     <p><strong>Bottle ID:</strong> <span th:text="${user.bottleId}"></span></p>
+    <p><strong>아침 알림 시각:</strong> <span th:text="${user.morningTime}"></span></p>
+    <p><strong>점심 알림 시각:</strong> <span th:text="${user.afternoonTime}"></span></p>
+    <p><strong>저녁 알림 시각:</strong> <span th:text="${user.eveningTime}"></span></p>
+
+    <br>
+
+    <form th:action="@{/test/time_update}" th:object="${user}" method="post">
+        <input type="hidden" name="id" th:value="${user.id}" /> <!-- User ID를 전송하기 위해 숨김 필드 추가 -->
+        <h3>알림 시간 수정</h3>
+        <div class="message" th:if="${message}">
+            <p th:text="${message}"></p>
+        </div>
+        <label for="morningTime">아침 시간:</label>
+        <input type="time" id="morningTime" name="morningTime"
+               th:value="${#strings.substring(user.morningTime.toString(), 0, 5)}"> <!-- 24시간 형식으로 표시 -->
+
+        <label for="afternoonTime">점심 시간:</label>
+        <input type="time" id="afternoonTime" name="afternoonTime"
+               th:value="${#strings.substring(user.afternoonTime.toString(), 0, 5)}"> <!-- 24시간 형식으로 표시 -->
+
+        <label for="eveningTime">저녁 시간:</label>
+        <input type="time" id="eveningTime" name="eveningTime"
+               th:value="${#strings.substring(user.eveningTime.toString(), 0, 5)}"> <!-- 24시간 형식으로 표시 -->
+
+        <button type="submit">시간 수정</button>
+    </form>
 
     <h2>Notification List</h2>
     <div class="scrollable-table">
