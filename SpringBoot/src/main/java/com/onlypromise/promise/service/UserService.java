@@ -132,4 +132,9 @@ public class UserService {
     {
         return user.getNotifications();  // User 객체로부터 알림 리스트를 바로 가져옴
     }
+
+    public void save(User user)
+    {
+        userRepository.save(user);
+    }
 }

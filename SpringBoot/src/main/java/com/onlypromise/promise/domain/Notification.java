@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Entity
 @Table(name = "notifications")
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Notification {
@@ -69,9 +69,5 @@ public class Notification {
     {
         this.user = user;
         user.getNotifications().add(this);
-    }
-
-    public void setRemainingDose(short remainingDose) {
-        this.remainingDose = remainingDose;
     }
 }

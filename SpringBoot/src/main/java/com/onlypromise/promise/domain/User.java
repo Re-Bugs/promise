@@ -14,7 +14,7 @@ import java.util.List;
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true) //객체 수정 허용
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
