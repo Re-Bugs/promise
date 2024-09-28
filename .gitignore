@@ -66,3 +66,5 @@ $RECYCLE.BIN/
 etc/ignore/
 SpringBoot/src/main/resources/application.properties
 SpringBoot/src/main/resources/application.yml
+SpringBoot/src/main/resources/application-local.yml
+SpringBoot/src/main/resources/application-prod.yml
