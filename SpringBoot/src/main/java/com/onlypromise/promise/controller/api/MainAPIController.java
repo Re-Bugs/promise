@@ -2,9 +2,9 @@ package com.promise.promise.controller.api;
 
 import com.promise.promise.DTO.api.NotificationDTO;
 import com.promise.promise.service.api.MedicationLogService;
-import com.promise.promise.service.api.UserAPIService;
 import com.promise.promise.domain.Notification;
 import com.promise.promise.domain.User;
+import com.promise.promise.service.web.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class MainAPIController {
     private final MedicationLogService medicationLogService;
-    private final UserAPIService userApiService;
+    private final UserService userService;
 
     @PostMapping("/dosage/{bottleId}")
     public ResponseEntity<Map<String, String>> updateMedicationStatusByBottleId(@PathVariable String bottleId)
@@ -42,7 +42,7 @@ public class MainAPIController {
         Map<String, Object> response = new HashMap<>();
 
         // bottleId로 유저 정보 가져오기
-        User user = userApiService.findUserByBottleId(bottleId).orElse(null);
+        User user = userService.findUserByBottleId(bottleId).orElse(null);
 
         if (user == null)
         {
@@ -51,7 +51,7 @@ public class MainAPIController {
         }
 
         // 사용자의 Notification 정보 가져오기
-        List<Notification> notifications = userApiService.findNotificationsByUser(user);
+        List<Notification> notifications = userService.findNotificationsByUser(user);
         if (notifications.isEmpty())
         {
             response.put("message", "No notifications found for this user");

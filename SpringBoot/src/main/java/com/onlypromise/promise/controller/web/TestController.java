@@ -1,10 +1,10 @@
-package com.promise.promise.controller.api;
+package com.promise.promise.controller.web;
 
 import com.promise.promise.DTO.api.SignUpDTO;
-import com.promise.promise.service.api.UserAPIService;
 import com.promise.promise.domain.MedicationLog;
 import com.promise.promise.domain.Notification;
 import com.promise.promise.domain.User;
+import com.promise.promise.service.web.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -22,7 +22,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TestController {
 
-    private final UserAPIService userAPIService;
+    private final UserService userService;
 
     @GetMapping
     public String testHome(SignUpDTO signUpDTO, Model model)
@@ -38,7 +38,7 @@ public class TestController {
     @PostMapping
     public String submitSignUpForm(@Valid SignUpDTO signUpDTO, RedirectAttributes redirectAttributes)
     {
-        boolean isSignUpSuccessful = userAPIService.testSignUp(signUpDTO);
+        boolean isSignUpSuccessful = userService.testSignUp(signUpDTO);
 
         if (isSignUpSuccessful)
         {
@@ -47,7 +47,7 @@ public class TestController {
         }
         else
         {
-            redirectAttributes.addFlashAttribute("message", "중복된 bottle ID가 존재하거나 이름 또는 약통 코드를 확인해주세요.");
+            redirectAttributes.addFlashAttribute("errorMessage", "중복된 bottle ID가 존재하거나 이름 또는 약통 코드를 확인해주세요.");
             return "redirect:/test"; // 다시 폼으로 리다이렉트
         }
     }
@@ -55,7 +55,7 @@ public class TestController {
     @PostMapping("/login")
     public String loginForm(@RequestParam String bottleId, RedirectAttributes redirectAttributes)
     {
-        Optional<User> userOptional = userAPIService.findUserByBottleId(bottleId);
+        Optional<User> userOptional = userService.findUserByBottleId(bottleId);
         if (userOptional.isPresent())
         {
             User user = userOptional.get();
@@ -73,13 +73,13 @@ public class TestController {
     public String testInfo(@PathVariable("id") Long id, Model model)
     {
         // 유저 정보 및 알림 정보 조회
-        Optional<User> userOptional = userAPIService.findUserById(id);  // PK 기반으로 조회
+        Optional<User> userOptional = userService.findUserById(id);  // PK 기반으로 조회
 
         if (userOptional.isPresent())
         {
             User user = userOptional.get();
-            List<Notification> notifications = userAPIService.findNotificationsByUser(user);  // 사용자 기반으로 알림 조회
-            List<MedicationLog> medicationLogs = userAPIService.findMedicationLogsByUser(user);  // 사용자 기반으로 복용 기록 조회
+            List<Notification> notifications = userService.findNotificationsByUser(user);  // 사용자 기반으로 알림 조회
+            List<MedicationLog> medicationLogs = userService.findMedicationLogsByUser(user);  // 사용자 기반으로 복용 기록 조회
 
             model.addAttribute("user", user);  // 사용자 정보 전달
             model.addAttribute("notifications", notifications);  // 알림 정보 전달

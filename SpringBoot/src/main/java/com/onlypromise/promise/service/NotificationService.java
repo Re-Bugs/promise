@@ -1,7 +1,7 @@
-package com.promise.promise.service.web;
+package com.onlypromise.promise.service.web;
 
-import com.promise.promise.domain.Notification;
-import com.promise.promise.repository.web.NotificationRepository;
+import com.onlypromise.promise.domain.Notification;
+import com.onlypromise.promise.repository.web.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

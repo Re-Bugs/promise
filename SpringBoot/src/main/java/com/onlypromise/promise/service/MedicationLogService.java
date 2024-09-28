@@ -1,11 +1,11 @@
-package com.promise.promise.service.api;
+package com.onlypromise.promise.service.api;
 
-import com.promise.promise.repository.api.MedicationLogRepository;
-import com.promise.promise.repository.api.NotificationAPIRepository;
-import com.promise.promise.repository.api.UserAPIRepository;
-import com.promise.promise.domain.MedicationLog;
-import com.promise.promise.domain.Notification;
-import com.promise.promise.domain.User;
+import com.onlypromise.promise.repository.api.MedicationLogRepository;
+import com.onlypromise.promise.repository.api.NotificationAPIRepository;
+import com.onlypromise.promise.domain.MedicationLog;
+import com.onlypromise.promise.domain.Notification;
+import com.onlypromise.promise.domain.User;
+import com.onlypromise.promise.repository.web.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,12 +21,12 @@ import java.util.Optional;
 public class MedicationLogService {
     private final NotificationAPIRepository notificationAPIRepository;
     private final MedicationLogRepository medicationLogRepository;
-    private final UserAPIRepository userAPIRepository;
+    private final UserRepository userRepository;
 
     // bottleId로 유저 찾고 복용 상태 업데이트
     public String updateMedicationStatusByBottleId(String bottleId)
     {
-        Optional<User> userOptional = userAPIRepository.findByBottleId(bottleId);
+        Optional<User> userOptional = userRepository.findByBottleId(bottleId);
         if (userOptional.isPresent())
         {
             User user = userOptional.get();

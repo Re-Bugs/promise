@@ -1,7 +1,7 @@
 package com.promise.promise.controller.api;
 
 import com.promise.promise.DTO.api.SignUpDTO;
-import com.promise.promise.service.api.UserAPIService;
+import com.promise.promise.service.web.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,12 +16,12 @@ import java.util.Map;
 @RequestMapping("/api")
 public class SignUpApiController {
 
-    private final UserAPIService userAPIService;
+    private final UserService userService;
 
     @PostMapping(value = "/sign_up", produces = "application/json")
     public ResponseEntity<Map<String, String>> signUp(@Valid @RequestBody SignUpDTO signUpDTO)
     {
-        Map<String, String> response = userAPIService.signUp(signUpDTO);
+        Map<String, String> response = userService.signUp(signUpDTO);
 
         if ("Duplicate bottle code".equals(response.get("message"))) return ResponseEntity.status(409).body(response); // HTTP 409 Conflict
         else if ("fail".equals(response.get("message"))) return ResponseEntity.status(500).body(response);

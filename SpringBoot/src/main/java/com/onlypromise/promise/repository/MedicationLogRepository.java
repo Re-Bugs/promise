@@ -1,8 +1,8 @@
-package com.promise.promise.repository.api;
+package com.onlypromise.promise.repository.api;
 
-import com.promise.promise.domain.MedicationLog;
-import com.promise.promise.domain.Notification;
-import com.promise.promise.domain.User;
+import com.onlypromise.promise.domain.MedicationLog;
+import com.onlypromise.promise.domain.Notification;
+import com.onlypromise.promise.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
