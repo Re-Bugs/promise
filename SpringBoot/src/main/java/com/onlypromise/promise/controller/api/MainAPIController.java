@@ -1,16 +1,20 @@
 package com.onlypromise.promise.controller.api;
 
+import com.onlypromise.promise.DTO.DailyTakenDTO;
 import com.onlypromise.promise.DTO.api.NotificationDTO;
 import com.onlypromise.promise.domain.enumeration.NotificationValue;
 import com.onlypromise.promise.service.MedicationLogService;
 import com.onlypromise.promise.domain.Notification;
 import com.onlypromise.promise.domain.User;
+import com.onlypromise.promise.service.NotificationService;
 import com.onlypromise.promise.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -26,6 +30,8 @@ import java.util.stream.Collectors;
 public class MainAPIController {
     private final MedicationLogService medicationLogService;
     private final UserService userService;
+    private final NotificationService notificationService;
+
 
     @PostMapping("/dosage/{bottleId}")
     public ResponseEntity<Map<String, String>> updateMedicationStatusByBottleId(@PathVariable String bottleId)
@@ -199,4 +205,37 @@ public class MainAPIController {
         }
     }
 
+
+    @GetMapping("/daily_taken")
+    public ResponseEntity<Map<String, Object>> setNotificationValue(@RequestParam String bottleId, @RequestParam LocalDate date) {
+
+        Map<String, Object> response = new HashMap<>();
+        Optional<User> findUser = userService.findUserByBottleId(bottleId);
+
+        if (findUser.isEmpty()) {
+            response.put("message", "user not found.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        User user = findUser.get();
+
+        // 날짜별로 유저의 복용 상태를 확인
+        Map<String, List<DailyTakenDTO>> medicationStatus = notificationService.getMedicationsStatusByDate(user, date);
+
+        // 복용한 약물과 복용하지 않은 약물을 결과에 담기
+        response.put("taken", medicationStatus.get("taken"));
+        response.put("notTaken", medicationStatus.get("notTaken"));
+
+        // 성공적으로 복용 상태 반환
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    // 날짜 형식 오류 처리 핸들러
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, String>> handleTypeMismatchException(MethodArgumentTypeMismatchException ex)
+    {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Invalid date format. Please use YYYY-MM-DD.");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
 }

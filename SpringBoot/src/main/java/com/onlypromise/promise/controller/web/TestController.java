@@ -1,9 +1,11 @@
 package com.onlypromise.promise.controller.web;
 
+import com.onlypromise.promise.DTO.DailyTakenDTO;
 import com.onlypromise.promise.DTO.api.SignUpDTO;
 import com.onlypromise.promise.domain.MedicationLog;
 import com.onlypromise.promise.domain.Notification;
 import com.onlypromise.promise.domain.User;
+import com.onlypromise.promise.service.NotificationService;
 import com.onlypromise.promise.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +15,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -26,6 +30,7 @@ import java.util.Optional;
 public class TestController {
 
     private final UserService userService;
+    private final NotificationService notificationService;
 
     @GetMapping
     public String testHome(SignUpDTO signUpDTO, Model model)
@@ -82,11 +87,16 @@ public class TestController {
         {
             User user = userOptional.get();
             List<Notification> notifications = userService.findNotificationsByUser(user);  // 사용자 기반으로 알림 조회
-            List<MedicationLog> medicationLogs = userService.findMedicationLogsByUser(user);  // 사용자 기반으로 복용 기록 조회
 
+            LocalDate date = LocalDate.now();
+
+            // 날짜별로 유저의 복용 상태를 확인
+            Map<String, List<DailyTakenDTO>> medicationStatus = notificationService.getMedicationsStatusByDate(user, date);
             model.addAttribute("user", user);  // 사용자 정보 전달
             model.addAttribute("notifications", notifications);  // 알림 정보 전달
-            model.addAttribute("medicationLogs", medicationLogs);  // 복용 기록 정보 전달
+            model.addAttribute("medicationStatus", medicationStatus);  // 복용 정보 전달
+            log.info("log = {}", medicationStatus);
+
         }
         else model.addAttribute("errorMessage", "사용자를 찾을 수 없습니다.");
 
