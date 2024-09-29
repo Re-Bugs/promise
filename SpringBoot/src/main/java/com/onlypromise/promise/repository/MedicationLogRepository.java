@@ -1,6 +1,7 @@
 package com.onlypromise.promise.repository;
 
 import com.onlypromise.promise.domain.MedicationLog;
+import com.onlypromise.promise.domain.Medicine;
 import com.onlypromise.promise.domain.Notification;
 import com.onlypromise.promise.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MedicationLogRepository extends JpaRepository<MedicationLog, Long> {

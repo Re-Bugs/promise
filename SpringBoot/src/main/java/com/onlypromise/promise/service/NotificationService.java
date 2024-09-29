@@ -2,10 +2,14 @@ package com.onlypromise.promise.service;
 
 import com.onlypromise.promise.DTO.DailyTakenDTO;
 import com.onlypromise.promise.domain.MedicationLog;
+import com.onlypromise.promise.domain.Medicine;
 import com.onlypromise.promise.domain.Notification;
 import com.onlypromise.promise.domain.User;
+import com.onlypromise.promise.domain.enumeration.DailyDose;
 import com.onlypromise.promise.repository.MedicationLogRepository;
+import com.onlypromise.promise.repository.MedicineRepository;
 import com.onlypromise.promise.repository.NotificationRepository;
+import com.onlypromise.promise.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +24,8 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final MedicationLogRepository medicationLogRepository;
+    private final UserRepository userRepository;
+    private final MedicineRepository medicineRepository;
 
     @Transactional
     public void save(Notification notification) {
@@ -69,6 +75,49 @@ public class NotificationService {
                 .id(notification.getId())
                 .medicineName(notification.getMedicine().getName()) // Medicine 객체의 이름을 가져옴
                 .build();
+    }
+
+    @Transactional
+    public void createNotification(String bottleId, Long medicineId, short total, boolean morning, boolean afternoon, boolean evening) {
+        // bottleId로 User 찾기
+        Optional<User> userOptional = userRepository.findByBottleId(bottleId);
+        if (userOptional.isEmpty()) {
+            throw new IllegalArgumentException("User not found with bottleId: " + bottleId);
+        }
+        User user = userOptional.get();
+
+        // 약물 ID로 Medicine 찾기
+        Optional<Medicine> medicineOptional = medicineRepository.findById(medicineId);
+        if (medicineOptional.isEmpty()) {
+            throw new IllegalArgumentException("Medicine not found with ID: " + medicineId);
+        }
+        Medicine medicine = medicineOptional.get();
+
+        // DailyDose 계산 (아침, 점심, 저녁 중 체크된 개수에 따라 결정)
+        int doseCount = (morning ? 1 : 0) + (afternoon ? 1 : 0) + (evening ? 1 : 0);
+        DailyDose dailyDose = switch (doseCount) {
+            case 1 -> DailyDose.one;
+            case 2 -> DailyDose.two;
+            case 3 -> DailyDose.three;
+            default -> throw new IllegalArgumentException("Invalid dose count");
+        };
+
+        // Notification 생성 및 저장
+        LocalDate currentDate = LocalDate.now();
+        Notification notification = Notification.builder()
+                .user(user)
+                .medicine(medicine)
+                .total(total)
+                .remainingDose(total)
+                .createdAt(currentDate)
+                .renewalDate(currentDate.plusDays(total)) // 투약일수를 더해 renewalDate 설정
+                .dailyDose(dailyDose)
+                .morning(morning)
+                .afternoon(afternoon)
+                .evening(evening)
+                .build();
+
+        notificationRepository.save(notification);
     }
 
 }

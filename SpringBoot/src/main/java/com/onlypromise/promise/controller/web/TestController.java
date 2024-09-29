@@ -1,10 +1,12 @@
 package com.onlypromise.promise.controller.web;
 
 import com.onlypromise.promise.DTO.DailyTakenDTO;
+import com.onlypromise.promise.DTO.MedicineDTO;
 import com.onlypromise.promise.DTO.api.SignUpDTO;
-import com.onlypromise.promise.domain.MedicationLog;
+import com.onlypromise.promise.domain.Medicine;
 import com.onlypromise.promise.domain.Notification;
 import com.onlypromise.promise.domain.User;
+import com.onlypromise.promise.service.MedicineService;
 import com.onlypromise.promise.service.NotificationService;
 import com.onlypromise.promise.service.UserService;
 import jakarta.validation.Valid;
@@ -31,6 +33,7 @@ public class TestController {
 
     private final UserService userService;
     private final NotificationService notificationService;
+    private final MedicineService medicineService;
 
     @GetMapping
     public String testHome(SignUpDTO signUpDTO, Model model)
@@ -128,5 +131,97 @@ public class TestController {
         redirectAttributes.addFlashAttribute("message", "알림 시간이 변경되었습니다.");
         // 수정이 완료되면 원래 페이지로 리다이렉트
         return "redirect:/test/info/" + id; // 수정 후 페이지를 리다이렉트
+    }
+
+
+
+    // 수동 약품 추가 검색 페이지로 이동하는 GET 메서드
+    @GetMapping("/add_medicine")
+    public String getSearchMedicine(Model model, @RequestParam Long id)
+    {
+        // 현재 사용자의 유효성을 확인하고, 필요한 데이터를 가져옴
+        Optional<User> userOptional = userService.findUserById(id);
+
+        if (userOptional.isPresent())
+        {
+            User user = userOptional.get();
+            model.addAttribute("user", user);
+            model.addAttribute("bottleId", user.getBottleId());  // 사용자 보틀 ID 가져오기
+        }
+        else
+        {
+            model.addAttribute("error", "사용자를 찾을 수 없습니다.");
+            return "redirect:/test/info/" + id;
+        }
+
+        // 약품 추가 페이지로 이동
+        return "test/addMedicine";
+    }
+
+    // 약품 검색 요청을 처리하는 메서드
+    @GetMapping("/search_medicine")
+    public String searchMedicine(@RequestParam Long id, @RequestParam String identifier, Model model)
+    {
+        // 사용자를 찾아서 모델에 추가
+        Optional<User> userOptional = userService.findUserById(id);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            model.addAttribute("user", user);
+            model.addAttribute("bottleId", user.getBottleId());
+
+            // 약품 이름 또는 코드로 약품을 검색
+            Optional<List<MedicineDTO>> medicinesOptional = medicineService.findMedicineByNameOrProductCode(identifier);
+            if (medicinesOptional.isPresent() && !medicinesOptional.get().isEmpty()) model.addAttribute("medicines", medicinesOptional.get()); // 검색된 약품 리스트 추가
+            else model.addAttribute("error", "해당 약품을 찾을 수 없습니다.");
+        }
+        else
+        {
+            model.addAttribute("error", "사용자를 찾을 수 없습니다.");
+            return "redirect:/test/info/" + id;
+        }
+
+        return "test/addMedicine"; // 검색 결과를 보여주는 페이지로 이동
+    }
+
+    // 약품 추가 폼에서 약품을 저장하는 POST 메서드
+    @PostMapping("/add_medicine")
+    public String addMedicine(@RequestParam(required = false) String bottleId,
+                              @RequestParam Long medicineId,
+                              @RequestParam short totalDays,
+                              @RequestParam(required = false) boolean morning,
+                              @RequestParam(required = false) boolean afternoon,
+                              @RequestParam(required = false) boolean evening,
+                              @RequestParam Long id,
+                              RedirectAttributes redirectAttributes)
+    {
+        // bottleId가 없을 경우 에러 처리
+        if (bottleId == null || bottleId.isEmpty())
+        {
+            redirectAttributes.addFlashAttribute("error", "약통 ID를 찾을 수 없습니다.");
+            return "redirect:/test/info/" + id;
+        }
+
+        // 약물 추가 로직
+        Optional<User> findUser = userService.findUserById(id);
+        if (findUser.isEmpty())
+        {
+            redirectAttributes.addFlashAttribute("error", "유저 정보를 찾을 수 없습니다.");
+            return "redirect:/test/info/" + id;
+        }
+
+        Optional<Medicine> findMedicine = medicineService.findMedicineById(medicineId);
+        if (findMedicine.isEmpty())
+        {
+            redirectAttributes.addFlashAttribute("error", "약물을 찾을 수 없습니다.");
+            return "redirect:/test/info/" + id;
+        }
+
+        Medicine medicine = findMedicine.get();
+
+        // 알림 생성
+        notificationService.createNotification(bottleId, medicine.getId(), totalDays, morning, afternoon, evening);
+        redirectAttributes.addFlashAttribute("message", "약물이 성공적으로 추가되었습니다.");
+
+        return "redirect:/test/info/" + id;
     }
 }
