@@ -86,6 +86,3 @@ CREATE TABLE clinic_location (
     latitude DOUBLE PRECISION NOT NULL,
     PRIMARY KEY (id)
 );
-
-select * from users;
-select * from notifications;
