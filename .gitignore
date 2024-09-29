@@ -62,9 +62,45 @@ $RECYCLE.BIN/
 *.msp
 *.lnk
 
+# Jupyter Notebook 체크포인트 파일 제외
+.ipynb_checkpoints/
+
+# 파이참 환경 파일
+.idea/
+*.iml
+
+# 파이썬 가상 환경 관련 파일
+venv/
+.env/
+*.pyc
+__pycache__/
+
+# Jupyter Notebook 임시 디렉토리
+.ipynb_checkpoints/
+
+# 데이터 파일 (필요 시 특정 파일만 제외)
+*.csv
+*.tsv
+*.dat
+*.data
+*.log
+
+# 기타 필요 없는 대용량 파일 유형
+*.h5
+*.hdf5
+*.sqlite
+*.db
+*.model
+*.pkl
+*.joblib
+*.npy
+*.npz
+
+
 # Ignore contents of the etc/ignore folder
 etc/ignore/
 SpringBoot/src/main/resources/application.properties
 SpringBoot/src/main/resources/application.yml
 SpringBoot/src/main/resources/application-local.yml
 SpringBoot/src/main/resources/application-prod.yml
+data/
