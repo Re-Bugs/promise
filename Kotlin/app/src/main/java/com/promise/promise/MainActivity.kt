@@ -49,13 +49,6 @@ class MainActivity : AppCompatActivity() {
         // 결과를 표시할 라벨 초기화
         resultLabel = findViewById(R.id.resultLabel)
 
-        // 삭제 버튼 초기화 및 클릭 이벤트 설정
-        val deleteButton = findViewById<Button>(R.id.deleteButton)
-        deleteButton.setOnClickListener {
-            deleteStoredData() // 저장된 이름과 약통 코드 삭제
-            navigateToSplashActivity() // SplashActivity로 이동
-        }
-
         // 처방전 인식 버튼 초기화 및 클릭 이벤트 설정
         val ocrButton = findViewById<Button>(R.id.ocrButton)
         ocrButton.setOnClickListener {
@@ -76,17 +69,12 @@ class MainActivity : AppCompatActivity() {
 
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.navigation_home -> {
-                    // Main 화면에서 Home 아이콘이 활성화되도록 설정
-                    true
-                }
+                R.id.navigation_home -> true
                 R.id.navigation_notification -> {
-                    // Notification 화면으로 이동
                     startActivity(Intent(this, HistoryActivity::class.java))
                     true
                 }
                 R.id.navigation_setting -> {
-                    // Settings 화면으로 이동
                     startActivity(Intent(this, SettingsActivity::class.java))
                     true
                 }
@@ -95,19 +83,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // 이전에 저장된 약통코드 불러오는 메서드
     private fun loadBottleCode() {
         val sharedPref = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         bottleCode = sharedPref.getString("bottleCode", "") ?: ""
     }
 
-    // 갤러리를 열어 이미지를 선택하는 메서드
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         galleryLauncher.launch(intent)
     }
 
-    // 갤러리에서 선택된 이미지를 처리하는 콜백
     private val galleryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             result.data?.data?.let { uri ->
@@ -124,7 +109,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // 카메라를 열어 사진을 촬영하는 메서드
     private fun openCamera() {
         try {
             photoFile = createImageFile()
@@ -138,12 +122,9 @@ class MainActivity : AppCompatActivity() {
             cameraLauncher.launch(cameraIntent)
         } catch (ex: IOException) {
             resultLabel.text = "사진 파일 생성에 실패했습니다."
-        } catch (ex: IllegalArgumentException) {
-            resultLabel.text = "파일 경로 설정 오류가 발생했습니다."
         }
     }
 
-    // 사진 파일 생성 메서드
     @Throws(IOException::class)
     private fun createImageFile(): File {
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
@@ -151,7 +132,6 @@ class MainActivity : AppCompatActivity() {
         return File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
     }
 
-    // 카메라에서 촬영된 이미지를 처리하는 콜백
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             selectedImageUri = Uri.fromFile(photoFile)
@@ -161,7 +141,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // 이미지 파일을 서버로 전송하는 메서드
     private fun sendPrescriptionImage(uri: Uri) {
         val file = File(uri.path ?: "")
         val requestFile = RequestBody.create("image/*".toMediaTypeOrNull(), file)
@@ -174,7 +153,6 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     resultLabel.text = "처방전 이미지 전송 성공!"
-                    scanFile(this@MainActivity, file.absolutePath)
                 } else {
                     resultLabel.text = "이미지 전송 실패: ${response.code()}"
                 }
@@ -186,7 +164,6 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    // Uri에서 실제 파일 경로를 가져오는 메서드
     private fun getRealPathFromURI(context: Context, uri: Uri): String? {
         var path: String? = null
         val projection = arrayOf(MediaStore.Images.Media.DATA)
@@ -198,31 +175,5 @@ class MainActivity : AppCompatActivity() {
             cursor.close()
         }
         return path
-    }
-
-    // 미디어 스캐너를 호출하여 갤러리에 파일을 표시하도록 하는 메서드
-    private fun scanFile(context: Context, path: String) {
-        val file = File(path)
-        val uri = Uri.fromFile(file)
-        val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri)
-        context.sendBroadcast(intent)
-    }
-
-    // SharedPreferences에 저장된 이름과 약통 코드를 삭제하는 메서드
-    private fun deleteStoredData() {
-        val sharedPref = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        with(sharedPref.edit()) {
-            remove("userName")
-            remove("bottleCode")
-            putBoolean("isLoggedIn", false) // 로그인 상태를 false로 변경
-            apply()
-        }
-    }
-
-    // SplashActivity로 이동하는 메서드
-    private fun navigateToSplashActivity() {
-        val intent = Intent(this, SplashActivity::class.java)
-        startActivity(intent)
-        finish()
     }
 }
