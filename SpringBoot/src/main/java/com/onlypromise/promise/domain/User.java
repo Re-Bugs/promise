@@ -35,7 +35,7 @@ public class User {
     @Column(name = "name", nullable = false, length = 5)
     private String name;
 
-    private byte age;
+    private Byte age;
 
     @Column(name = "nick_name", unique = true, length = 10)
     private String nickName;

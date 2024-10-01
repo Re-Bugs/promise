@@ -98,11 +98,17 @@ public class UserService {
         }
     }
 
-    // 로그인 메서드
+    // 로그인 메서드(web)
     public Boolean login(LoginDTO loginDTO)
     {
         Optional<User> user = userRepository.findByUserId(loginDTO.getUserId()); // 리포지토리에서 user를 찾음
         return user.isPresent() && user.get().getUserPassword().equals(loginDTO.getPassword()); // 찾은 user와 dto를 비교하여 로그인 성공여부 리턴
+    }
+
+    public Boolean APILogin(com.onlypromise.promise.DTO.api.LoginDTO loginDTO)
+    {
+        Optional<User> findUser = userRepository.findByBottleId(loginDTO.getBottleId());
+        return findUser.isPresent();
     }
 
     // String 타입 userId로 user 찾기
