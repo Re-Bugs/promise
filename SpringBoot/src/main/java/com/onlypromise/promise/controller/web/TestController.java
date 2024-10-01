@@ -2,14 +2,13 @@ package com.onlypromise.promise.controller.web;
 
 import com.onlypromise.promise.DTO.DailyTakenDTO;
 import com.onlypromise.promise.DTO.MedicineDTO;
-import com.onlypromise.promise.DTO.api.SignUpDTO;
+import com.onlypromise.promise.DTO.api.LoginDTO;
 import com.onlypromise.promise.domain.Medicine;
 import com.onlypromise.promise.domain.Notification;
 import com.onlypromise.promise.domain.User;
 import com.onlypromise.promise.service.MedicineService;
 import com.onlypromise.promise.service.NotificationService;
 import com.onlypromise.promise.service.UserService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -36,41 +35,27 @@ public class TestController {
     private final MedicineService medicineService;
 
     @GetMapping
-    public String testHome(SignUpDTO signUpDTO, Model model)
+    public String testHome(LoginDTO loginDTO, Model model)
     {
         LocalDateTime currentTime = LocalDateTime.now();
         String formattedDateTime = currentTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
-        model.addAttribute(signUpDTO);
+        model.addAttribute(loginDTO);
         model.addAttribute("currentDateTime", formattedDateTime); // 문자열로 변환된 시간을 넘김
         return "test/test";
     }
 
-    @PostMapping
-    public String submitSignUpForm(@Valid SignUpDTO signUpDTO, RedirectAttributes redirectAttributes)
-    {
-        boolean isSignUpSuccessful = userService.testSignUp(signUpDTO);
-
-        if (isSignUpSuccessful)
-        {
-            redirectAttributes.addFlashAttribute("message", "회원가입이 성공적으로 완료되었습니다.");
-            return "redirect:/test"; // PRG 패턴으로 리다이렉트
-        }
-        else
-        {
-            redirectAttributes.addFlashAttribute("errorMessage", "중복된 약통코드가 존재하거나 이름 또는 약통 코드를 확인해주세요.");
-            return "redirect:/test"; // 다시 폼으로 리다이렉트
-        }
-    }
 
     @PostMapping("/login")
-    public String loginForm(@RequestParam String bottleId, RedirectAttributes redirectAttributes)
+    public String loginForm(LoginDTO loginDTO, RedirectAttributes redirectAttributes)
     {
-        Optional<User> userOptional = userService.findUserByBottleId(bottleId);
-        if (userOptional.isPresent())
+        Optional<User> findUser = userService.findUserByBottleId(loginDTO.getBottleId());
+        if (findUser.isPresent())
         {
-            User user = userOptional.get();
-            return "redirect:/test/info/" + user.getId();  // 유저 PK를 기반으로 리다이렉트
+            User user = findUser.get();
+            User updateUser = user.toBuilder().name(loginDTO.getName()).age(loginDTO.getAge()).build();
+            userService.save(updateUser);
+            return "redirect:/test/info/" + updateUser.getId();  // 유저 PK를 기반으로 리다이렉트
         }
         else
         {

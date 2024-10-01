@@ -35,7 +35,7 @@
       color: #555;
       font-weight: bold;
     }
-    input[type="text"], input[type="submit"] {
+    input[type="text"], input[type="submit"], input[type="number"] {
       width: 100%;
       padding: 10px;
       margin-top: 5px;
@@ -68,6 +68,24 @@
       font-weight: bold;
       color: #666;
     }
+    .code-list {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .code-list ul {
+      list-style: none;
+      padding: 0;
+    }
+    .code-list li {
+      display: inline-block;
+      background-color: #f0f0f0;
+      margin: 5px;
+      padding: 10px;
+      border-radius: 5px;
+      color: #333;
+      font-weight: bold;
+      font-family: monospace;
+    }
   </style>
 </head>
 <body>
@@ -77,42 +95,52 @@
     현재 시간: <span th:text="${currentDateTime}"></span>
   </div>
 
-  <h1>TEST를 위한 약통코드 등록</h1>
-  <!-- 회원가입 폼 -->
-  <div class="message" th:if="${message}">
-    <p th:text="${message}"></p>
-  </div>
-  <div class="errorMessage" th:if="${errorMessage}">
-    <p th:text="${errorMessage}"></p>
-  </div>
-  <form th:action="@{/test}" th:object="${signUpDTO}" method="post">
-    <div class="form-group">
-      <label for="name">이름</label>
-      <input type="text" th:field="*{name}" id="name" placeholder="이름을 입력해주세요." required>
-    </div>
-    <div class="form-group">
-      <label for="bottleId">스마트 약통 코드번호</label>
-      <input type="text" th:field="*{bottleId}" id="bottleId" placeholder="스마트 약통의 고유번호를 입력해주세요." required>
-    </div>
-    <input type="submit" value="등록">
-  </form>
-
-  <br>
-  <br>
-  <br>
-
   <!-- 로그인 폼 -->
-  <h1>TEST를 위한 복용기록 조회</h1>
+  <h1>TEST</h1>
   <div class="errorMessage" th:if="${loginErrorMessage}">
     <p th:text="${loginErrorMessage}"></p>
   </div>
-  <form th:action="@{/test/login}" method="post">
+  <form th:action="@{/test/login}" th:object="${loginDTO}" method="post">
+    <!-- 이름 입력 필드 -->
+    <div class="form-group">
+      <label for="name">이름</label>
+      <input type="text" id="name" th:field="*{name}" placeholder="이름을 입력해주세요." required>
+    </div>
+
+    <!-- 나이 입력 필드 -->
+    <div class="form-group">
+      <label for="age">나이</label>
+      <input type="number" id="age" th:field="*{age}" placeholder="나이를 입력해주세요." required>
+    </div>
+
+    <!-- 약통 코드 입력 필드 -->
     <div class="form-group">
       <label for="loginBottleId">스마트 약통 코드번호</label>
-      <input type="text" id="loginBottleId" name="bottleId" placeholder="약통 코드를 입력해주세요." required>
+      <input type="text" id="loginBottleId" th:field="*{bottleId}" placeholder="약통 코드를 입력해주세요." required>
     </div>
+
     <input type="submit" value="확인">
   </form>
+
+  <!-- 코드 리스트 표시 -->
+  <div class="code-list">
+    <h2>등록된 약통코드 목록</h2>
+    <ul>
+      <li>1. egr7b</li>
+      <li>2. qoa5d</li>
+      <li>3. cz2ys</li>
+      <li>4. 8uji7</li>
+      <li>5. otoh4</li>
+      <li>6. pb6dh</li>
+      <li>7. rm2n9</li>
+      <li>8. vrb5x</li>
+      <li>9. k1e8q</li>
+      <li>10. j870o</li>
+      <br>
+      <li>test1. btmr8</li>
+      <li>test2. 8p3kp</li>
+    </ul>
+  </div>
 </div>
 </body>
 </html>

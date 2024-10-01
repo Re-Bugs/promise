@@ -1,11 +1,8 @@
 package com.onlypromise.promise.service;
 
-import com.onlypromise.promise.DTO.api.SignUpDTO;
 import com.onlypromise.promise.domain.MedicationLog;
 import com.onlypromise.promise.domain.Notification;
 import com.onlypromise.promise.domain.User;
-import com.onlypromise.promise.domain.enumeration.NotificationValue;
-import com.onlypromise.promise.domain.enumeration.Role;
 import com.onlypromise.promise.repository.MedicationLogRepository;
 import com.onlypromise.promise.repository.UserRepository;
 import com.onlypromise.promise.DTO.web.LoginDTO;
@@ -14,11 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -34,68 +27,6 @@ public class UserService {
         if(userRepository.existsByUserId(user.getUserId())) return false; // DB에 user ID가 이미 존재한다면 false
         else userRepository.save(user); // DB에 user ID가 존재하지 않는다면 DB에 저장
         return true;
-    }
-
-    // 회원가입(API)
-    public Map<String, String> signUp(SignUpDTO signUpDTO) {
-        Map<String, String> response = new HashMap<>();
-        try {
-            // 기본값 설정
-            User user = User.builder()
-                    .role(Role.user)  // 기본값: user
-                    .name(signUpDTO.getName())
-                    .notificationValue(NotificationValue.bottle) // 기본값: bottle
-                    .bottleId(signUpDTO.getBottleId())
-                    .morningTime(LocalTime.parse("08:00", DateTimeFormatter.ofPattern("HH:mm")))
-                    .afternoonTime(LocalTime.parse("13:00", DateTimeFormatter.ofPattern("HH:mm")))
-                    .eveningTime(LocalTime.parse("18:00", DateTimeFormatter.ofPattern("HH:mm")))
-                    .build();
-
-            userRepository.save(user); // DB에 저장
-
-            // 성공 메시지 JSON으로 반환
-            response.put("message", "success");
-        } catch (org.springframework.dao.DataIntegrityViolationException e) {
-            // 데이터 무결성 관련 예외 처리 (중복된 키 등)
-            log.warn("Data integrity violation: {}", e.getMessage());
-            response.put("message", "Duplicate bottle code");
-        } catch (Exception e) {
-            // 예외가 발생하면 실패 메시지 반환
-            log.error("An error occurred: {}", e.getMessage());
-            response.put("message", "fail");
-        }
-        return response;
-    }
-
-    // 회원가입(test)
-    public boolean testSignUp(SignUpDTO signUpDTO)
-    {
-        try
-        {
-            // User 객체 생성
-            User user = User.builder()
-                    .role(Role.user)  // 기본값: user
-                    .name(signUpDTO.getName())
-                    .notificationValue(NotificationValue.bottle) // 기본값: bottle
-                    .bottleId(signUpDTO.getBottleId())
-                    .morningTime(LocalTime.parse("08:00", DateTimeFormatter.ofPattern("HH:mm")))
-                    .afternoonTime(LocalTime.parse("13:00", DateTimeFormatter.ofPattern("HH:mm")))
-                    .eveningTime(LocalTime.parse("18:00", DateTimeFormatter.ofPattern("HH:mm")))
-                    .build();
-
-            userRepository.save(user); // DB에 저장
-            return true;  // 회원가입 성공
-        }
-        catch (org.springframework.dao.DataIntegrityViolationException e)
-        {
-            log.warn("중복된 bottle ID: {}", signUpDTO.getBottleId());
-            return false;  // 중복된 bottle ID 처리
-        }
-        catch (Exception e)
-        {
-            log.error("회원가입 중 오류 발생: {}", e.getMessage());
-            return false;  // 기타 오류 처리
-        }
     }
 
     // 로그인 메서드(web)
