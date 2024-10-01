@@ -11,6 +11,7 @@ import com.onlypromise.promise.controller.web.ocr.MedicationDTO;
 import com.onlypromise.promise.controller.web.ocr.MedicineDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,7 +50,16 @@ public class VisionApiController {
         Map<String, Object> response = new HashMap<>();
         try {
             // bottleId로 사용자 조회
-            User user = userService.findUserByBottleId(bottleId).orElseThrow(() -> new IllegalArgumentException("해당 bottleId로 사용자를 찾을 수 없습니다: " + bottleId));
+            Optional<User> findUser = userService.findUserByBottleId(bottleId);
+
+            // 해당하는 bottleId가 존재하지 않을 경우
+            if(findUser.isEmpty())
+            {
+                response.put("message", "user not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+
+            User user = findUser.get();
 
             // 이미지에서 텍스트 추출
             String extractedText = visionService.extractTextFromImage(file);
@@ -63,9 +73,24 @@ public class VisionApiController {
                 notificationBuilder.user(user);
 
                 // medicine_id 설정 (medicineId를 사용하여 Medicine 조회)
-                Medicine medicine = visionService.getMedicineById(medicineDTO.getMedicineId())
-                        .orElseThrow(() -> new IllegalArgumentException("해당 ID의 약물이 존재하지 않습니다: " + medicineDTO.getMedicineId()));
+                Optional<Medicine> findMedicine = visionService.getMedicineById(medicineDTO.getMedicineId());
+
+                // 약품코드로 medicine을 찾을 수 없을 때
+                if(findMedicine.isEmpty())
+                {
+                    response.put("message", "medicine not found");
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+                }
+
+                Medicine medicine = findMedicine.get();
                 notificationBuilder.medicine(medicine);
+
+                // 동일한 약물이 이미 등록되어 있는지 확인
+                Optional<Notification> existingNotification = notificationService.findByUserAndMedicine(user, medicine);
+                if (existingNotification.isPresent()) {
+                    log.info("이미 동일한 약물이 존재 User ID = {}, Medicine = {}", user.getId(), medicine.getProductCode());
+                    continue; // 다음 약물로 이동
+                }
 
                 // daily_dose 설정
                 String dailyDosageTimes = medicineDTO.getDailyDosageTimes();
@@ -99,10 +124,7 @@ public class VisionApiController {
                 notificationService.save(notification);
             }
 
-            response.put("status", "success");
             response.put("data", validDtoList);
-            response.put("count", validDtoList.size());
-
             return ResponseEntity.ok(response);
         } catch (Exception e)
         {

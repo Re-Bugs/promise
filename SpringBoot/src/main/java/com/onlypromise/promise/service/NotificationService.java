@@ -32,6 +32,11 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
+    // 사용자와 약물로 알림 조회
+    public Optional<Notification> findByUserAndMedicine(User user, Medicine medicine) {
+        return notificationRepository.findByUserAndMedicine(user, medicine);
+    }
+
     public Map<String, List<DailyTakenDTO>> getMedicationsStatusByDate(User user, LocalDate targetDate)
     {
         // 해당 유저의 모든 알림 조회
