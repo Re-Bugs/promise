@@ -214,7 +214,7 @@ class MainActivity : AppCompatActivity() {
         with(sharedPref.edit()) {
             remove("userName")
             remove("bottleCode")
-            putBoolean("isRegistered", false)
+            putBoolean("isLoggedIn", false) // 로그인 상태를 false로 변경
             apply()
         }
     }

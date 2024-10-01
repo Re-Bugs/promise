@@ -10,17 +10,17 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // SharedPreferences에서 회원가입 상태 확인
+        // SharedPreferences에서 로그인 상태 확인
         val sharedPref = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        val isRegistered = sharedPref.getBoolean("isRegistered", false)
+        val isLoggedIn = sharedPref.getBoolean("isLoggedIn", false)
 
-        // 상태에 따라 화면 전환
-        if (isRegistered) {
-            // 회원가입이 되어있다면 MainActivity로 이동
+        // 로그인 여부에 따라 화면 전환
+        if (isLoggedIn) {
+            // 로그인이 되어있다면 MainActivity로 이동
             startActivity(Intent(this, MainActivity::class.java))
         } else {
-            // 회원가입이 안되어 있다면 RegisterActivity로 이동
-            startActivity(Intent(this, RegisterActivity::class.java))
+            // 로그인이 안되어 있다면 LoginActivity로 이동
+            startActivity(Intent(this, LoginActivity::class.java))
         }
 
         // SplashActivity 종료

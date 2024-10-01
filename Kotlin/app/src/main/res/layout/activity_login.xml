@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:padding="16dp"
     android:background="@android:color/white"
-    tools:context="com.promise.promise.RegisterActivity">
+    tools:context="com.promise.promise.LoginActivity">
 
     <!-- 앱 이름 -->
     <TextView
@@ -87,7 +87,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/instructionTextView" />
 
-    <!-- 약통코드 입력란 -->
+    <!-- 나이 입력란 (위치 변경됨) -->
+    <EditText
+        android:id="@+id/ageEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/edittext_background"
+        android:hint="나이를 입력하세요"
+        android:padding="12dp"
+        android:inputType="number"
+        android:textColor="#000000"
+        android:textColorHint="#AAAAAA"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nameEditText" />
+
+    <!-- 약통코드 입력란 (위치 변경됨) -->
     <EditText
         android:id="@+id/bottleCodeEditText"
         android:layout_width="0dp"
@@ -101,7 +118,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/nameEditText" />
+        app:layout_constraintTop_toBottomOf="@id/ageEditText" />
 
     <!-- "이미 웹에서 가입한 아이디가 있으신가요?" 텍스트 -->
     <TextView
@@ -118,14 +135,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/bottleCodeEditText" />
 
-    <!-- 회원가입 완료 버튼 -->
+    <!-- 로그인 버튼 -->
     <Button
-        android:id="@+id/registerButton"
+        android:id="@+id/loginButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:backgroundTint="@color/design_default_color_primary"
-        android:text="확인"
+        android:text="로그인"
         android:textColor="@android:color/white"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"

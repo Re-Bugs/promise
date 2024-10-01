@@ -3,43 +3,39 @@ package com.promise.promise
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.promise.promise.network.ApiClient
-import com.promise.promise.network.SignUpRequest
-import com.promise.promise.network.SignUpResponse
+import com.promise.promise.network.LoginRequest
+import com.promise.promise.network.LoginResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class RegisterActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity() {
 
     private lateinit var bottleCodeEditText: EditText
     private lateinit var nameEditText: EditText
+    private lateinit var ageEditText: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_register)
+        setContentView(R.layout.activity_login)
 
         // EditText 및 버튼 초기화
         bottleCodeEditText = findViewById(R.id.bottleCodeEditText)
         nameEditText = findViewById(R.id.nameEditText)
-        setupRegisterButton()
+        ageEditText = findViewById(R.id.ageEditText)
+        setupLoginButton()
 
         // EditText에 포커스가 설정되면 키보드를 띄우도록 설정
         showKeyboardOnFocus(nameEditText)
         showKeyboardOnFocus(bottleCodeEditText)
-
-        // "이미 웹에서 가입한 아이디가 있으신가요?" 텍스트 클릭 시 LoginActivity로 이동
-        val alreadyRegisteredTextView = findViewById<TextView>(R.id.alreadyRegisteredTextView)
-        alreadyRegisteredTextView.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
-        }
+        showKeyboardOnFocus(ageEditText)
     }
 
     // EditText 선택 시 키보드를 자동으로 띄우는 메서드
@@ -53,20 +49,22 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    // 버튼 클릭 이벤트를 설정하는 메서드
-    private fun setupRegisterButton() {
-        val registerButton = findViewById<Button>(R.id.registerButton)
-        registerButton.setOnClickListener {
+    // 로그인 버튼 클릭 이벤트 설정
+    private fun setupLoginButton() {
+        val loginButton = findViewById<Button>(R.id.loginButton)
+        loginButton.setOnClickListener {
             val bottleCode = bottleCodeEditText.text.toString().trim()
             val name = nameEditText.text.toString().trim()
-            if (isValidName(name) && isValidBottleCode(bottleCode)) {
-                // 회원가입 요청 보내기
-                sendSignUpRequest(name, bottleCode)
+            val age = ageEditText.text.toString().trim()
+
+            if (isValidName(name) && isValidBottleCode(bottleCode) && isValidAge(age)) {
+                // 로그인 요청 보내기
+                sendLoginRequest(name, age, bottleCode)
             }
         }
     }
 
-    // 이름 유효성 검사: 5글자 이하인지 확인
+    // 이름 유효성 검사
     private fun isValidName(name: String): Boolean {
         return if (name.isEmpty()) {
             nameEditText.error = "이름을 입력하세요."
@@ -79,7 +77,20 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    // 약통 코드 유효성 검사: 소문자와 숫자로 이루어진 5글자 조합인지 확인
+    // 나이 유효성 검사
+    private fun isValidAge(age: String): Boolean {
+        return if (age.isEmpty()) {
+            ageEditText.error = "나이를 입력하세요."
+            false
+        } else if (!age.matches(Regex("^[0-9]{1,3}$"))) {
+            ageEditText.error = "유효한 나이를 입력하세요."
+            false
+        } else {
+            true
+        }
+    }
+
+    // 약통 코드 유효성 검사
     private fun isValidBottleCode(bottleCode: String): Boolean {
         val regex = Regex("^[a-z0-9]{5}$") // 소문자와 숫자 5글자 패턴
         return if (bottleCode.isEmpty()) {
@@ -93,44 +104,43 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    // 회원가입 요청을 보내는 메서드
-    private fun sendSignUpRequest(name: String, bottleCode: String) {
-        val request = SignUpRequest(name, bottleCode)
+    // 로그인 요청을 보내는 메서드
+    private fun sendLoginRequest(name: String, age: String, bottleCode: String) {
+        val request = LoginRequest(name, age.toInt(), bottleCode)
 
-        // Retrofit을 사용하여 서버로 요청 전송
-        ApiClient.signUpService.signUp(request).enqueue(object : Callback<SignUpResponse> {
-            override fun onResponse(call: Call<SignUpResponse>, response: Response<SignUpResponse>) {
+        // Retrofit을 사용하여 서버로 로그인 요청 전송
+        ApiClient.loginService.login(request).enqueue(object : Callback<LoginResponse> {
+            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 if (response.isSuccessful) {
                     val result = response.body()
                     if (result?.message == "success") {
-                        Toast.makeText(this@RegisterActivity, "회원가입 성공!", Toast.LENGTH_SHORT).show()
-                        saveRegistrationStatus(name, bottleCode) // 이름과 약통 코드 저장 및 회원가입 상태 저장
+                        Toast.makeText(this@LoginActivity, "로그인 성공!", Toast.LENGTH_SHORT).show()
+                        saveLoginStatus(name, age, bottleCode) // 이름, 나이, 약통 코드 저장
                         navigateToMainActivity() // 메인 화면으로 이동
                     } else {
-                        Toast.makeText(this@RegisterActivity, "회원가입 실패: ${result?.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@LoginActivity, "로그인 실패: ${result?.message}", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    // 409 오류가 발생한 경우 처리
-                    if (response.code() == 409) {
-                        Toast.makeText(this@RegisterActivity, "이미 중복된 약통 코드가 존재합니다.", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(this@RegisterActivity, "서버 오류: ${response.code()}", Toast.LENGTH_SHORT).show()
-                    }
+                    Log.e("LoginActivity", "서버 오류: ${response.code()}, 오류 메시지: ${response.errorBody()?.string()}")
+                    Toast.makeText(this@LoginActivity, "서버 오류: ${response.code()}", Toast.LENGTH_SHORT).show()
                 }
             }
 
-            override fun onFailure(call: Call<SignUpResponse>, t: Throwable) {
-                Toast.makeText(this@RegisterActivity, "네트워크 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                // 네트워크 오류 발생 시 로그 출력
+                Log.e("LoginActivity", "네트워크 오류: ${t.message}", t) // 에러 메시지 및 스택 트레이스 로그 출력
+                Toast.makeText(this@LoginActivity, "네트워크 오류: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
-    // 회원가입 완료 상태와 이름, 약통 코드를 SharedPreferences에 저장하는 메서드
-    private fun saveRegistrationStatus(name: String, bottleCode: String) {
+    // 로그인 성공 시 상태와 이름, 나이, 약통 코드를 SharedPreferences에 저장하는 메서드
+    private fun saveLoginStatus(name: String, age: String, bottleCode: String) {
         val sharedPref = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
-            putBoolean("isRegistered", true)
+            putBoolean("isLoggedIn", true)
             putString("userName", name) // 입력된 이름 저장
+            putString("userAge", age) // 입력된 나이 저장
             putString("bottleCode", bottleCode) // 입력된 약통 코드 저장
             apply() // 데이터를 비동기적으로 저장
         }
