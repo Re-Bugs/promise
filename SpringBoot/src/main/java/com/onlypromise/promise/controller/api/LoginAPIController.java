@@ -21,7 +21,7 @@ public class LoginAPIController {
 
     private final UserService userService;
 
-    @PatchMapping(value = "/login", produces = "application/json")
+    @PostMapping(value = "/login", produces = "application/json")
     public ResponseEntity<Map<String, String>> login(@Valid @RequestBody LoginDTO loginDTO)
     {
         Map<String, String> response =new HashMap<>();

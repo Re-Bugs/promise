@@ -51,7 +51,7 @@ public class MedicationLogService {
             {
                 hasMatchingNotification = true;
 
-                if (samePeriod(user, notification, currentTimePeriod, currentTime)) return "Duplication Dose"; // 중복 복용 거절 메시지
+                if (samePeriod(user, notification, currentTimePeriod, currentTime)) return "You already have a history of taking it at that time."; // 중복 복용 거절 메시지
 
                 // 남은 약물 수 감소 및 저장
                 updateNotificationRemainingDose(notification);

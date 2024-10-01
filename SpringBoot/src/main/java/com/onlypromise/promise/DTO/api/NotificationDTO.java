@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class NotificationDTO {
     private long id;
+    private String name;
     private short remainingDose;
     private LocalDate renewalDate;
     private String dailyDose;

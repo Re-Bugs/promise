@@ -37,6 +37,7 @@ public class NotificationService {
         return notificationRepository.findByUserAndMedicine(user, medicine);
     }
 
+    // 복용 및 미복용 조회
     public Map<String, List<DailyTakenDTO>> getMedicationsStatusByDate(User user, LocalDate targetDate)
     {
         // 해당 유저의 모든 알림 조회
@@ -123,6 +124,11 @@ public class NotificationService {
                 .build();
 
         notificationRepository.save(notification);
+    }
+
+    public List<Notification> findNotificationByUser(User user)
+    {
+        return notificationRepository.findByUser(user);
     }
 
 }
