@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:text="의사와 환자의 약속(藥束)"
         android:textColor="#888888"
-        android:textSize="16sp"
+        android:textSize="15sp"
         android:fontFamily="sans-serif"
         app:layout_constraintTop_toBottomOf="@id/appNameTextView"
         app:layout_constraintStart_toStartOf="parent"
@@ -93,6 +93,32 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cameraButton" />
 
+    <!-- 알림 시간 표시할 TextView -->
+    <TextView
+        android:id="@+id/alarmTimesLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="알림 시간: 없음"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ocrButton" />
+
+    <!-- 알림 유형 표시할 TextView (알림 유형이 아래로 이동됨) -->
+    <TextView
+        android:id="@+id/notificationValueLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="알림 유형: 없음"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/alarmTimesLabel" />
+
     <!-- 하단 네비게이션 바 -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
@@ -106,4 +132,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

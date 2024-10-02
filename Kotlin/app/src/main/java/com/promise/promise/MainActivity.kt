@@ -15,6 +15,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.promise.promise.network.ApiClient
+import com.promise.promise.network.NotificationService
 import com.promise.promise.network.OcrService
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -32,11 +33,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var selectedImageUri: Uri
     private lateinit var bottleCode: String
     private lateinit var resultLabel: TextView
+    private lateinit var notificationValueLabel: TextView
+    private lateinit var alarmTimesLabel: TextView
     private lateinit var photoFile: File
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -48,6 +52,12 @@ class MainActivity : AppCompatActivity() {
 
         // 결과를 표시할 라벨 초기화
         resultLabel = findViewById(R.id.resultLabel)
+        notificationValueLabel = findViewById(R.id.notificationValueLabel)
+        alarmTimesLabel = findViewById(R.id.alarmTimesLabel)
+
+        // 알림 정보를 불러오기
+        getNotificationValue()
+        getAlarmTimes()
 
         // 처방전 인식 버튼 초기화 및 클릭 이벤트 설정
         val ocrButton = findViewById<Button>(R.id.ocrButton)
@@ -63,10 +73,7 @@ class MainActivity : AppCompatActivity() {
 
         // 네비게이션 바 초기화 및 클릭 이벤트 설정
         val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottom_navigation)
-
-        // 처음에 Main 화면이 기본으로 활성화되도록 설정
         bottomNavigation.selectedItemId = R.id.navigation_home
-
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> true
@@ -86,6 +93,49 @@ class MainActivity : AppCompatActivity() {
     private fun loadBottleCode() {
         val sharedPref = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         bottleCode = sharedPref.getString("bottleCode", "") ?: ""
+    }
+
+    // 알림 시간 정보 불러오기
+    private fun getAlarmTimes() {
+        val notificationService = ApiClient.createService(NotificationService::class.java)
+        notificationService.getAlarmTimes(bottleCode).enqueue(object : Callback<Map<String, String>> {
+            override fun onResponse(call: Call<Map<String, String>>, response: Response<Map<String, String>>) {
+                if (response.isSuccessful) {
+                    val alarmTimes = response.body()
+                    alarmTimes?.let {
+                        val morning = it["morning"] ?: "없음"
+                        val afternoon = it["afternoon"] ?: "없음"
+                        val evening = it["evening"] ?: "없음"
+                        alarmTimesLabel.text = "아침 알림 시간: $morning\n점심 알림 시간: $afternoon\n저녁 알림 시간: $evening"
+                    }
+                } else {
+                    alarmTimesLabel.text = "알림 시간을 불러오지 못했습니다."
+                }
+            }
+
+            override fun onFailure(call: Call<Map<String, String>>, t: Throwable) {
+                alarmTimesLabel.text = "네트워크 오류: ${t.message}"
+            }
+        })
+    }
+
+    // 알림 유형 정보 불러오기
+    private fun getNotificationValue() {
+        val notificationService = ApiClient.createService(NotificationService::class.java)
+        notificationService.getNotificationValue(bottleCode).enqueue(object : Callback<Map<String, String>> {
+            override fun onResponse(call: Call<Map<String, String>>, response: Response<Map<String, String>>) {
+                if (response.isSuccessful) {
+                    val notificationValue = response.body()?.get("NotificationValue") ?: "없음"
+                    notificationValueLabel.text = "알림 유형: $notificationValue"
+                } else {
+                    notificationValueLabel.text = "알림 값을 불러오지 못했습니다."
+                }
+            }
+
+            override fun onFailure(call: Call<Map<String, String>>, t: Throwable) {
+                notificationValueLabel.text = "네트워크 오류: ${t.message}"
+            }
+        })
     }
 
     private fun openGallery() {
