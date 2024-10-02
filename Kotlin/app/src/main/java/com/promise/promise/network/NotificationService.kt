@@ -3,6 +3,7 @@ package com.promise.promise.network
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.PATCH
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface NotificationService {
@@ -27,4 +28,8 @@ interface NotificationService {
         @Query("afternoonTime") afternoonTime: String,
         @Query("eveningTime") eveningTime: String
     ): Call<Map<String, String>>
+
+    // 기존 /api/lookup/{bottleCode} 경로에 맞춰 수정
+    @GET("/api/lookup/{bottleCode}")
+    fun getNotifications(@Path("bottleCode") bottleCode: String): Call<Map<String, Any>>
 }

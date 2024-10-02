@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- 약 이름 -->
+    <TextView
+        android:id="@+id/notificationName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="약 이름"
+        android:textSize="18sp"
+        android:textColor="@android:color/black" />
+
+    <!-- 남은 복용량 -->
+    <TextView
+        android:id="@+id/remainingDose"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="남은 복용량: 0"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:layout_marginTop="8dp"/>
+
+    <!-- 갱신 날짜 -->
+    <TextView
+        android:id="@+id/renewalDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="갱신 날짜: 2024-11-30"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:layout_marginTop="8dp"/>
+
+    <!-- 복용 시간 -->
+    <TextView
+        android:id="@+id/doseTimes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="복용 시간: 아침, 저녁"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:layout_marginTop="8dp"/>
+
+</LinearLayout>

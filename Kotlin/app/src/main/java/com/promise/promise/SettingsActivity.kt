@@ -129,7 +129,8 @@ class SettingsActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<Map<String, String>>, t: Throwable) {
-                Toast.makeText(this@SettingsActivity, "네트워크 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                Log.e("SettingActivity", "네트워크 오류: ${t.message}", t) // 에러 메시지 및 스택 트레이스 로그 출력
+                Toast.makeText(this@SettingsActivity, "인터넷 연결을 확인해주세요.", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -162,7 +163,7 @@ class SettingsActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<Map<String, String>>, t: Throwable) {
-                Toast.makeText(this@SettingsActivity, "네트워크 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@SettingsActivity, "인터넷 연결을 확인해주세요.", Toast.LENGTH_SHORT).show()
                 Log.e("NetworkError", "Network failure: ${t.message}")
             }
         })
@@ -182,7 +183,8 @@ class SettingsActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<Map<String, String>>, t: Throwable) {
-                Toast.makeText(this@SettingsActivity, "네트워크 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                Log.e("SettingActivity", "네트워크 오류: ${t.message}", t) // 에러 메시지 및 스택 트레이스 로그 출력
+                Toast.makeText(this@SettingsActivity, "인터넷 연결을 확인해주세요.", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -201,7 +203,8 @@ class SettingsActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<Map<String, String>>, t: Throwable) {
-                Toast.makeText(this@SettingsActivity, "네트워크 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                Log.e("SettingActivity", "네트워크 오류: ${t.message}", t) // 에러 메시지 및 스택 트레이스 로그 출력
+                Toast.makeText(this@SettingsActivity, "인터넷 연결을 확인해주세요.", Toast.LENGTH_SHORT).show()
             }
         })
     }

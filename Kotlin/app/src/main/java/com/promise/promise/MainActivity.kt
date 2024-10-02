@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
@@ -114,7 +115,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<Map<String, String>>, t: Throwable) {
-                alarmTimesLabel.text = "네트워크 오류: ${t.message}"
+                Log.e("MainActivity", "네트워크 오류: ${t.message}", t) // 에러 메시지 및 스택 트레이스 로그 출력
+                alarmTimesLabel.text = "인터넷 연결을 확인해주세요."
             }
         })
     }
@@ -133,7 +135,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<Map<String, String>>, t: Throwable) {
-                notificationValueLabel.text = "네트워크 오류: ${t.message}"
+                Log.e("MainActivity", "네트워크 오류: ${t.message}", t) // 에러 메시지 및 스택 트레이스 로그 출력
+                notificationValueLabel.text = "인터넷 연결을 확인해주세요."
             }
         })
     }
@@ -209,7 +212,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
-                resultLabel.text = "네트워크 오류: ${t.message}"
+                Log.e("MainActivity", "네트워크 오류: ${t.message}", t) // 에러 메시지 및 스택 트레이스 로그 출력
+                resultLabel.text = "인터넷 연결을 확인해주세요."
             }
         })
     }

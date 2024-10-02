@@ -129,7 +129,7 @@ class LoginActivity : AppCompatActivity() {
             override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
                 // 네트워크 오류 발생 시 로그 출력
                 Log.e("LoginActivity", "네트워크 오류: ${t.message}", t) // 에러 메시지 및 스택 트레이스 로그 출력
-                Toast.makeText(this@LoginActivity, "네트워크 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@LoginActivity, "인터넷 연결을 확인해주세요.", Toast.LENGTH_SHORT).show()
             }
         })
     }

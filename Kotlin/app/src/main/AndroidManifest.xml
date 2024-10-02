@@ -37,6 +37,9 @@
         <!-- SettingsActivity 설정 -->
         <activity android:name=".SettingsActivity" android:exported="true"/>
 
+        <!-- HistoryActivity 설정 -->
+        <activity android:name=".HistoryActivity" android:exported="true"/>
+
         <!-- FileProvider 설정: 사진 촬영 등에서 파일 URI를 공유하기 위해 필요 -->
         <provider
             android:name="androidx.core.content.FileProvider"
