@@ -3,6 +3,7 @@ package com.promise.promise
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -85,6 +86,9 @@ class SettingsActivity : AppCompatActivity() {
         // 저장된 bottleCode 불러오기
         val bottleCode = getStoredBottleCode()
 
+        // 알림 설정 값을 서버에서 불러오기
+        getNotificationValue(bottleCode)
+
         // 알림 시간 불러오기
         getAlarmTimes(bottleCode)
 
@@ -134,25 +138,34 @@ class SettingsActivity : AppCompatActivity() {
 
     // PATCH 요청: 알림 시간 업데이트
     private fun updateAlarmTimes(bottleCode: String) {
-        val morningTime = "${morningTimePicker.hour}:${morningTimePicker.minute}"
-        val afternoonTime = "${afternoonTimePicker.hour}:${afternoonTimePicker.minute}"
-        val eveningTime = "${eveningTimePicker.hour}:${eveningTimePicker.minute}"
+        val morningTime = formatTime(morningTimePicker.hour, morningTimePicker.minute)
+        val afternoonTime = formatTime(afternoonTimePicker.hour, afternoonTimePicker.minute)
+        val eveningTime = formatTime(eveningTimePicker.hour, eveningTimePicker.minute)
+
+        Log.d("RequestData", "Formatted Times - Morning: $morningTime, Afternoon: $afternoonTime, Evening: $eveningTime") // 로그 추가
 
         val notificationService = ApiClient.createService(NotificationService::class.java)
         notificationService.updateAlarmTimes(bottleCode, morningTime, afternoonTime, eveningTime).enqueue(object : Callback<Map<String, String>> {
             override fun onResponse(call: Call<Map<String, String>>, response: Response<Map<String, String>>) {
                 if (response.isSuccessful) {
                     val result = response.body()
+                    Log.d("ServerResponse", "Alarm update result: $result")
                     if (result?.get("message") == "success") {
                         Toast.makeText(this@SettingsActivity, "알림 시간이 변경되었습니다.", Toast.LENGTH_SHORT).show()
                     } else {
                         Toast.makeText(this@SettingsActivity, "알림 시간 변경 실패", Toast.LENGTH_SHORT).show()
                     }
+                } else {
+                    val errorBody = response.errorBody()?.string() // 서버에서 받은 에러 메시지 확인
+                    val statusCode = response.code() // 상태 코드 확인
+                    Toast.makeText(this@SettingsActivity, "서버 오류: $errorBody", Toast.LENGTH_SHORT).show()
+                    Log.e("ServerError", "Failed to update alarm times. Status code: $statusCode, Error: $errorBody")
                 }
             }
 
             override fun onFailure(call: Call<Map<String, String>>, t: Throwable) {
                 Toast.makeText(this@SettingsActivity, "네트워크 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                Log.e("NetworkError", "Network failure: ${t.message}")
             }
         })
     }
@@ -213,5 +226,9 @@ class SettingsActivity : AppCompatActivity() {
             putBoolean("isLoggedIn", false)
             apply()
         }
+    }
+
+    private fun formatTime(hour: Int, minute: Int): String {
+        return String.format("%02d:%02d", hour, minute) // 시간과 분을 두 자리로 맞춘다
     }
 }
