@@ -18,7 +18,7 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class AlarmController {
+public class AlarmAPIController {
 
     private final UserService userService;
 

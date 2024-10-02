@@ -32,4 +32,10 @@ interface NotificationService {
     // 기존 /api/lookup/{bottleCode} 경로에 맞춰 수정
     @GET("/api/lookup/{bottleCode}")
     fun getNotifications(@Path("bottleCode") bottleCode: String): Call<Map<String, Any>>
+
+    @GET("/api/daily_taken")
+    fun getDailyTaken(
+        @Query("bottleId") bottleId: String,
+        @Query("date") date: String
+    ): Call<Map<String, Any>>
 }

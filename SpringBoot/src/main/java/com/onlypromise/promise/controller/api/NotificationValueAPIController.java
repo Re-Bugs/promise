@@ -16,7 +16,7 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class NotificationValueController {
+public class NotificationValueAPIController {
 
     private final UserService userService;
 

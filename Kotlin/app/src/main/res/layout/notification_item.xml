@@ -29,7 +29,7 @@
         android:id="@+id/renewalDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="갱신 날짜: 2024-11-30"
+        android:text="재처방일: 2024-11-30"
         android:textSize="16sp"
         android:textColor="@android:color/black"
         android:layout_marginTop="8dp"/>
@@ -39,7 +39,7 @@
         android:id="@+id/doseTimes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="복용 시간: 아침, 저녁"
+        android:text="복용 시간: 아침, 점심, 저녁"
         android:textSize="16sp"
         android:textColor="@android:color/black"
         android:layout_marginTop="8dp"/>

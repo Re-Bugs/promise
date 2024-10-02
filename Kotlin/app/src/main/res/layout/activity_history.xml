@@ -1,61 +1,223 @@
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:layout_height="match_parent">
 
-    <!-- "나의 복약 정보" 라벨 추가 -->
-    <TextView
-        android:id="@+id/medicationInfoLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="나의 복약 정보"
-        android:textSize="20sp"
-        android:textColor="@android:color/black"
-        android:textStyle="bold"
-        android:gravity="center"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
-
-    <!-- RecyclerView 추가 -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/notificationRecyclerView"
-        android:layout_width="match_parent"
+    <!-- ScrollView를 스크롤 가능한 내용으로 설정 -->
+    <ScrollView
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:scrollbars="vertical"
-        app:layout_constraintTop_toBottomOf="@id/medicationInfoLabel"
-        app:layout_constraintHeight_percent="0.33"
-        android:padding="16dp"
-        android:layout_marginTop="16dp"
-        android:background="@android:color/white"/>
-
-    <!-- 알림이 비어있을 때 표시할 TextView 추가 -->
-    <TextView
-        android:id="@+id/emptyView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="알림이 없습니다."
-        android:textSize="18sp"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/notificationRecyclerView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:gravity="center"/>
+        android:fillViewport="true">
 
-    <!-- 하단 네비게이션 바 추가 -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white">
+
+            <!-- "나의 복약 정보" 라벨 추가 -->
+            <TextView
+                android:id="@+id/medicationInfoLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="나의 복약 정보"
+                android:textSize="20sp"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                android:gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="16dp" />
+
+            <!-- 알림 리스트를 표시할 FrameLayout (테두리 적용) -->
+            <FrameLayout
+                android:id="@+id/notificationRecyclerViewContainer"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toBottomOf="@id/medicationInfoLabel"
+                app:layout_constraintHeight_percent="0.33"
+                android:padding="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/recycler_view_border">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/notificationRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scrollbars="vertical"
+                    android:backgroundTint="@android:color/white" />
+            </FrameLayout>
+
+            <!-- 구분선 추가 -->
+            <View
+                android:id="@+id/sectionDivider"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"
+                app:layout_constraintTop_toBottomOf="@id/notificationRecyclerViewContainer"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="16dp" />
+
+            <!-- "일일 복용/미복용 약물 리스트" 라벨 추가 -->
+            <TextView
+                android:id="@+id/dailyLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="일일 복용/미복용 약물 리스트"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                android:gravity="center"
+                app:layout_constraintTop_toBottomOf="@id/sectionDivider"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="16dp" />
+
+            <!-- 날짜 선택 영역 -->
+            <ImageView
+                android:id="@+id/previousDayButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_media_previous"
+                android:contentDescription="이전날"
+                app:layout_constraintTop_toBottomOf="@id/dailyLabel"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/selectedDate"
+                app:layout_constraintWidth_percent="0.1"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/selectedDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="2024-10-02"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:gravity="center"
+                android:padding="8dp"
+                app:layout_constraintTop_toBottomOf="@id/dailyLabel"
+                app:layout_constraintStart_toEndOf="@+id/previousDayButton"
+                app:layout_constraintEnd_toStartOf="@+id/nextDayButton"
+                app:layout_constraintWidth_percent="0.8"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp" />
+
+            <ImageView
+                android:id="@+id/nextDayButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_media_next"
+                android:contentDescription="다음날"
+                app:layout_constraintTop_toBottomOf="@id/dailyLabel"
+                app:layout_constraintStart_toEndOf="@+id/selectedDate"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintWidth_percent="0.1"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- 미복용 약품 라벨 -->
+            <TextView
+                android:id="@+id/notTakenLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="미복용 약품"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintTop_toBottomOf="@id/selectedDate"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- 미복용 약품 리스트를 표시할 FrameLayout (테두리 적용) -->
+            <FrameLayout
+                android:id="@+id/notTakenRecyclerViewContainer"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toBottomOf="@id/notTakenLabel"
+                app:layout_constraintHeight_percent="0.2"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/recycler_view_border">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/notTakenRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scrollbars="vertical"
+                    android:padding="16dp"
+                    android:backgroundTint="@android:color/white" />
+            </FrameLayout>
+
+            <!-- 복용 약품 라벨 -->
+            <TextView
+                android:id="@+id/takenLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="복용 약품"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintTop_toBottomOf="@id/notTakenRecyclerViewContainer"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- 복용 완료 약품 리스트를 표시할 FrameLayout (테두리 적용) -->
+            <FrameLayout
+                android:id="@+id/takenRecyclerViewContainer"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toBottomOf="@id/takenLabel"
+                app:layout_constraintHeight_percent="0.2"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/recycler_view_border">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/takenRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scrollbars="vertical"
+                    android:padding="16dp"
+                    android:backgroundTint="@android:color/white" />
+            </FrameLayout>
+
+            <!-- 알림이 비어있을 때 표시할 TextView -->
+            <TextView
+                android:id="@+id/emptyView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="알림이 없습니다."
+                android:textSize="18sp"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/takenRecyclerViewContainer"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:gravity="center" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+    <!-- 하단 네비게이션 바 -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_gravity="bottom"
         android:background="#2B2B2B"
         app:itemIconTint="@color/white"
         app:itemTextColor="@color/white"
         app:menu="@menu/bottom_navigation_menu"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
