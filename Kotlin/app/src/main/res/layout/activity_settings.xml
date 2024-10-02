@@ -21,111 +21,180 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="16dp"
+            android:gravity="center">
 
-            <!-- 알림 설정 표시 -->
-            <TextView
-                android:id="@+id/currentNotificationTextView"
+            <!-- 첫 번째 섹션: 알림 설정 -->
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="현재 알림 설정: "
-                android:textSize="18sp"
-                android:textColor="#333" />
+                android:orientation="vertical"
+                android:background="@android:color/white"
+                android:padding="16dp"
+                android:elevation="4dp"
+                android:layout_marginBottom="16dp"
+                android:gravity="center">
 
-            <!-- 알림 설정 선택 Spinner -->
-            <Spinner
-                android:id="@+id/notificationSpinner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/black"
-                android:background="@drawable/spinner_background"
-                android:padding="8dp"
-                android:layout_marginTop="8dp" />
+                <!-- "현재 알림 유형 : " 텍스트와 Spinner 배치 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"> <!-- 수직 중앙 정렬 -->
 
-            <!-- 알림 설정 업데이트 버튼 -->
-            <Button
-                android:id="@+id/updateButton"
-                android:layout_width="300dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="16dp"
-                android:text="알림 설정 변경"
-                android:textSize="20sp"
-                android:background="@drawable/rounded_button"
-                android:backgroundTint="@android:color/holo_blue_light"
-                android:textColor="@android:color/white" />
+                    <!-- 현재 알림 유형 텍스트 -->
+                    <TextView
+                        android:id="@+id/notificationLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="현재 알림 유형 :"
+                        android:textSize="16sp"
+                        android:textColor="#333"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginRight="8dp" />
 
-            <!-- 아침, 점심, 저녁 알림 시간 설정 -->
-            <TextView
-                android:id="@+id/morningTextView"
+                    <!-- 알림 설정 선택 Spinner -->
+                    <Spinner
+                        android:id="@+id/notificationSpinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginTop="10dp"
+                    android:background="@drawable/spinner_background"
+                    android:layout_marginBottom="16dp"/>
+                </LinearLayout>
+
+                <!-- 알림 설정 설명 추가 -->
+                <TextView
+                    android:id="@+id/notificationDescriptionTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="bottle : 약통에서만 알림\napp : 앱에서만 알림\nmix : 약통과 앱 둘다 알림\nnone : 알림 없음\n아래의 변경 버튼을 누르면 적용됩니다."
+                    android:textSize="14sp"
+                    android:textColor="#666"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- 알림 설정 업데이트 버튼 -->
+                <Button
+                    android:id="@+id/updateButton"
+                    android:layout_width="300dp"
+                    android:layout_height="60dp"
+                    android:text="알림 설정 변경"
+                    android:textSize="20sp"
+                    android:layout_marginBottom="24dp"
+                    android:background="@drawable/rounded_button"
+                    android:backgroundTint="@android:color/holo_blue_light"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
+
+            <!-- 두 번째 섹션: 알람 시간 설정 -->
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="아침 시간"
-                android:textSize="16sp" />
+                android:orientation="vertical"
+                android:background="@android:color/white"
+                android:padding="16dp"
+                android:elevation="4dp"
+                android:layout_marginBottom="16dp"
+                android:gravity="center">
 
-            <TimePicker
-                android:id="@+id/morningTimePicker"
+                <!-- 아침, 점심, 저녁 알림 시간 설정 -->
+                <TextView
+                    android:id="@+id/morningTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="아침 알림 시간"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"
+                    android:layout_marginBottom="8dp" />
+
+                <TimePicker
+                    android:id="@+id/morningTimePicker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:timePickerMode="spinner"
+                    android:theme="@style/CustomTimePicker" />
+
+                <TextView
+                    android:id="@+id/afternoonTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="점심 알림 시간"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"
+                    android:layout_marginBottom="8dp" />
+
+                <TimePicker
+                    android:id="@+id/afternoonTimePicker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:timePickerMode="spinner"
+                    android:theme="@style/CustomTimePicker" />
+
+                <TextView
+                    android:id="@+id/eveningTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="저녁 알림 시간"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"
+                    android:layout_marginBottom="8dp" />
+
+                <TimePicker
+                    android:id="@+id/eveningTimePicker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:timePickerMode="spinner"
+                    android:theme="@style/CustomTimePicker" />
+
+                <!-- 알람 시간 변경 버튼 추가 -->
+                <Button
+                    android:id="@+id/setAlarmTimesButton"
+                    android:layout_width="300dp"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="24dp"
+                    android:text="알람 시간 변경"
+                    android:textSize="20sp"
+                    android:background="@drawable/rounded_button"
+                    android:backgroundTint="@android:color/holo_blue_light"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
+
+            <!-- 세 번째 섹션: 애플리케이션 초기화 -->
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:timePickerMode="spinner"
-                android:layout_gravity="center" />
+                android:orientation="vertical"
+                android:background="@android:color/white"
+                android:padding="16dp"
+                android:elevation="4dp"
+                android:gravity="center">
 
-            <TextView
-                android:id="@+id/afternoonTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="점심 시간"
-                android:textSize="16sp" />
+                <!-- 설명 텍스트 추가 -->
+                <TextView
+                    android:id="@+id/resetDescriptionTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="애플리케이션 내에 저장된 정보를 삭제합니다.\n(이름, 나이, 약통코드)"
+                    android:textSize="14sp"
+                    android:textColor="#666"
+                    android:layout_marginBottom="16dp" />
 
-            <TimePicker
-                android:id="@+id/afternoonTimePicker"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:timePickerMode="spinner"
-                android:layout_gravity="center" />
-
-            <TextView
-                android:id="@+id/eveningTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="저녁 시간"
-                android:textSize="16sp" />
-
-            <TimePicker
-                android:id="@+id/eveningTimePicker"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:timePickerMode="spinner"
-                android:layout_gravity="center" />
-
-            <!-- 알람 시간 변경 버튼 추가 -->
-            <Button
-                android:id="@+id/setAlarmTimesButton"
-                android:layout_width="300dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="16dp"
-                android:text="알람 시간 변경"
-                android:textSize="20sp"
-                android:background="@drawable/rounded_button"
-                android:backgroundTint="@android:color/holo_blue_light"
-                android:textColor="@android:color/white" />
-
-            <!-- 애플리케이션 초기화 버튼 -->
-            <Button
-                android:id="@+id/resetButton"
-                android:layout_width="300dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="16dp"
-                android:text="애플리케이션 초기화"
-                android:textSize="20sp"
-                android:background="@drawable/rounded_button"
-                android:backgroundTint="@android:color/holo_red_light"
-                android:textColor="@android:color/white" />
+                <!-- 애플리케이션 초기화 버튼 -->
+                <Button
+                    android:id="@+id/resetButton"
+                    android:layout_width="300dp"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="16dp"
+                    android:text="애플리케이션 초기화"
+                    android:textSize="20sp"
+                    android:background="@drawable/rounded_button"
+                    android:backgroundTint="@android:color/holo_red_light"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
@@ -135,11 +204,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:background="?android:attr/windowBackground"
+        android:background="#2B2B2B"
         app:itemIconTint="@color/white"
         app:itemTextColor="@color/white"
         app:menu="@menu/bottom_navigation_menu"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

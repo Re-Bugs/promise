@@ -16,7 +16,6 @@ import retrofit2.Response
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var notificationSpinner: Spinner
-    private lateinit var currentNotificationTextView: TextView
     private lateinit var updateButton: Button
     private lateinit var resetButton: Button
 
@@ -38,7 +37,6 @@ class SettingsActivity : AppCompatActivity() {
 
         // View 초기화
         notificationSpinner = findViewById(R.id.notificationSpinner)
-        currentNotificationTextView = findViewById(R.id.currentNotificationTextView)
         updateButton = findViewById(R.id.updateButton)
         resetButton = findViewById(R.id.resetButton)
         setAlarmTimesButton = findViewById(R.id.setAlarmTimesButton)
@@ -79,7 +77,7 @@ class SettingsActivity : AppCompatActivity() {
 
         // 알림 선택 Spinner에 값 설정
         val notificationOptions = arrayOf("bottle", "app", "mix", "none")
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, notificationOptions)
+        val adapter = ArrayAdapter(this, R.layout.spinner_item, notificationOptions)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         notificationSpinner.adapter = adapter
 
@@ -142,7 +140,7 @@ class SettingsActivity : AppCompatActivity() {
         val afternoonTime = formatTime(afternoonTimePicker.hour, afternoonTimePicker.minute)
         val eveningTime = formatTime(eveningTimePicker.hour, eveningTimePicker.minute)
 
-        Log.d("RequestData", "Formatted Times - Morning: $morningTime, Afternoon: $afternoonTime, Evening: $eveningTime") // 로그 추가
+        Log.d("RequestData", "Formatted Times - Morning: $morningTime, Afternoon: $afternoonTime, Evening: $eveningTime")
 
         val notificationService = ApiClient.createService(NotificationService::class.java)
         notificationService.updateAlarmTimes(bottleCode, morningTime, afternoonTime, eveningTime).enqueue(object : Callback<Map<String, String>> {
@@ -156,8 +154,8 @@ class SettingsActivity : AppCompatActivity() {
                         Toast.makeText(this@SettingsActivity, "알림 시간 변경 실패", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    val errorBody = response.errorBody()?.string() // 서버에서 받은 에러 메시지 확인
-                    val statusCode = response.code() // 상태 코드 확인
+                    val errorBody = response.errorBody()?.string()
+                    val statusCode = response.code()
                     Toast.makeText(this@SettingsActivity, "서버 오류: $errorBody", Toast.LENGTH_SHORT).show()
                     Log.e("ServerError", "Failed to update alarm times. Status code: $statusCode, Error: $errorBody")
                 }
@@ -177,7 +175,6 @@ class SettingsActivity : AppCompatActivity() {
             override fun onResponse(call: Call<Map<String, String>>, response: Response<Map<String, String>>) {
                 if (response.isSuccessful) {
                     val notificationValue = response.body()?.get("NotificationValue")
-                    currentNotificationTextView.text = "현재 알림 설정: $notificationValue"
                     notificationSpinner.setSelection((notificationSpinner.adapter as ArrayAdapter<String>).getPosition(notificationValue))
                 } else {
                     Toast.makeText(this@SettingsActivity, "알림 값을 불러오지 못했습니다.", Toast.LENGTH_SHORT).show()
@@ -229,6 +226,6 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun formatTime(hour: Int, minute: Int): String {
-        return String.format("%02d:%02d", hour, minute) // 시간과 분을 두 자리로 맞춘다
+        return String.format("%02d:%02d", hour, minute)
     }
 }
