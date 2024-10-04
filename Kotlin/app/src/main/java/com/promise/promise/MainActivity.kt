@@ -1,7 +1,5 @@
 package com.promise.promise
 
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -10,12 +8,10 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.provider.Settings
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -26,6 +22,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.promise.promise.network.ApiClient
 import com.promise.promise.network.NotificationService
 import com.promise.promise.network.OcrService
+import com.promise.promise.utils.AlarmManagerUtils // AlarmManagerUtils 임포트
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -154,13 +151,14 @@ class MainActivity : AppCompatActivity() {
 
                         // 알림 값에 따라 알람을 설정하거나 취소
                         if (currentNotificationValue == "app" || currentNotificationValue == "mix") {
-                            if (morning != "없음") setAlarm(morning, "morning")
-                            if (afternoon != "없음") setAlarm(afternoon, "afternoon")
-                            if (evening != "없음") setAlarm(evening, "evening")
+                            AlarmManagerUtils.manageAlarm(this@MainActivity, morning, "morning", morning != "없음")
+                            AlarmManagerUtils.manageAlarm(this@MainActivity, afternoon, "afternoon", afternoon != "없음")
+                            AlarmManagerUtils.manageAlarm(this@MainActivity, evening, "evening", evening != "없음")
                         } else if (currentNotificationValue == "bottle" || currentNotificationValue == "none") {
-                            cancelAlarm("morning")
-                            cancelAlarm("afternoon")
-                            cancelAlarm("evening")
+                            // 기존 알람 모두 취소
+                            AlarmManagerUtils.manageAlarm(this@MainActivity, morning, "morning", false)
+                            AlarmManagerUtils.manageAlarm(this@MainActivity, afternoon, "afternoon", false)
+                            AlarmManagerUtils.manageAlarm(this@MainActivity, evening, "evening", false)
                         }
                     }
                 } else {
@@ -173,68 +171,6 @@ class MainActivity : AppCompatActivity() {
                 alarmTimesLabel.text = "인터넷 연결을 확인해주세요."
             }
         })
-    }
-
-    // 알람 설정 함수
-    private fun setAlarm(time: String, type: String) {
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, AlarmReceiver::class.java).apply {
-            putExtra("alarmType", type)
-            putExtra("alarmTime", time)  // 알람 시간이 이곳에 포함되어야 함
-        }
-
-        val pendingIntent = PendingIntent.getBroadcast(
-            this,
-            type.hashCode(),
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        // 시간을 "HH:mm" 형식으로 받아와 파싱하여 알람을 설정
-        val timeParts = time.split(":")
-        val hour = timeParts[0].toInt()
-        val minute = timeParts[1].toInt()
-
-        val calendar = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, hour)
-            set(Calendar.MINUTE, minute)
-            set(Calendar.SECOND, 0)
-
-            // 현재 시간보다 이전 시간일 경우 다음날로 설정
-            if (before(Calendar.getInstance())) {
-                add(Calendar.DATE, 1)
-            }
-        }
-
-        try {
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
-            Log.d("MainActivity", "$type 알람이 설정되었습니다: ${calendar.time}")
-        } catch (e: SecurityException) {
-            AlertDialog.Builder(this)
-                .setTitle("권한 부족")
-                .setMessage("정확한 알람을 설정할 권한이 없습니다. 설정에서 권한을 활성화해 주세요.")
-                .setPositiveButton("설정으로 이동") { _, _ ->
-                    val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-                    startActivity(intent)
-                }
-                .setNegativeButton("취소", null)
-                .show()
-        }
-    }
-
-    // 알람 취소 함수
-    private fun cancelAlarm(type: String) {
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, AlarmReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(
-            this,
-            type.hashCode(),
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        alarmManager.cancel(pendingIntent)
-        Log.d("MainActivity", "$type 알람이 취소되었습니다.")
     }
 
     // 알림 유형 정보 불러오기
@@ -259,6 +195,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // 이하 기존의 openGallery, openCamera 등의 코드 유지
+
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         galleryLauncher.launch(intent)

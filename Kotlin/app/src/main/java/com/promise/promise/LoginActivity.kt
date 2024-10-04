@@ -2,6 +2,8 @@ package com.promise.promise
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.inputmethod.InputMethodManager
@@ -9,6 +11,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.promise.promise.network.ApiClient
 import com.promise.promise.network.LoginRequest
 import com.promise.promise.network.LoginResponse
@@ -21,6 +25,9 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var bottleCodeEditText: EditText
     private lateinit var nameEditText: EditText
     private lateinit var ageEditText: EditText
+
+    private val PERMISSION_REQUEST_CODE = 100
+    private val CAMERA_PERMISSION_REQUEST_CODE = 101
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +43,71 @@ class LoginActivity : AppCompatActivity() {
         showKeyboardOnFocus(nameEditText)
         showKeyboardOnFocus(bottleCodeEditText)
         showKeyboardOnFocus(ageEditText)
+
+        // 알림 권한 요청
+        requestNotificationPermission()
+
+        // 카메라 권한 요청 (이 부분 추가)
+        requestCameraPermission()
+    }
+
+    // 알림 권한 요청 함수
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                Log.d("LoginActivity", "알림 권한이 없으므로 요청합니다.")
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                    PERMISSION_REQUEST_CODE
+                )
+            } else {
+                Log.d("LoginActivity", "알림 권한이 이미 허용되어 있습니다.")
+            }
+        }
+    }
+
+    // 카메라 권한 요청 함수 추가
+    private fun requestCameraPermission() {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            Log.d("LoginActivity", "카메라 권한이 없으므로 요청합니다.")
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.CAMERA),
+                CAMERA_PERMISSION_REQUEST_CODE
+            )
+        } else {
+            Log.d("LoginActivity", "카메라 권한이 이미 허용되어 있습니다.")
+        }
+    }
+
+    // 권한 요청 결과 처리
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            PERMISSION_REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d("LoginActivity", "알림 권한이 허용되었습니다.")
+                } else {
+                    Log.e("LoginActivity", "알림 권한이 거부되었습니다.")
+                }
+            }
+            CAMERA_PERMISSION_REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d("LoginActivity", "카메라 권한이 허용되었습니다.")
+                } else {
+                    Log.e("LoginActivity", "카메라 권한이 거부되었습니다.")
+                }
+            }
+        }
     }
 
     // EditText 선택 시 키보드를 자동으로 띄우는 메서드
@@ -128,7 +200,7 @@ class LoginActivity : AppCompatActivity() {
 
             override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
                 // 네트워크 오류 발생 시 로그 출력
-                Log.e("LoginActivity", "네트워크 오류: ${t.message}", t) // 에러 메시지 및 스택 트레이스 로그 출력
+                Log.e("LoginActivity", "네트워크 오류: ${t.message}", t)
                 Toast.makeText(this@LoginActivity, "인터넷 연결을 확인해주세요.", Toast.LENGTH_SHORT).show()
             }
         })

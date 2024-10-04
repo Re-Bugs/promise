@@ -1,4 +1,4 @@
-package com.promise.promise
+package com.promise.promise.utils
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -17,6 +17,8 @@ import androidx.core.content.ContextCompat
 import android.Manifest
 import android.content.pm.PackageManager
 import android.util.Log
+import com.promise.promise.MainActivity
+import com.promise.promise.R
 import java.text.SimpleDateFormat
 import java.util.*
 

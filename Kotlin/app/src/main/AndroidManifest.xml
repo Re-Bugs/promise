@@ -8,6 +8,10 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- 부팅 완료 권한 추가 -->
+
+    <!-- 카메라 하드웨어 필수 여부 설정 -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -43,7 +47,14 @@
         <activity android:name=".HistoryActivity" android:exported="true"/>
 
         <!-- 알람 리시버 설정 -->
-        <receiver android:name=".AlarmReceiver" />
+        <receiver android:name=".utils.AlarmReceiver" />
+
+        <!-- 부팅 완료 시 알람을 다시 설정하기 위한 리시버 설정 -->
+        <receiver android:name=".utils.BootReceiver" android:enabled="true" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
         <!-- FileProvider 설정: 사진 촬영 등에서 파일 URI를 공유하기 위해 필요 -->
         <provider

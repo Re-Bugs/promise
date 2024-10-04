@@ -1,22 +1,17 @@
 package com.promise.promise
 
-import android.app.AlarmManager
-import android.app.AlertDialog
-import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.promise.promise.network.ApiClient
 import com.promise.promise.network.NotificationService
+import com.promise.promise.utils.AlarmManagerUtils // AlarmManagerUtils 임포트
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.Calendar
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -33,7 +28,7 @@ class SettingsActivity : AppCompatActivity() {
 
     // SharedPreferences에서 저장된 bottleCode를 불러오기
     private fun getStoredBottleCode(): String {
-        val sharedPref = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val sharedPref = getSharedPreferences("app_prefs", MODE_PRIVATE)
         return sharedPref.getString("bottleCode", "") ?: ""
     }
 
@@ -159,15 +154,15 @@ class SettingsActivity : AppCompatActivity() {
                         // 알림 값에 따른 알람 처리
                         if (currentNotificationValue == "app" || currentNotificationValue == "mix") {
                             // 알람 설정
-                            setAlarm(morningTime, "morning")
-                            setAlarm(afternoonTime, "afternoon")
-                            setAlarm(eveningTime, "evening")
+                            AlarmManagerUtils.manageAlarm(this@SettingsActivity, morningTime, "morning", true)
+                            AlarmManagerUtils.manageAlarm(this@SettingsActivity, afternoonTime, "afternoon", true)
+                            AlarmManagerUtils.manageAlarm(this@SettingsActivity, eveningTime, "evening", true)
                             Toast.makeText(this@SettingsActivity, "알림 시간이 변경되었고 알람이 설정되었습니다.", Toast.LENGTH_SHORT).show()
                         } else if (currentNotificationValue == "bottle" || currentNotificationValue == "none") {
                             // 기존 알람 취소
-                            cancelAlarm("morning")
-                            cancelAlarm("afternoon")
-                            cancelAlarm("evening")
+                            AlarmManagerUtils.manageAlarm(this@SettingsActivity, morningTime, "morning", false)
+                            AlarmManagerUtils.manageAlarm(this@SettingsActivity, afternoonTime, "afternoon", false)
+                            AlarmManagerUtils.manageAlarm(this@SettingsActivity, eveningTime, "evening", false)
                             Toast.makeText(this@SettingsActivity, "알림 시간이 변경되었고 기존 알람이 취소되었습니다.", Toast.LENGTH_SHORT).show()
                         }
                     } else {
@@ -188,68 +183,7 @@ class SettingsActivity : AppCompatActivity() {
         })
     }
 
-    // 알람 설정 함수
-    private fun setAlarm(time: String, type: String) {
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, AlarmReceiver::class.java).apply {
-            putExtra("alarmType", type)
-            putExtra("alarmTime", time)
-        }
-
-        val pendingIntent = PendingIntent.getBroadcast(
-            this,
-            type.hashCode(),
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        // 시간을 "HH:mm" 형식으로 받아와 파싱하여 알람을 설정
-        val timeParts = time.split(":")
-        val hour = timeParts[0].toInt()
-        val minute = timeParts[1].toInt()
-
-        val calendar = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, hour)
-            set(Calendar.MINUTE, minute)
-            set(Calendar.SECOND, 0)
-
-            // 현재 시간보다 이전 시간일 경우 다음날로 설정
-            if (before(Calendar.getInstance())) {
-                add(Calendar.DATE, 1)
-            }
-        }
-
-        try {
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
-            Log.d("MainActivity", "$type 알람이 설정되었습니다: ${calendar.time}")
-        } catch (e: SecurityException) {
-            AlertDialog.Builder(this)
-                .setTitle("권한 부족")
-                .setMessage("정확한 알람을 설정할 권한이 없습니다. 설정에서 권한을 활성화해 주세요.")
-                .setPositiveButton("설정으로 이동") { _, _ ->
-                    val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-                    startActivity(intent)
-                }
-                .setNegativeButton("취소", null)
-                .show()
-        }
-    }
-
-    // 알람 취소 함수
-    private fun cancelAlarm(type: String) {
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, AlarmReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(
-            this,
-            type.hashCode(),
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        alarmManager.cancel(pendingIntent)
-        Log.d("MainActivity", "$type 알람이 취소되었습니다.")
-    }
-
+    // 시간 포맷 함수
     private fun formatTime(hour: Int, minute: Int): String {
         return String.format("%02d:%02d", hour, minute)
     }
@@ -286,18 +220,18 @@ class SettingsActivity : AppCompatActivity() {
 
                     // 'bottle' 또는 'none'일 경우 기존 알람 삭제
                     if (value == "bottle" || value == "none") {
-                        cancelAlarm("morning")
-                        cancelAlarm("afternoon")
-                        cancelAlarm("evening")
+                        AlarmManagerUtils.manageAlarm(this@SettingsActivity, formatTime(morningTimePicker.hour, morningTimePicker.minute), "morning", false)
+                        AlarmManagerUtils.manageAlarm(this@SettingsActivity, formatTime(afternoonTimePicker.hour, afternoonTimePicker.minute), "afternoon", false)
+                        AlarmManagerUtils.manageAlarm(this@SettingsActivity, formatTime(eveningTimePicker.hour, eveningTimePicker.minute), "evening", false)
                         Toast.makeText(this@SettingsActivity, "기존 알람이 삭제되었습니다.", Toast.LENGTH_SHORT).show()
                     } else if (value == "app" || value == "mix") {
                         // 알람이 다시 설정되도록 함
                         val morningTime = formatTime(morningTimePicker.hour, morningTimePicker.minute)
                         val afternoonTime = formatTime(afternoonTimePicker.hour, afternoonTimePicker.minute)
                         val eveningTime = formatTime(eveningTimePicker.hour, eveningTimePicker.minute)
-                        setAlarm(morningTime, "morning")
-                        setAlarm(afternoonTime, "afternoon")
-                        setAlarm(eveningTime, "evening")
+                        AlarmManagerUtils.manageAlarm(this@SettingsActivity, morningTime, "morning", true)
+                        AlarmManagerUtils.manageAlarm(this@SettingsActivity, afternoonTime, "afternoon", true)
+                        AlarmManagerUtils.manageAlarm(this@SettingsActivity, eveningTime, "evening", true)
                         Toast.makeText(this@SettingsActivity, "알람이 설정되었습니다.", Toast.LENGTH_SHORT).show()
                     }
 
@@ -325,7 +259,7 @@ class SettingsActivity : AppCompatActivity() {
 
     // 저장된 데이터 삭제
     private fun deleteStoredData() {
-        val sharedPref = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val sharedPref = getSharedPreferences("app_prefs", MODE_PRIVATE)
         with(sharedPref.edit()) {
             remove("userName")
             remove("bottleCode")

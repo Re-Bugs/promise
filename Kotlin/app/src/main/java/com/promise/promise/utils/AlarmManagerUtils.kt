@@ -8,7 +8,6 @@ import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
-import com.promise.promise.AlarmReceiver
 import java.util.Calendar
 
 object AlarmManagerUtils {
@@ -22,7 +21,6 @@ object AlarmManagerUtils {
     ) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        // API 레벨 31 이상에서는 canScheduleExactAlarms() 확인
         if (shouldSetAlarm && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
             showExactAlarmPermissionDialog(context)
             return
@@ -30,7 +28,7 @@ object AlarmManagerUtils {
 
         val intent = Intent(context, AlarmReceiver::class.java).apply {
             putExtra("alarmType", type)
-            putExtra("alarmTime", time)  // 알람 시간이 포함됨
+            putExtra("alarmTime", time)
         }
 
         val pendingIntent = PendingIntent.getBroadcast(
@@ -42,7 +40,6 @@ object AlarmManagerUtils {
 
         try {
             if (shouldSetAlarm) {
-                // 알람 설정 로직
                 val timeParts = time.split(":")
                 val hour = timeParts[0].toInt()
                 val minute = timeParts[1].toInt()
@@ -52,7 +49,6 @@ object AlarmManagerUtils {
                     set(Calendar.MINUTE, minute)
                     set(Calendar.SECOND, 0)
 
-                    // 현재 시간보다 이전 시간일 경우 다음날로 설정
                     if (before(Calendar.getInstance())) {
                         add(Calendar.DATE, 1)
                     }
@@ -60,18 +56,54 @@ object AlarmManagerUtils {
 
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
                 Log.d("AlarmManager", "$type 알람이 설정되었습니다.")
+
+                // 알람 시간을 SharedPreferences에 저장
+                saveAlarmTime(context, time, type)
             } else {
-                // 알람 취소 로직
                 alarmManager.cancel(pendingIntent)
                 Log.d("AlarmManager", "$type 알람이 취소되었습니다.")
+                removeAlarmTime(context, type)
             }
         } catch (e: SecurityException) {
-            // 권한이 없을 때 처리
             showExactAlarmPermissionDialog(context)
         }
     }
 
-    // 권한 요청을 위한 다이얼로그 표시
+    private fun saveAlarmTime(context: Context, time: String, type: String) {
+        val sharedPref = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putString(type, time)
+            apply()
+        }
+    }
+
+    private fun removeAlarmTime(context: Context, type: String) {
+        val sharedPref = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            remove(type)
+            apply()
+        }
+    }
+
+    // 저장된 알람을 복원하는 함수
+    fun restoreAlarms(context: Context) {
+        val sharedPref = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+
+        val morningTime = sharedPref.getString("morning", null)
+        val afternoonTime = sharedPref.getString("afternoon", null)
+        val eveningTime = sharedPref.getString("evening", null)
+
+        if (morningTime != null) {
+            manageAlarm(context, morningTime, "morning", true)
+        }
+        if (afternoonTime != null) {
+            manageAlarm(context, afternoonTime, "afternoon", true)
+        }
+        if (eveningTime != null) {
+            manageAlarm(context, eveningTime, "evening", true)
+        }
+    }
+
     private fun showExactAlarmPermissionDialog(context: Context) {
         AlertDialog.Builder(context)
             .setTitle("정확한 알람 설정 권한 필요")
