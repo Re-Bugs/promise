@@ -63,7 +63,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="아래의 입력란에 이름과 약통 코드를 입력해주세요."
+        android:text="아래의 입력란에 이름, 나이, 약통 코드를 입력해주세요."
         android:textColor="@color/black"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -120,27 +120,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ageEditText" />
 
-    <!-- "이미 웹에서 가입한 아이디가 있으신가요?" 텍스트 -->
-    <TextView
-        android:id="@+id/alreadyRegisteredTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="이미 웹에서 가입한 아이디가 있으신가요?"
-        android:textColor="#FF6200EE"
-        android:textSize="14sp"
-        android:clickable="true"
-        android:focusable="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/bottleCodeEditText" />
-
     <!-- 로그인 버튼 -->
     <Button
         android:id="@+id/loginButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:backgroundTint="@color/design_default_color_primary"
         android:text="로그인"
         android:textColor="@android:color/white"
@@ -148,6 +133,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/alreadyRegisteredTextView" />
+        app:layout_constraintTop_toBottomOf="@id/bottleCodeEditText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

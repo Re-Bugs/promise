@@ -1,8 +1,12 @@
 package com.promise.promise
 
+import android.app.AlarmManager
+import android.app.AlertDialog
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +16,7 @@ import com.promise.promise.network.NotificationService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.Calendar
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -24,6 +29,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var afternoonTimePicker: TimePicker
     private lateinit var eveningTimePicker: TimePicker
     private lateinit var setAlarmTimesButton: Button
+    private var currentNotificationValue: String = "none" // 현재 알림 설정 값 저장
 
     // SharedPreferences에서 저장된 bottleCode를 불러오기
     private fun getStoredBottleCode(): String {
@@ -129,13 +135,13 @@ class SettingsActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<Map<String, String>>, t: Throwable) {
-                Log.e("SettingActivity", "네트워크 오류: ${t.message}", t) // 에러 메시지 및 스택 트레이스 로그 출력
+                Log.e("SettingActivity", "네트워크 오류: ${t.message}", t)
                 Toast.makeText(this@SettingsActivity, "인터넷 연결을 확인해주세요.", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
-    // PATCH 요청: 알림 시간 업데이트
+    // PATCH 요청: 알림 시간 업데이트 후 알람 재설정
     private fun updateAlarmTimes(bottleCode: String) {
         val morningTime = formatTime(morningTimePicker.hour, morningTimePicker.minute)
         val afternoonTime = formatTime(afternoonTimePicker.hour, afternoonTimePicker.minute)
@@ -150,7 +156,20 @@ class SettingsActivity : AppCompatActivity() {
                     val result = response.body()
                     Log.d("ServerResponse", "Alarm update result: $result")
                     if (result?.get("message") == "success") {
-                        Toast.makeText(this@SettingsActivity, "알림 시간이 변경되었습니다.", Toast.LENGTH_SHORT).show()
+                        // 알림 값에 따른 알람 처리
+                        if (currentNotificationValue == "app" || currentNotificationValue == "mix") {
+                            // 알람 설정
+                            setAlarm(morningTime, "morning")
+                            setAlarm(afternoonTime, "afternoon")
+                            setAlarm(eveningTime, "evening")
+                            Toast.makeText(this@SettingsActivity, "알림 시간이 변경되었고 알람이 설정되었습니다.", Toast.LENGTH_SHORT).show()
+                        } else if (currentNotificationValue == "bottle" || currentNotificationValue == "none") {
+                            // 기존 알람 취소
+                            cancelAlarm("morning")
+                            cancelAlarm("afternoon")
+                            cancelAlarm("evening")
+                            Toast.makeText(this@SettingsActivity, "알림 시간이 변경되었고 기존 알람이 취소되었습니다.", Toast.LENGTH_SHORT).show()
+                        }
                     } else {
                         Toast.makeText(this@SettingsActivity, "알림 시간 변경 실패", Toast.LENGTH_SHORT).show()
                     }
@@ -169,6 +188,72 @@ class SettingsActivity : AppCompatActivity() {
         })
     }
 
+    // 알람 설정 함수
+    private fun setAlarm(time: String, type: String) {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReceiver::class.java).apply {
+            putExtra("alarmType", type)
+            putExtra("alarmTime", time)
+        }
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            type.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // 시간을 "HH:mm" 형식으로 받아와 파싱하여 알람을 설정
+        val timeParts = time.split(":")
+        val hour = timeParts[0].toInt()
+        val minute = timeParts[1].toInt()
+
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, hour)
+            set(Calendar.MINUTE, minute)
+            set(Calendar.SECOND, 0)
+
+            // 현재 시간보다 이전 시간일 경우 다음날로 설정
+            if (before(Calendar.getInstance())) {
+                add(Calendar.DATE, 1)
+            }
+        }
+
+        try {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+            Log.d("MainActivity", "$type 알람이 설정되었습니다: ${calendar.time}")
+        } catch (e: SecurityException) {
+            AlertDialog.Builder(this)
+                .setTitle("권한 부족")
+                .setMessage("정확한 알람을 설정할 권한이 없습니다. 설정에서 권한을 활성화해 주세요.")
+                .setPositiveButton("설정으로 이동") { _, _ ->
+                    val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                    startActivity(intent)
+                }
+                .setNegativeButton("취소", null)
+                .show()
+        }
+    }
+
+    // 알람 취소 함수
+    private fun cancelAlarm(type: String) {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            type.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        alarmManager.cancel(pendingIntent)
+        Log.d("MainActivity", "$type 알람이 취소되었습니다.")
+    }
+
+    private fun formatTime(hour: Int, minute: Int): String {
+        return String.format("%02d:%02d", hour, minute)
+    }
+
     // GET 요청: 알림 설정 가져오기
     private fun getNotificationValue(bottleCode: String) {
         val notificationService = ApiClient.createService(NotificationService::class.java)
@@ -177,13 +262,14 @@ class SettingsActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val notificationValue = response.body()?.get("NotificationValue")
                     notificationSpinner.setSelection((notificationSpinner.adapter as ArrayAdapter<String>).getPosition(notificationValue))
+                    currentNotificationValue = notificationValue ?: "none"  // 알림 값 저장
                 } else {
                     Toast.makeText(this@SettingsActivity, "알림 값을 불러오지 못했습니다.", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<Map<String, String>>, t: Throwable) {
-                Log.e("SettingActivity", "네트워크 오류: ${t.message}", t) // 에러 메시지 및 스택 트레이스 로그 출력
+                Log.e("SettingActivity", "네트워크 오류: ${t.message}", t)
                 Toast.makeText(this@SettingsActivity, "인터넷 연결을 확인해주세요.", Toast.LENGTH_SHORT).show()
             }
         })
@@ -197,13 +283,33 @@ class SettingsActivity : AppCompatActivity() {
                 val result = response.body()
                 if (response.isSuccessful && result?.get("message") == "success") {
                     Toast.makeText(this@SettingsActivity, "알림 설정이 변경되었습니다.", Toast.LENGTH_SHORT).show()
+
+                    // 'bottle' 또는 'none'일 경우 기존 알람 삭제
+                    if (value == "bottle" || value == "none") {
+                        cancelAlarm("morning")
+                        cancelAlarm("afternoon")
+                        cancelAlarm("evening")
+                        Toast.makeText(this@SettingsActivity, "기존 알람이 삭제되었습니다.", Toast.LENGTH_SHORT).show()
+                    } else if (value == "app" || value == "mix") {
+                        // 알람이 다시 설정되도록 함
+                        val morningTime = formatTime(morningTimePicker.hour, morningTimePicker.minute)
+                        val afternoonTime = formatTime(afternoonTimePicker.hour, afternoonTimePicker.minute)
+                        val eveningTime = formatTime(eveningTimePicker.hour, eveningTimePicker.minute)
+                        setAlarm(morningTime, "morning")
+                        setAlarm(afternoonTime, "afternoon")
+                        setAlarm(eveningTime, "evening")
+                        Toast.makeText(this@SettingsActivity, "알람이 설정되었습니다.", Toast.LENGTH_SHORT).show()
+                    }
+
+                    currentNotificationValue = value // 알림 값 저장
+
                 } else {
                     Toast.makeText(this@SettingsActivity, "알림 설정 변경 실패: ${result?.get("message")}", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<Map<String, String>>, t: Throwable) {
-                Log.e("SettingActivity", "네트워크 오류: ${t.message}", t) // 에러 메시지 및 스택 트레이스 로그 출력
+                Log.e("SettingActivity", "네트워크 오류: ${t.message}", t)
                 Toast.makeText(this@SettingsActivity, "인터넷 연결을 확인해주세요.", Toast.LENGTH_SHORT).show()
             }
         })
@@ -226,9 +332,5 @@ class SettingsActivity : AppCompatActivity() {
             putBoolean("isLoggedIn", false)
             apply()
         }
-    }
-
-    private fun formatTime(hour: Int, minute: Int): String {
-        return String.format("%02d:%02d", hour, minute)
     }
 }

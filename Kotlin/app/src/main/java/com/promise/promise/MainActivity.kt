@@ -1,16 +1,24 @@
 package com.promise.promise
 
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.provider.Settings
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -27,7 +35,7 @@ import retrofit2.Response
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,6 +45,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var notificationValueLabel: TextView
     private lateinit var alarmTimesLabel: TextView
     private lateinit var photoFile: File
+    private var currentNotificationValue: String = "none" // 현재 알림 설정 값 저장
+
+    private val PERMISSION_REQUEST_CODE = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +58,9 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        // 알림 권한 요청
+        requestNotificationPermission()
 
         // 이전에 저장된 약통코드 불러오기
         loadBottleCode()
@@ -91,6 +105,35 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // 알림 권한 요청 함수
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                    PERMISSION_REQUEST_CODE
+                )
+            }
+        }
+    }
+
+    // 권한 요청 결과 처리
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                Log.e("MainActivity", "알림 권한이 거부되었습니다.")
+            }
+        }
+    }
+
     private fun loadBottleCode() {
         val sharedPref = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         bottleCode = sharedPref.getString("bottleCode", "") ?: ""
@@ -108,6 +151,17 @@ class MainActivity : AppCompatActivity() {
                         val afternoon = it["afternoon"] ?: "없음"
                         val evening = it["evening"] ?: "없음"
                         alarmTimesLabel.text = "아침 알림 시간: $morning\n점심 알림 시간: $afternoon\n저녁 알림 시간: $evening"
+
+                        // 알림 값에 따라 알람을 설정하거나 취소
+                        if (currentNotificationValue == "app" || currentNotificationValue == "mix") {
+                            if (morning != "없음") setAlarm(morning, "morning")
+                            if (afternoon != "없음") setAlarm(afternoon, "afternoon")
+                            if (evening != "없음") setAlarm(evening, "evening")
+                        } else if (currentNotificationValue == "bottle" || currentNotificationValue == "none") {
+                            cancelAlarm("morning")
+                            cancelAlarm("afternoon")
+                            cancelAlarm("evening")
+                        }
                     }
                 } else {
                     alarmTimesLabel.text = "알림 시간을 불러오지 못했습니다."
@@ -115,10 +169,72 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<Map<String, String>>, t: Throwable) {
-                Log.e("MainActivity", "네트워크 오류: ${t.message}", t) // 에러 메시지 및 스택 트레이스 로그 출력
+                Log.e("MainActivity", "네트워크 오류: ${t.message}", t)
                 alarmTimesLabel.text = "인터넷 연결을 확인해주세요."
             }
         })
+    }
+
+    // 알람 설정 함수
+    private fun setAlarm(time: String, type: String) {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReceiver::class.java).apply {
+            putExtra("alarmType", type)
+            putExtra("alarmTime", time)  // 알람 시간이 이곳에 포함되어야 함
+        }
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            type.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // 시간을 "HH:mm" 형식으로 받아와 파싱하여 알람을 설정
+        val timeParts = time.split(":")
+        val hour = timeParts[0].toInt()
+        val minute = timeParts[1].toInt()
+
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, hour)
+            set(Calendar.MINUTE, minute)
+            set(Calendar.SECOND, 0)
+
+            // 현재 시간보다 이전 시간일 경우 다음날로 설정
+            if (before(Calendar.getInstance())) {
+                add(Calendar.DATE, 1)
+            }
+        }
+
+        try {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+            Log.d("MainActivity", "$type 알람이 설정되었습니다: ${calendar.time}")
+        } catch (e: SecurityException) {
+            AlertDialog.Builder(this)
+                .setTitle("권한 부족")
+                .setMessage("정확한 알람을 설정할 권한이 없습니다. 설정에서 권한을 활성화해 주세요.")
+                .setPositiveButton("설정으로 이동") { _, _ ->
+                    val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                    startActivity(intent)
+                }
+                .setNegativeButton("취소", null)
+                .show()
+        }
+    }
+
+    // 알람 취소 함수
+    private fun cancelAlarm(type: String) {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            type.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        alarmManager.cancel(pendingIntent)
+        Log.d("MainActivity", "$type 알람이 취소되었습니다.")
     }
 
     // 알림 유형 정보 불러오기
@@ -129,18 +245,20 @@ class MainActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val notificationValue = response.body()?.get("NotificationValue") ?: "없음"
                     notificationValueLabel.text = "알림 유형: $notificationValue"
+                    currentNotificationValue = notificationValue  // 알림 값을 저장하여 알람 설정에 사용
                 } else {
                     notificationValueLabel.text = "알림 값을 불러오지 못했습니다."
                 }
             }
 
             override fun onFailure(call: Call<Map<String, String>>, t: Throwable) {
-                Log.e("MainActivity", "네트워크 오류: ${t.message}", t) // 에러 메시지 및 스택 트레이스 로그 출력
+                Log.e("MainActivity", "네트워크 오류: ${t.message}", t)
                 notificationValueLabel.text = "인터넷 연결을 확인해주세요."
             }
         })
     }
 
+    // 이하 기존의 openGallery, openCamera 등의 코드 유지
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         galleryLauncher.launch(intent)
@@ -212,7 +330,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
-                Log.e("MainActivity", "네트워크 오류: ${t.message}", t) // 에러 메시지 및 스택 트레이스 로그 출력
+                Log.e("MainActivity", "네트워크 오류: ${t.message}", t)
                 resultLabel.text = "인터넷 연결을 확인해주세요."
             }
         })
