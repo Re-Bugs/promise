@@ -22,7 +22,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.promise.promise.network.ApiClient
 import com.promise.promise.network.NotificationService
 import com.promise.promise.network.OcrService
-import com.promise.promise.utils.AlarmManagerUtils // AlarmManagerUtils 임포트
+import com.promise.promise.utils.AlarmManagerUtils
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody

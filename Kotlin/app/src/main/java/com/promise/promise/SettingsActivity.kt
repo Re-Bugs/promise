@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.promise.promise.network.ApiClient
 import com.promise.promise.network.NotificationService
-import com.promise.promise.utils.AlarmManagerUtils // AlarmManagerUtils 임포트
+import com.promise.promise.utils.AlarmManagerUtils
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -51,6 +51,9 @@ class SettingsActivity : AppCompatActivity() {
         morningTimePicker.setIs24HourView(true)
         afternoonTimePicker.setIs24HourView(true)
         eveningTimePicker.setIs24HourView(true)
+
+        // 시간 제한 설정
+        setTimeRestrictions()
 
         // 애플리케이션 초기화 버튼 클릭 이벤트 설정
         resetButton.setOnClickListener {
@@ -100,6 +103,33 @@ class SettingsActivity : AppCompatActivity() {
         // 알람 시간 변경 버튼 클릭 이벤트 설정
         setAlarmTimesButton.setOnClickListener {
             updateAlarmTimes(bottleCode)
+        }
+    }
+
+    // 시간 제한 설정 메서드
+    private fun setTimeRestrictions() {
+        morningTimePicker.setOnTimeChangedListener { _, hourOfDay, _ ->
+            if (hourOfDay !in 4..10) {
+                morningTimePicker.hour = 4
+                morningTimePicker.minute = 1
+                Toast.makeText(this, "오전 4시 1분에서 오전 10시까지만 선택 가능합니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        afternoonTimePicker.setOnTimeChangedListener { _, hourOfDay, _ ->
+            if (hourOfDay !in 10..15 || (hourOfDay == 10 && afternoonTimePicker.minute == 0)) {
+                afternoonTimePicker.hour = 10
+                afternoonTimePicker.minute = 1
+                Toast.makeText(this, "오전 10시 1분에서 오후 3시까지만 선택 가능합니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        eveningTimePicker.setOnTimeChangedListener { _, hourOfDay, _ ->
+            if ((hourOfDay in 0..3) || (hourOfDay !in 15..23)) {
+                eveningTimePicker.hour = 15
+                eveningTimePicker.minute = 1
+                Toast.makeText(this, "오후 3시 1분에서 오전 4시까지만 선택 가능합니다.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -153,13 +183,11 @@ class SettingsActivity : AppCompatActivity() {
                     if (result?.get("message") == "success") {
                         // 알림 값에 따른 알람 처리
                         if (currentNotificationValue == "app" || currentNotificationValue == "mix") {
-                            // 알람 설정
                             AlarmManagerUtils.manageAlarm(this@SettingsActivity, morningTime, "morning", true)
                             AlarmManagerUtils.manageAlarm(this@SettingsActivity, afternoonTime, "afternoon", true)
                             AlarmManagerUtils.manageAlarm(this@SettingsActivity, eveningTime, "evening", true)
                             Toast.makeText(this@SettingsActivity, "알림 시간이 변경되었고 알람이 설정되었습니다.", Toast.LENGTH_SHORT).show()
                         } else if (currentNotificationValue == "bottle" || currentNotificationValue == "none") {
-                            // 기존 알람 취소
                             AlarmManagerUtils.manageAlarm(this@SettingsActivity, morningTime, "morning", false)
                             AlarmManagerUtils.manageAlarm(this@SettingsActivity, afternoonTime, "afternoon", false)
                             AlarmManagerUtils.manageAlarm(this@SettingsActivity, eveningTime, "evening", false)
@@ -218,14 +246,12 @@ class SettingsActivity : AppCompatActivity() {
                 if (response.isSuccessful && result?.get("message") == "success") {
                     Toast.makeText(this@SettingsActivity, "알림 설정이 변경되었습니다.", Toast.LENGTH_SHORT).show()
 
-                    // 'bottle' 또는 'none'일 경우 기존 알람 삭제
                     if (value == "bottle" || value == "none") {
                         AlarmManagerUtils.manageAlarm(this@SettingsActivity, formatTime(morningTimePicker.hour, morningTimePicker.minute), "morning", false)
                         AlarmManagerUtils.manageAlarm(this@SettingsActivity, formatTime(afternoonTimePicker.hour, afternoonTimePicker.minute), "afternoon", false)
                         AlarmManagerUtils.manageAlarm(this@SettingsActivity, formatTime(eveningTimePicker.hour, eveningTimePicker.minute), "evening", false)
                         Toast.makeText(this@SettingsActivity, "기존 알람이 삭제되었습니다.", Toast.LENGTH_SHORT).show()
                     } else if (value == "app" || value == "mix") {
-                        // 알람이 다시 설정되도록 함
                         val morningTime = formatTime(morningTimePicker.hour, morningTimePicker.minute)
                         val afternoonTime = formatTime(afternoonTimePicker.hour, afternoonTimePicker.minute)
                         val eveningTime = formatTime(eveningTimePicker.hour, eveningTimePicker.minute)
