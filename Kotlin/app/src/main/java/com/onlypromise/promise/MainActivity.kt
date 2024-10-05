@@ -1,4 +1,4 @@
-package com.promise.promise
+package com.onlypromise.promise
 
 import android.content.Context
 import android.content.Intent
@@ -19,10 +19,10 @@ import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.promise.promise.network.ApiClient
-import com.promise.promise.network.NotificationService
-import com.promise.promise.network.OcrService
-import com.promise.promise.utils.AlarmManagerUtils
+import com.onlypromise.promise.network.ApiClient
+import com.onlypromise.promise.network.NotificationService
+import com.onlypromise.promise.network.OcrService
+import com.onlypromise.promise.utils.AlarmManagerUtils // AlarmManagerUtils 임포트
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody

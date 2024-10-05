@@ -1,4 +1,4 @@
-package com.promise.promise
+package com.onlypromise.promise
 
 import android.content.Context
 import android.content.Intent
@@ -12,8 +12,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.promise.promise.network.ApiClient
-import com.promise.promise.network.NotificationService
+import com.onlypromise.promise.network.ApiClient
+import com.onlypromise.promise.network.NotificationService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

@@ -1,5 +1,5 @@
 // 파일명: MedicineAdapter.kt
-package com.promise.promise
+package com.onlypromise.promise
 
 import android.graphics.Color
 import android.view.LayoutInflater

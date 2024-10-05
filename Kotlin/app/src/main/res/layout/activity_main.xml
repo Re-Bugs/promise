@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    tools:context="com.promise.promise.MainActivity">
+    tools:context="com.onlypromise.promise.MainActivity">
 
     <!-- 앱 이름 표시 -->
     <TextView

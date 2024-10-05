@@ -1,4 +1,4 @@
-package com.promise.promise
+package com.onlypromise.promise
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,9 +6,9 @@ import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.promise.promise.network.ApiClient
-import com.promise.promise.network.NotificationService
-import com.promise.promise.utils.AlarmManagerUtils
+import com.onlypromise.promise.network.ApiClient
+import com.onlypromise.promise.network.NotificationService
+import com.onlypromise.promise.utils.AlarmManagerUtils
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -112,7 +112,7 @@ class SettingsActivity : AppCompatActivity() {
             if (hourOfDay !in 4..10) {
                 morningTimePicker.hour = 4
                 morningTimePicker.minute = 1
-                Toast.makeText(this, "오전 4시 1분에서 오전 10시까지만 선택 가능합니다.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "아침은 오전 4시 1분에서 오전 10시까지만 선택 가능", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -120,7 +120,7 @@ class SettingsActivity : AppCompatActivity() {
             if (hourOfDay !in 10..15 || (hourOfDay == 10 && afternoonTimePicker.minute == 0)) {
                 afternoonTimePicker.hour = 10
                 afternoonTimePicker.minute = 1
-                Toast.makeText(this, "오전 10시 1분에서 오후 3시까지만 선택 가능합니다.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "점심은 오전 10시 1분에서 오후 3시까지만 선택 가능", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -128,7 +128,7 @@ class SettingsActivity : AppCompatActivity() {
             if ((hourOfDay in 0..3) || (hourOfDay !in 15..23)) {
                 eveningTimePicker.hour = 15
                 eveningTimePicker.minute = 1
-                Toast.makeText(this, "오후 3시 1분에서 오전 4시까지만 선택 가능합니다.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "저녁은 오후 3시 1분에서 오전 4시까지만 선택 가능", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -141,18 +141,40 @@ class SettingsActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val alarmTimes = response.body()
                     alarmTimes?.let {
-                        val morning = it["morning"]?.split(":") ?: listOf("06", "00")
-                        val afternoon = it["afternoon"]?.split(":") ?: listOf("14", "00")
-                        val evening = it["evening"]?.split(":") ?: listOf("19", "30")
+                        // 서버에서 받은 알람 시간을 확인하고 파싱
+                        val morning = it["morning"] ?: "06:00" // 기본값 설정
+                        val afternoon = it["afternoon"] ?: "12:00"
+                        val evening = it["evening"] ?: "18:00"
 
-                        morningTimePicker.hour = morning[0].toInt()
-                        morningTimePicker.minute = morning[1].toInt()
+                        try {
+                            // 아침 알람 시간 설정
+                            val morningTimeParts = morning.split(":")
+                            morningTimePicker.hour = morningTimeParts[0].toInt()
+                            morningTimePicker.minute = morningTimeParts[1].toInt()
 
-                        afternoonTimePicker.hour = afternoon[0].toInt()
-                        afternoonTimePicker.minute = afternoon[1].toInt()
+                            // 로그 남기기 (서버 시간과 설정된 시간 비교)
+                            Log.d("AlarmTimes", "서버에서 받은 아침 시간: $morning, TimePicker 설정 시간: ${morningTimePicker.hour}:${morningTimePicker.minute}")
 
-                        eveningTimePicker.hour = evening[0].toInt()
-                        eveningTimePicker.minute = evening[1].toInt()
+                            // 점심 알람 시간 설정
+                            val afternoonTimeParts = afternoon.split(":")
+                            afternoonTimePicker.hour = afternoonTimeParts[0].toInt()
+                            afternoonTimePicker.minute = afternoonTimeParts[1].toInt()
+
+                            // 로그 남기기 (서버 시간과 설정된 시간 비교)
+                            Log.d("AlarmTimes", "서버에서 받은 점심 시간: $afternoon, TimePicker 설정 시간: ${afternoonTimePicker.hour}:${afternoonTimePicker.minute}")
+
+                            // 저녁 알람 시간 설정
+                            val eveningTimeParts = evening.split(":")
+                            eveningTimePicker.hour = eveningTimeParts[0].toInt()
+                            eveningTimePicker.minute = eveningTimeParts[1].toInt()
+
+                            // 로그 남기기 (서버 시간과 설정된 시간 비교)
+                            Log.d("AlarmTimes", "서버에서 받은 저녁 시간: $evening, TimePicker 설정 시간: ${eveningTimePicker.hour}:${eveningTimePicker.minute}")
+
+                        } catch (e: Exception) {
+                            // 시간이 제대로 파싱되지 않으면 오류 로깅
+                            Log.e("SettingsActivity", "시간 파싱 오류: ${e.message}", e)
+                        }
                     }
                 } else {
                     Toast.makeText(this@SettingsActivity, "알림 시간을 불러오지 못했습니다.", Toast.LENGTH_SHORT).show()
@@ -320,6 +342,13 @@ class SettingsActivity : AppCompatActivity() {
 
     // 애플리케이션 초기화 메서드
     private fun resetApplication() {
+        val morningTime = formatTime(morningTimePicker.hour, morningTimePicker.minute)
+        val afternoonTime = formatTime(afternoonTimePicker.hour, afternoonTimePicker.minute)
+        val eveningTime = formatTime(eveningTimePicker.hour, eveningTimePicker.minute)
+        AlarmManagerUtils.manageAlarm(this@SettingsActivity, morningTime, "morning", false)
+        AlarmManagerUtils.manageAlarm(this@SettingsActivity, afternoonTime, "afternoon", false)
+        AlarmManagerUtils.manageAlarm(this@SettingsActivity, eveningTime, "evening", false)
+
         deleteStoredData()
         val intent = Intent(this, SplashActivity::class.java)
         startActivity(intent)

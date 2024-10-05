@@ -1,4 +1,4 @@
-package com.promise.promise
+package com.onlypromise.promise
 
 import android.content.Context
 import android.content.Intent

@@ -1,4 +1,4 @@
-package com.promise.promise
+package com.onlypromise.promise
 
 import android.content.Context
 import android.content.Intent
@@ -13,9 +13,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.promise.promise.network.ApiClient
-import com.promise.promise.network.LoginRequest
-import com.promise.promise.network.LoginResponse
+import com.onlypromise.promise.network.ApiClient
+import com.onlypromise.promise.network.LoginRequest
+import com.onlypromise.promise.network.LoginResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

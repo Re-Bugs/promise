@@ -1,4 +1,4 @@
-package com.promise.promise.network
+package com.onlypromise.promise.network
 
 import retrofit2.Call
 import retrofit2.http.Body

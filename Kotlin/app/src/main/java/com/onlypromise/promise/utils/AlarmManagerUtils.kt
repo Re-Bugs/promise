@@ -1,4 +1,4 @@
-package com.promise.promise.utils
+package com.onlypromise.promise.utils
 
 import android.app.AlarmManager
 import android.app.PendingIntent

@@ -1,4 +1,4 @@
-package com.promise.promise
+package com.onlypromise.promise
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

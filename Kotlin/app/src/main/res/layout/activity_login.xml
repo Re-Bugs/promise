@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:padding="16dp"
     android:background="@android:color/white"
-    tools:context="com.promise.promise.LoginActivity">
+    tools:context="com.onlypromise.promise.LoginActivity">
 
     <!-- 앱 이름 -->
     <TextView

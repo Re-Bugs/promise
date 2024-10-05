@@ -1,5 +1,5 @@
 // OcrService.kt
-package com.promise.promise.network
+package com.onlypromise.promise.network
 
 import okhttp3.MultipartBody
 import retrofit2.Call
