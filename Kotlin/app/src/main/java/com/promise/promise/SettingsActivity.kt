@@ -182,17 +182,59 @@ class SettingsActivity : AppCompatActivity() {
                     Log.d("ServerResponse", "Alarm update result: $result")
                     if (result?.get("message") == "success") {
                         // 알림 값에 따른 알람 처리
-                        if (currentNotificationValue == "app" || currentNotificationValue == "mix") {
-                            AlarmManagerUtils.manageAlarm(this@SettingsActivity, morningTime, "morning", true)
-                            AlarmManagerUtils.manageAlarm(this@SettingsActivity, afternoonTime, "afternoon", true)
-                            AlarmManagerUtils.manageAlarm(this@SettingsActivity, eveningTime, "evening", true)
-                            Toast.makeText(this@SettingsActivity, "알림 시간이 변경되었고 알람이 설정되었습니다.", Toast.LENGTH_SHORT).show()
-                        } else if (currentNotificationValue == "bottle" || currentNotificationValue == "none") {
-                            AlarmManagerUtils.manageAlarm(this@SettingsActivity, morningTime, "morning", false)
-                            AlarmManagerUtils.manageAlarm(this@SettingsActivity, afternoonTime, "afternoon", false)
-                            AlarmManagerUtils.manageAlarm(this@SettingsActivity, eveningTime, "evening", false)
-                            Toast.makeText(this@SettingsActivity, "알림 시간이 변경되었고 기존 알람이 취소되었습니다.", Toast.LENGTH_SHORT).show()
-                        }
+                        notificationService.getNotifications(bottleCode).enqueue(object : Callback<Map<String, Any>> {
+                            override fun onResponse(call: Call<Map<String, Any>>, response: Response<Map<String, Any>>) {
+                                if (response.isSuccessful) {
+                                    val notifications = response.body()?.get("notifications") as? List<Map<String, Any>>
+                                    var morningSet = false
+                                    var afternoonSet = false
+                                    var eveningSet = false
+
+                                    notifications?.forEach { notification ->
+                                        if (notification["morning"] == true && !morningSet) {
+                                            AlarmManagerUtils.manageAlarm(this@SettingsActivity, morningTime, "morning", true)
+                                            morningSet = true // 중복 설정 방지
+                                            Log.d("AlarmManager", "morning 알람이 설정되었습니다.")
+                                        }
+
+                                        if (notification["afternoon"] == true && !afternoonSet) {
+                                            AlarmManagerUtils.manageAlarm(this@SettingsActivity, afternoonTime, "afternoon", true)
+                                            afternoonSet = true // 중복 설정 방지
+                                            Log.d("AlarmManager", "afternoon 알람이 설정되었습니다.")
+                                        }
+
+                                        if (notification["evening"] == true && !eveningSet) {
+                                            AlarmManagerUtils.manageAlarm(this@SettingsActivity, eveningTime, "evening", true)
+                                            eveningSet = true // 중복 설정 방지
+                                            Log.d("AlarmManager", "evening 알람이 설정되었습니다.")
+                                        }
+                                    }
+
+                                    // 만약 해당 시간대에 알람이 없다면 해당 알람을 취소
+                                    if (!morningSet) {
+                                        AlarmManagerUtils.manageAlarm(this@SettingsActivity, morningTime, "morning", false)
+                                        Log.d("AlarmManager", "morning 알람이 취소되었습니다.")
+                                    }
+                                    if (!afternoonSet) {
+                                        AlarmManagerUtils.manageAlarm(this@SettingsActivity, afternoonTime, "afternoon", false)
+                                        Log.d("AlarmManager", "afternoon 알람이 취소되었습니다.")
+                                    }
+                                    if (!eveningSet) {
+                                        AlarmManagerUtils.manageAlarm(this@SettingsActivity, eveningTime, "evening", false)
+                                        Log.d("AlarmManager", "evening 알람이 취소되었습니다.")
+                                    }
+                                } else {
+                                    Toast.makeText(this@SettingsActivity, "알람 정보를 가져오지 못했습니다.", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+
+                            override fun onFailure(call: Call<Map<String, Any>>, t: Throwable) {
+                                Log.e("SettingActivity", "네트워크 오류: ${t.message}", t)
+                                Toast.makeText(this@SettingsActivity, "인터넷 연결을 확인해주세요.", Toast.LENGTH_SHORT).show()
+                            }
+                        })
+
+                        Toast.makeText(this@SettingsActivity, "알림 시간이 변경되었고 알람이 설정되었습니다.", Toast.LENGTH_SHORT).show()
                     } else {
                         Toast.makeText(this@SettingsActivity, "알림 시간 변경 실패", Toast.LENGTH_SHORT).show()
                     }
@@ -215,6 +257,7 @@ class SettingsActivity : AppCompatActivity() {
     private fun formatTime(hour: Int, minute: Int): String {
         return String.format("%02d:%02d", hour, minute)
     }
+
 
     // GET 요청: 알림 설정 가져오기
     private fun getNotificationValue(bottleCode: String) {
