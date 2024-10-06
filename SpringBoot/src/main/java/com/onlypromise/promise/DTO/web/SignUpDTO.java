@@ -33,7 +33,7 @@ public class SignUpDTO {
     @NotNull(message = "알림 설정은 필수 항목입니다.")
     private NotificationValue notificationValue;
 
-    @Nullable
+    @NotBlank(message = "약통코드는 필수 항목입니다.")
     private String bottleId;
 
     @Nullable

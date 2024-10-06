@@ -15,7 +15,7 @@ public class WebConfig implements WebMvcConfigurer {
     {
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/**") // 모든 경로에 대해 인터셉터를 적용
-                .excludePathPatterns("/login", "/login/sign_up", "/resources/**", "/error", "/api/**", "/test/**", "/health");
+                .excludePathPatterns("/login", "/login/sign_up", "/static/**", "/images/**", "/error", "/api/**", "/health");
     }
 
 //    @Override

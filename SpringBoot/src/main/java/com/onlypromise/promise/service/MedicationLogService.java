@@ -122,4 +122,9 @@ public class MedicationLogService {
                 .build();
         medicationLogRepository.save(medicationLog);
     }
+
+    List<MedicationLog> findByUserAndTimeBetween(User user, LocalDateTime startTime, LocalDateTime endTime)
+    {
+        return medicationLogRepository.findByUserAndTimeBetween(user, startTime, endTime);
+    }
 }

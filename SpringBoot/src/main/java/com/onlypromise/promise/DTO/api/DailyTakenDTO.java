@@ -1,4 +1,4 @@
-package com.onlypromise.promise.DTO;
+package com.onlypromise.promise.DTO.api;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

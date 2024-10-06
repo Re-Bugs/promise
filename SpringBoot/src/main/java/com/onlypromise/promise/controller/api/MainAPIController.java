@@ -1,6 +1,6 @@
 package com.onlypromise.promise.controller.api;
 
-import com.onlypromise.promise.DTO.DailyTakenDTO;
+import com.onlypromise.promise.DTO.api.DailyTakenDTO;
 import com.onlypromise.promise.DTO.api.NotificationDTO;
 import com.onlypromise.promise.domain.Medicine;
 import com.onlypromise.promise.service.MedicationLogService;

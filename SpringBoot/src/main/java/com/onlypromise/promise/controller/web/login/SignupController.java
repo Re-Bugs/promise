@@ -17,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 
 @Slf4j
@@ -34,7 +35,7 @@ public class SignupController {
     }
 
     @PostMapping("/sign_up")
-    public String registerUser(@Validated @ModelAttribute SignUpDTO signUpDTO, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    public String registerUser(@Validated @ModelAttribute SignUpDTO signUpDTO, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
 
         if (bindingResult.hasErrors()) {
             log.info("errors={}", bindingResult);
@@ -47,39 +48,45 @@ public class SignupController {
             return "loginView/sign_up";
         }
 
-        //약통코드가 null이면 DB에 NULL 처리하는 로직
-        if (signUpDTO.getBottleId() != null && signUpDTO.getBottleId().trim().isEmpty()) //약통 코드가 null이면
-            signUpDTO.setBottleId(null);//DB에 null값을 넣음
+        Optional<User> findUser = userService.findUserByBottleId(signUpDTO.getBottleId());
 
-        //빌더로 user 객체 생성
-        User user = User.builder()
-                .userId(signUpDTO.getUserId())
-                .userPassword(signUpDTO.getUserPassword())
-                .name(signUpDTO.getName())
-                .age(signUpDTO.getAge())
-                .nickName(signUpDTO.getNickName())
-                .notificationValue(signUpDTO.getNotificationValue())
-                .bottleId(signUpDTO.getBottleId())
-                .zipcode(signUpDTO.getZipcode())
-                .role(Role.user) //role 은 기본적으로 user
-                .morningTime(LocalTime.parse("08:00", DateTimeFormatter.ofPattern("HH:mm")))
-                .afternoonTime(LocalTime.parse("13:00", DateTimeFormatter.ofPattern("HH:mm")))
-                .eveningTime(LocalTime.parse("18:00", DateTimeFormatter.ofPattern("HH:mm")))
-                .build();
+        if(findUser.isEmpty())
+        {
+            bindingResult.rejectValue("bottleId", "error.bottleId", "잘못된 약통코드입니다.");
+            return "loginView/sign_up";
+        }
 
-        if (userService.signUp(user)) {
+        if (userService.findByUserId(signUpDTO.getUserId()).isEmpty())
+        {
+            User user = findUser.get().toBuilder()
+                    .userId(signUpDTO.getUserId())
+                    .userPassword(signUpDTO.getUserPassword())
+                    .name(signUpDTO.getName())
+                    .age(signUpDTO.getAge())
+                    .nickName(signUpDTO.getNickName())
+                    .notificationValue(signUpDTO.getNotificationValue())
+                    .bottleId(signUpDTO.getBottleId())
+                    .zipcode(signUpDTO.getZipcode())
+                    .role(Role.user)
+                    .build();
+
+            userService.save(user);
             redirectAttributes.addFlashAttribute("message", "회원가입이 성공적으로 완료되었습니다.");
             return "redirect:/login";
-        } else {
-            redirectAttributes.addFlashAttribute("errorMessage", "이미 존재하는 아이디입니다.");
-            return "redirect:/login/sign_up";
+        }
+        else
+        {
+            model.addAttribute("errorMessage", "이미 존재하는 아이디입니다.");
+            return "loginView/sign_up";
         }
     }
 
     //닉네임 중복 방지
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public String handleDataIntegrityViolationException(DataIntegrityViolationException ex, RedirectAttributes redirectAttributes) {
-        if (ex.getCause() instanceof ConstraintViolationException) {
+    public String handleDataIntegrityViolationException(DataIntegrityViolationException ex, RedirectAttributes redirectAttributes)
+    {
+        if (ex.getCause() instanceof ConstraintViolationException)
+        {
             redirectAttributes.addFlashAttribute("errorMessage", "닉네임이 중복되었습니다. 다른 닉네임을 사용해주세요.");
         }
         return "redirect:/login/sign_up";

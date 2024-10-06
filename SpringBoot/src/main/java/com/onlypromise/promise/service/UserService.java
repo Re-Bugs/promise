@@ -22,13 +22,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final MedicationLogRepository medicationLogRepository;
 
-    // 회원가입(웹) 메서드
-    public boolean signUp(User user) {
-        if(userRepository.existsByUserId(user.getUserId())) return false; // DB에 user ID가 이미 존재한다면 false
-        else userRepository.save(user); // DB에 user ID가 존재하지 않는다면 DB에 저장
-        return true;
-    }
-
     // 로그인 메서드(web)
     public Boolean login(LoginDTO loginDTO)
     {
@@ -81,5 +74,10 @@ public class UserService {
     public void save(User user)
     {
         userRepository.save(user);
+    }
+
+    public List<User> findAllUser()
+    {
+       return userRepository.findAll();
     }
 }

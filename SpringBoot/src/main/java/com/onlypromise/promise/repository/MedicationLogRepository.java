@@ -22,4 +22,6 @@ public interface MedicationLogRepository extends JpaRepository<MedicationLog, Lo
 
     // 특정 유저와 시간 범위에 해당하는 복용 기록을 조회하는 메서드
     List<MedicationLog> findByUserAndTimeBetween(User user, LocalDateTime startTime, LocalDateTime endTime);
+
+
 }

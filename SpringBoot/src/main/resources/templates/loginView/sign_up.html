@@ -69,6 +69,12 @@
     <!-- 회원가입 폼 -->
     <form th:action="@{/login/sign_up}" method="post" th:object="${signUpDTO}">
         <div class="form-group">
+            <label for="bottleId">약통 코드(필수)</label>
+            <input type="text" id="bottleId" th:field="*{bottleId}" placeholder="약통 아이디 입력">
+            <div th:if="${#fields.hasErrors('bottleId')}" th:errors="*{bottleId}" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
             <label for="userId">아이디(필수)</label>
             <input type="text" id="userId" th:field="*{userId}" placeholder="아이디 입력">
             <div th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}" class="error-message"></div>
@@ -99,12 +105,6 @@
         </div>
 
         <div class="form-group">
-            <label for="zipcode">우편번호</label>
-            <input type="text" id="zipcode" th:field="*{zipcode}" placeholder="우편번호 입력">
-            <div th:if="${#fields.hasErrors('zipcode')}" th:errors="*{zipcode}" class="error-message"></div>
-        </div>
-
-        <div class="form-group">
             <label for="notificationValue">알림 유형(필수)</label>
             <select id="notificationValue" th:field="*{notificationValue}">
                 <option value="app">앱</option>
@@ -116,11 +116,10 @@
         </div>
 
         <div class="form-group">
-            <label for="bottleId">약통 번호</label>
-            <input type="text" id="bottleId" th:field="*{bottleId}" placeholder="약통 아이디 입력">
-            <div th:if="${#fields.hasErrors('bottleId')}" th:errors="*{bottleId}" class="error-message"></div>
+            <label for="zipcode">우편번호</label>
+            <input type="text" id="zipcode" th:field="*{zipcode}" placeholder="우편번호 입력">
+            <div th:if="${#fields.hasErrors('zipcode')}" th:errors="*{zipcode}" class="error-message"></div>
         </div>
-
         <button type="submit">가입하기</button>
     </form>
 </div>

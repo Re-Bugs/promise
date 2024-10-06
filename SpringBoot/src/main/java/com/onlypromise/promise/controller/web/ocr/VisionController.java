@@ -1,5 +1,7 @@
 package com.onlypromise.promise.controller.web.ocr;
 
+import com.onlypromise.promise.DTO.MedicationDTO;
+import com.onlypromise.promise.DTO.api.MedicineDTO;
 import com.onlypromise.promise.domain.Medicine;
 import com.onlypromise.promise.domain.Notification;
 import com.onlypromise.promise.domain.User;
@@ -47,7 +49,7 @@ public class VisionController {
     }
 
     @PostMapping("/extract-text")
-    public String extractTextFromImage(MultipartFile file, Model model, RedirectAttributes redirectAttributes, HttpSession session) {
+    public String extractTextFromImage(MultipartFile file, RedirectAttributes redirectAttributes, HttpSession session) {
         try {
             String extractedText = visionService.extractTextFromImage(file);
             List<MedicationDTO> dtoList = buildMedicationDtoList(extractedText);

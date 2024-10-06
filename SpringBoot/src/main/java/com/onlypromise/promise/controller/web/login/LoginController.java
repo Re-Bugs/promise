@@ -1,6 +1,7 @@
 package com.onlypromise.promise.controller.web.login;
 
 import com.onlypromise.promise.domain.User;
+import com.onlypromise.promise.domain.enumeration.Role;
 import com.onlypromise.promise.service.UserService;
 import com.onlypromise.promise.DTO.web.LoginDTO;
 import jakarta.servlet.http.HttpSession;
@@ -33,6 +34,10 @@ public class LoginController {
         {
             User user = userService.findByUserId(loginDTO.getUserId()).orElseThrow();
             session.setAttribute("user", user);
+            if(user.getRole().equals(Role.admin))
+            {
+                return "redirect:/admin/home";
+            }
             return "redirect:/home";
         }
         else

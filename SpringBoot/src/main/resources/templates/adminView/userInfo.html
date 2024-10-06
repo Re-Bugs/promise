@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사용자 정보</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #e9ecef; /* 더 어두운 회색 배경 */
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 40px auto;
+            background-color: #f8f9fa; /* 조금 더 밝은 배경색 */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+            font-weight: 300;
+        }
+
+        .alert {
+            color: white;
+            background-color: #28a745;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .section {
+            padding: 20px;
+            background-color: #ffffff; /* 섹션 배경을 조금 더 눈에 띄게 */
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid #dee2e6; /* 섹션 테두리로 구분감 추가 */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: #fafafa;
+            font-weight: 500;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input[type="time"], input[type="number"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+
+        button {
+            display: block;
+            padding: 10px 15px;
+            background-color: black;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 20px auto;
+        }
+
+        button:hover {
+            background-color: #333;
+        }
+
+        .scrollable-table {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .taken {
+            color: #28a745;
+        }
+
+        .not-taken {
+            color: #dc3545;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #ccc;
+            margin: 40px 0;
+        }
+
+        .date-navigation {
+            display: flex;
+            justify-content: center; /* 수평 가운데 정렬 */
+            align-items: center; /* 수직 가운데 정렬 */
+            margin: 20px 0;
+        }
+
+        .date-navigation a {
+            text-decoration: none;
+            font-size: 24px;
+            margin: 0 20px;
+            color: black;
+        }
+
+        .date-navigation span {
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>사용자 정보</h1>
+
+    <!-- 성공 메시지 출력 부분 추가 -->
+    <div th:if="${message}" class="alert">
+        <p th:text="${message}"></p>
+    </div>
+
+    <!-- 유저 정보 섹션 -->
+    <div class="section">
+        <h2>기본 정보</h2>
+        <div class="form-group">
+            <p><strong>이름:</strong> <span th:text="${user.name}"></span></p>
+            <p><strong>나이:</strong> <span th:text="${user.age}"></span></p>
+            <p><strong>약통코드:</strong> <span th:text="${user.bottleId}"></span></p>
+            <p><strong>알림 타입:</strong> <span th:text="${user.notificationValue}"></span></p>
+            <p><strong>아침 알림 시각:</strong> <span th:text="${user.morningTime}"></span></p>
+            <p><strong>점심 알림 시각:</strong> <span th:text="${user.afternoonTime}"></span></p>
+            <p><strong>저녁 알림 시각:</strong> <span th:text="${user.eveningTime}"></span></p>
+        </div>
+    </div>
+
+    <!-- 알림 수정 섹션 (admin일 경우에만 표시) -->
+    <div class="section" th:if="${user.role == T(com.onlypromise.promise.domain.enumeration.Role).admin}">
+        <h2>알림 시각 수정</h2>
+        <form th:action="@{/admin/time_update}" method="post">
+            <input type="hidden" name="id" th:value="${user.id}" />
+
+            <div class="form-group">
+                <label for="morningTime">아침 시간:</label>
+                <input type="time" id="morningTime" name="morningTime" th:value="${#strings.substring(user.morningTime.toString(), 0, 5)}">
+            </div>
+
+            <div class="form-group">
+                <label for="afternoonTime">점심 시간:</label>
+                <input type="time" id="afternoonTime" name="afternoonTime" th:value="${#strings.substring(user.afternoonTime.toString(), 0, 5)}">
+            </div>
+
+            <div class="form-group">
+                <label for="eveningTime">저녁 시간:</label>
+                <input type="time" id="eveningTime" name="eveningTime" th:value="${#strings.substring(user.eveningTime.toString(), 0, 5)}">
+            </div>
+            <button type="submit">시간 수정</button>
+        </form>
+
+        <br>
+
+        <h2>수동 약물 추가</h2>
+        <form th:action="@{/admin/add_medicine}" method="get">
+            <input type="hidden" name="id" th:value="${user.id}">
+            <button type="submit">수동 약품 추가</button>
+        </form>
+    </div>
+
+    <!-- 알림 리스트 섹션 -->
+    <div class="section">
+        <h2>알림 리스트</h2>
+        <div class="scrollable-table">
+            <table>
+                <thead>
+                <tr>
+                    <th>약품 이름</th>
+                    <th>하루 몇회</th>
+                    <th>남은 약품 수</th>
+                    <th>재처방일</th>
+                    <th>아침</th>
+                    <th>점심</th>
+                    <th>저녁</th>
+                    <th>추가일</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="notification : ${notifications}">
+                    <td th:text="${notification.medicine.name}"></td>
+                    <td th:text="${notification.dailyDose}"></td>
+                    <td th:text="${notification.remainingDose}"></td>
+                    <td th:text="${notification.renewalDate}"></td>
+                    <td th:text="${notification.morning} ? 'Yes' : 'No'"></td>
+                    <td th:text="${notification.afternoon} ? 'Yes' : 'No'"></td>
+                    <td th:text="${notification.evening} ? 'Yes' : 'No'"></td>
+                    <td th:text="${#temporals.format(notification.createdAt, 'yyyy-MM-dd')}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 복약 로그 섹션 -->
+    <div class="section">
+        <h2>복약 로그</h2>
+
+        <!-- 날짜 네비게이션 -->
+        <div class="date-navigation">
+            <a th:href="@{|/admin/${user.id}?date=${previousDate}|}">&larr;</a>
+            <span th:text="${#temporals.format(targetDate, 'yyyy-MM-dd')}"></span>
+            <a th:href="@{|/admin/${user.id}?date=${nextDate}|}">&rarr;</a>
+        </div>
+
+        <div class="scrollable-table">
+            <table>
+                <thead>
+                <tr>
+                    <th>약품 이름</th>
+                    <th>상태</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- 복용한 약물 표시 -->
+                <tr th:each="medication : ${medicationStatus.taken}" class="taken">
+                    <td th:text="${medication.medicineName}"></td>
+                    <td>복용함</td>
+                </tr>
+                <!-- 복용하지 않은 약물 표시 -->
+                <tr th:each="medication : ${medicationStatus.notTaken}" class="not-taken">
+                    <td th:text="${medication.medicineName}"></td>
+                    <td>미복용</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
