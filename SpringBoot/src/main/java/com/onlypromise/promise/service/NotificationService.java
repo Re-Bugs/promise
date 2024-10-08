@@ -131,4 +131,8 @@ public class NotificationService {
         return notificationRepository.findByUser(user);
     }
 
+    public void delete(Notification notification)
+    {
+        notificationRepository.delete(notification);
+    }
 }

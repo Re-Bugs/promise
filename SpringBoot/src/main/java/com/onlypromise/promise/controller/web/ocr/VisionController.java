@@ -50,7 +50,8 @@ public class VisionController {
 
     @PostMapping("/extract-text")
     public String extractTextFromImage(MultipartFile file, RedirectAttributes redirectAttributes, HttpSession session) {
-        try {
+        try
+        {
             String extractedText = visionService.extractTextFromImage(file);
             List<MedicationDTO> dtoList = buildMedicationDtoList(extractedText);
             List<MedicineDTO> validDtoList = filterAndBuildValidDtoList(dtoList, session);
@@ -73,15 +74,10 @@ public class VisionController {
                 log.info("Daily dosage times: {}", dailyDosageTimes);
 
                 // 숫자 문자열을 Enum 값으로 변환하여 저장
-                if ("1".equals(dailyDosageTimes)) {
-                    notificationBuilder.dailyDose(DailyDose.one);
-                } else if ("2".equals(dailyDosageTimes)) {
-                    notificationBuilder.dailyDose(DailyDose.two);
-                } else if ("3".equals(dailyDosageTimes)) {
-                    notificationBuilder.dailyDose(DailyDose.three);
-                } else {
-                    throw new IllegalArgumentException("Invalid daily dosage times: " + dailyDosageTimes);
-                }
+                if ("1".equals(dailyDosageTimes)) notificationBuilder.dailyDose(DailyDose.one);
+                else if ("2".equals(dailyDosageTimes)) notificationBuilder.dailyDose(DailyDose.two);
+                else if ("3".equals(dailyDosageTimes)) notificationBuilder.dailyDose(DailyDose.three);
+                else throw new IllegalArgumentException("Invalid daily dosage times: " + dailyDosageTimes);
 
                 // morning, afternoon, evening 설정
                 List<String> mealTimes = medicineDTO.getMealTimes();
@@ -106,7 +102,9 @@ public class VisionController {
             }
 
             redirectAttributes.addFlashAttribute("dtoList", validDtoList);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             redirectAttributes.addAttribute("errorMessage", "오류가 발생했습니다. 다시 시도해 주세요.");
             log.error("OCR error = {}", e.getMessage());
         }
@@ -121,17 +119,15 @@ public class VisionController {
         notificationBuilder.evening(false);
 
         // 식사 시간을 분리하여 플래그 설정
-        for (String mealTime : mealTimes) {
+        for (String mealTime : mealTimes)
+        {
             String[] meals = mealTime.split(",");
-            for (String meal : meals) {
+            for (String meal : meals)
+            {
                 meal = meal.trim();  // 공백 제거
-                if (meal.equals("아침")) {
-                    notificationBuilder.morning(true);
-                } else if (meal.equals("점심")) {
-                    notificationBuilder.afternoon(true);
-                } else if (meal.equals("저녁")) {
-                    notificationBuilder.evening(true);
-                }
+                if (meal.equals("아침")) notificationBuilder.morning(true);
+                else if (meal.equals("점심")) notificationBuilder.afternoon(true);
+                else if (meal.equals("저녁")) notificationBuilder.evening(true);
             }
         }
     }
@@ -147,7 +143,8 @@ public class VisionController {
         List<MedicationDTO> dtoList = new ArrayList<>();
         int size = nineDigitNumbers.size(); // 약품 코드 개수를 기준으로 처리
 
-        for (int i = 0; i < size; ++i) {
+        for (int i = 0; i < size; ++i)
+        {
             MedicationDTO dto = new MedicationDTO();
             dto.setMedicationCode(nineDigitNumbers.get(i));
 
@@ -170,8 +167,10 @@ public class VisionController {
     // MedicationDTO 리스트를 기반으로 값이 누락되지 않은 DTO 객체만 필터링
     private List<MedicineDTO> filterAndBuildValidDtoList(List<MedicationDTO> dtoList, HttpSession session) {
         List<MedicineDTO> validDtoList = new ArrayList<>();
-        for (MedicationDTO dto : dtoList) {
-            if (isValidDto(dto)) {
+        for (MedicationDTO dto : dtoList)
+        {
+            if (isValidDto(dto))
+            {
                 Optional<Medicine> medicine = visionService.getMedicineByProductCode(dto.getMedicationCode());
                 medicine.ifPresent(med -> {
                     MedicineDTO medicineDTO = new MedicineDTO(
@@ -208,12 +207,11 @@ public class VisionController {
     private List<String> extractNineDigitNumbers(String text) {
         List<String> nineDigitNumbers = new ArrayList<>();
         Matcher betweenMatcher = BETWEEN_PATTERN.matcher(text);
-        if (betweenMatcher.find()) {
+        if (betweenMatcher.find())
+        {
             String betweenWords = betweenMatcher.group(1);
             Matcher matcher = NINE_DIGIT_PATTERN.matcher(betweenWords);
-            while (matcher.find()) {
-                nineDigitNumbers.add(matcher.group());
-            }
+            while (matcher.find()) nineDigitNumbers.add(matcher.group());
         }
         return nineDigitNumbers;
     }
@@ -221,12 +219,11 @@ public class VisionController {
     public List<String> extractValidTwoDigitNumbers(String text) {
         List<String> validNumbers = new ArrayList<>();
         Matcher betweenMatcher = BETWEEN_PATTERN.matcher(text);
-        if (betweenMatcher.find()) {
+        if (betweenMatcher.find())
+        {
             String betweenWords = betweenMatcher.group(1);
             Matcher digitMatcher = DIGIT_PATTERN.matcher(betweenWords);
-            while (digitMatcher.find()) {
-                validNumbers.add(digitMatcher.group(1));
-            }
+            while (digitMatcher.find()) validNumbers.add(digitMatcher.group(1));
         }
         return validNumbers;
     }
@@ -234,32 +231,25 @@ public class VisionController {
     public List<String> extractDayAndMealSet(String text) {
         List<String> dayAndMealSet = new ArrayList<>();
         Matcher mealSetMatcher = MEAL_SET_PATTERN.matcher(text);
-        while (mealSetMatcher.find()) {
-            dayAndMealSet.add(mealSetMatcher.group());
-        }
+        while (mealSetMatcher.find()) dayAndMealSet.add(mealSetMatcher.group());
         return dayAndMealSet;
     }
 
     public List<String> extractDayNumber(String text) {
         List<String> dayNumbers = new ArrayList<>();
         Matcher dayNumberMatcher = DAY_NUMBER_PATTERN.matcher(text);
-        while (dayNumberMatcher.find()) {
-            dayNumbers.add(dayNumberMatcher.group(1));
-        }
+        while (dayNumberMatcher.find()) dayNumbers.add(dayNumberMatcher.group(1));
         return dayNumbers;
     }
 
     public List<String> extractMealTimesFromList(List<String> lines) {
         List<String> mealTimes = new ArrayList<>();
-        for (String line : lines) {
+        for (String line : lines)
+        {
             Matcher mealMatcher = MEAL_PATTERN.matcher(line);
             List<String> mealsInLine = new ArrayList<>();
-            while (mealMatcher.find()) {
-                mealsInLine.add(mealMatcher.group(1));
-            }
-            if (!mealsInLine.isEmpty()) {
-                mealTimes.add(String.join(",", mealsInLine));
-            }
+            while (mealMatcher.find()) mealsInLine.add(mealMatcher.group(1));
+            if (!mealsInLine.isEmpty()) mealTimes.add(String.join(",", mealsInLine));
         }
         return mealTimes;
     }

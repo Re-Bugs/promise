@@ -157,36 +157,51 @@
 </head>
 <body>
 
-<h1>관리자 페이지</h1>
-
 <div class="container">
+    <!-- 새로운 타이틀과 이미지 섹션 추가 -->
+    <h1 style="text-align: center; color: #2c3e50; font-weight: 600;">약속</h1>
+    <div style="text-align: center;">
+        <img src="/images/promise.png" alt="의사와 환자의 약속" style="max-width: 25%; height: auto; border-radius: 8px;">
+    </div>
+    <div class="info-text" style="font-size: 18px; font-weight: bold; color: #34495e;">의사와 환자의 약속(藥束)</div>
+
+    <br>
+
+    <!-- 기존 사용자 정보 테이블 섹션 -->
     <div class="info-text" th:text="'사용자를 선택하면 상세 정보를 확인할 수 있음'"></div>
+    <div class="info-text" th:text="'관찰 시작일 : ' + ${startDateTime}"></div>
 
     <table>
         <thead>
         <tr>
+            <th>역할</th>
             <th>이름</th>
             <th>나이</th>
             <th>약통 코드</th>
-            <th>복용 약물 수</th>
-            <th>복약 순응도(%)</th>
+            <th>복약한 약물 수</th>
+            <th>등록된 약물 수</th>
+            <th>복약 순응도</th>
         </tr>
         </thead>
         <tbody>
         <!-- 유저 정보 리스트 출력 -->
         <tr th:each="user : ${userInfo}" th:data-href="@{/admin/{id}(id=${user.id})}">
             <!-- 행 클릭 시 이동하도록 이벤트 설정 -->
+            <td th:text="${user.role}"></td>
             <td th:text="${user.name}"></td>
             <td th:text="${user.age}"></td>
             <td th:text="${user.bottleId}"></td>
+            <td th:text="${user.logSize}"></td>
             <td th:text="${user.totalMedicine}"></td>
-            <td th:text="${user.percent}"></td>
+            <td th:text="${user.percent} + '%'"></td>
         </tr>
         </tbody>
     </table>
     <br>
-    <div class="info-text" th:text="'개인 복약 순응도 계산식 : 복약한 약물 수 / 관찰기간 * 총 약물 수'"></div>
+    <div class="info-text" th:text="'관찰 기간 : ' + ${daysBetween} + '일'"></div>
+    <div class="info-text" th:text="'개인 복약 순응도 계산식 : 복약한 약물 수 / (등록된 약물 수 * 관찰기간)'"></div>
 </div>
+
 
 <!-- 프로그래스 바 섹션 -->
 <div class="progress-container">
@@ -197,8 +212,8 @@
         <div class="progress-bar-text" th:text="${'평균 복약 순응도 : ' + totalPercent + '%'}"></div>
     </div>
     <br>
-    <div class="info-text" th:text="'평균 복약 순응도 계산식 : 개인 복약 순응도 합산 값 / 사용자 전체 수'"></div>
-    <div class="info-text" th:text="'평균 복약 순응도 계산식은 테스트용 계정의 복약 순응도를 뺀 값임'"></div>
+    <div class="info-text" th:text="'평균 복약 순응도 계산식 : 모든 user의 복약 순응도 합산 값 / 모든 user 수'"></div>
+    <div class="info-text" th:text="'- 관리자(테스트) 계정의 복약 순응도는 반영하지 않음 -'"></div>
 </div>
 
 </body>

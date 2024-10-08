@@ -68,10 +68,6 @@ public class VisionApiController {
 
             for (MedicineDTO medicineDTO : validDtoList)
             {
-                // Notification 객체 생성 및 설정
-                Notification.NotificationBuilder notificationBuilder = Notification.builder();
-                notificationBuilder.user(user);
-
                 // medicine_id 설정 (medicineId를 사용하여 Medicine 조회)
                 Optional<Medicine> findMedicine = visionService.getMedicineById(medicineDTO.getMedicineId());
 
@@ -83,14 +79,20 @@ public class VisionApiController {
                 }
 
                 Medicine medicine = findMedicine.get();
-                notificationBuilder.medicine(medicine);
 
                 // 동일한 약물이 이미 등록되어 있는지 확인
-                Optional<Notification> existingNotification = notificationService.findByUserAndMedicine(user, medicine);
-                if (existingNotification.isPresent()) {
+                Optional<Notification> findNotification = notificationService.findByUserAndMedicine(user, medicine);
+                if (findNotification.isPresent())
+                {
+                    notificationService.delete(findNotification.get()); //기존 알림을 삭제
                     log.info("이미 동일한 약물이 존재 User ID = {}, Medicine = {}", user.getId(), medicine.getProductCode());
-                    continue; // 다음 약물로 이동
+                    // continue;
                 }
+
+                // Notification 객체 생성 및 설정
+                Notification.NotificationBuilder notificationBuilder = Notification.builder();
+                notificationBuilder.user(user);
+                notificationBuilder.medicine(medicine);
 
                 // daily_dose 설정
                 String dailyDosageTimes = medicineDTO.getDailyDosageTimes();
@@ -126,9 +128,10 @@ public class VisionApiController {
 
             response.put("data", validDtoList);
             return ResponseEntity.ok(response);
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
-            response.put("message", "fail");
+            response.put("message", "server error");
             log.error("OCR error = {}", e.getMessage());
             return ResponseEntity.status(500).body(response);
         }
@@ -169,7 +172,6 @@ public class VisionApiController {
         {
             MedicationDTO dto = new MedicationDTO();
             dto.setMedicationCode(nineDigitNumbers.get(i));
-
             dto.setTotalDosageDays(getValueOrDefault(twoDigitNumbers, i, "0"));
             dto.setDailyDosageTimes(getValueOrDefault(dailyDosageTimes, i, "0"));
             dto.setMealTimes(List.of(getValueOrDefault(mealTimes, i, "없음")));

@@ -62,7 +62,8 @@ public class MedicationLogService {
         }
 
         // 일치하는 시간대에 약물이 없을 때 오류 메시지 반환
-        if (!hasMatchingNotification) {
+        if (!hasMatchingNotification)
+        {
             log.warn("No medication scheduled for {} time for bottleId: {}", currentTimePeriod, bottleId);
             return "No medication scheduled for this time period.";
         }
@@ -74,10 +75,13 @@ public class MedicationLogService {
     private String determineTimePeriod(LocalDateTime currentTime)
     {
         int hour = currentTime.getHour();
-        if (hour >= 4 && hour <= 10) return "morning";
-        else if (hour > 10 && hour <= 15) return "afternoon";
+        int minute = currentTime.getMinute();
+
+        if ((hour == 4 && minute >= 1) || (hour > 4 && hour < 10) || (hour == 10 && minute == 0)) return "morning";
+        else if ((hour == 10 && minute >= 1) || (hour > 10 && hour < 15) || (hour == 15 && minute == 0)) return "afternoon";
         else return "evening";
     }
+
 
     // 현재 시간대와 알림의 시간대가 일치하는지 확인
     private boolean isMatchingTimePeriod(Notification notification, String currentTimePeriod)
@@ -105,10 +109,18 @@ public class MedicationLogService {
     // 남은 약물 수 감소 및 저장
     private void updateNotificationRemainingDose(Notification notification)
     {
-        Notification updatedNotification = notification.toBuilder()
-                .remainingDose((short) (notification.getRemainingDose() - 1))
-                .build();
-        notificationRepository.save(updatedNotification);
+        if(notification.getRemainingDose() == 1)
+        {
+            log.info("약물이 소진됨 : {}, {}", notification.getUser().getName(), notification.getMedicine().getName());
+            notificationRepository.delete(notification); //알림 삭제
+        }
+        else
+        {
+            Notification updatedNotification = notification.toBuilder()
+                    .remainingDose((short) (notification.getRemainingDose() - 1)) //약물 남은 수 1 감소
+                    .build();
+            notificationRepository.save(updatedNotification);
+        }
     }
 
     // 투약 기록 추가
@@ -123,7 +135,7 @@ public class MedicationLogService {
         medicationLogRepository.save(medicationLog);
     }
 
-    List<MedicationLog> findByUserAndTimeBetween(User user, LocalDateTime startTime, LocalDateTime endTime)
+    public List<MedicationLog> findByUserAndTimeBetween(User user, LocalDateTime startTime, LocalDateTime endTime)
     {
         return medicationLogRepository.findByUserAndTimeBetween(user, startTime, endTime);
     }

@@ -3,11 +3,10 @@ package com.onlypromise.promise.controller.web.admin;
 import com.onlypromise.promise.DTO.MedicineDTO;
 import com.onlypromise.promise.DTO.api.DailyTakenDTO;
 import com.onlypromise.promise.DTO.web.AdminHomeDTO;
-import com.onlypromise.promise.domain.MedicationLog;
 import com.onlypromise.promise.domain.Medicine;
 import com.onlypromise.promise.domain.Notification;
 import com.onlypromise.promise.domain.User;
-import com.onlypromise.promise.repository.MedicationLogRepository;
+import com.onlypromise.promise.service.MedicationLogService;
 import com.onlypromise.promise.service.MedicineService;
 import com.onlypromise.promise.service.NotificationService;
 import com.onlypromise.promise.service.UserService;
@@ -37,7 +36,7 @@ public class adminController {
 
     private final UserService userService;
     private final NotificationService notificationService;
-    private final MedicationLogRepository medicationLogRepository;
+    private final MedicationLogService medicationLogService;
     private final MedicineService medicineService;
 
 
@@ -47,13 +46,12 @@ public class adminController {
         User user = (User) session.getAttribute("user");
         if(user == null) return "redirect:/login";
 
-        // 2024년 9월 30일 00:00부터 오늘까지의 범위 지정
-        LocalDateTime startDateTime = LocalDateTime.of(2024, 9, 30, 0, 0);
+        // 2024년 10월 07일 00:00부터 현재까지의 범위 지정
+        LocalDateTime startDateTime = LocalDateTime.of(2024, 10, 7, 0, 0); //관찰 시작일
         LocalDateTime endDateTime = LocalDateTime.now(); // 현재 시간까지
 
         // LocalDate로 변환하여 두 날짜의 차이를 구함
-        long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(startDateTime.toLocalDate(), endDateTime.toLocalDate());
-        log.info("두 날짜의 차이 : {}", daysBetween);
+        long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(startDateTime.toLocalDate(), endDateTime.toLocalDate()) + 1; // 관찰 시작일부터 1일차이기 때문에 1을 더함
 
         List<AdminHomeDTO> dtoList = new ArrayList<>();
         double totalPercent = 0.0;
@@ -62,6 +60,7 @@ public class adminController {
         {
             AdminHomeDTO newDto = new AdminHomeDTO();
             newDto.setId(u.getId());
+            newDto.setRole(u.getRole());
             newDto.setName(u.getName());
             newDto.setAge(u.getAge());
             newDto.setBottleId(u.getBottleId());
@@ -71,16 +70,19 @@ public class adminController {
             if (daysBetween == 0 || notificationSize == 0) newDto.setPercent(0); // 알림이 없는 경우 0%로 설정
             else
             {
-                int logs = medicationLogRepository.findByUserAndTimeBetween(u, startDateTime, endDateTime).size();
-                double percent = (logs / (daysBetween * (double) notificationSize)) * 100;
+                int logSize = medicationLogService.findByUserAndTimeBetween(u, startDateTime, endDateTime).size();
+                double percent = (logSize / (daysBetween * (double) notificationSize)) * 100;
+                newDto.setLogSize(logSize);
                 newDto.setPercent(Double.parseDouble(df.format(percent)));
                 totalPercent += newDto.getPercent();
             }
             dtoList.add(newDto);
         }
-        totalPercent = Double.parseDouble(df.format((totalPercent - dtoList.get(10).getPercent() - dtoList.get(11).getPercent()) / (dtoList.size() - 2)));
+        totalPercent = Double.parseDouble(df.format((totalPercent - dtoList.get(10).getPercent() - dtoList.get(11).getPercent()) / (dtoList.size() - 2))); //관리자(테스트) 계정의 복약 순응도는 반영 안함
         model.addAttribute("userInfo", dtoList);
         model.addAttribute("totalPercent", totalPercent);
+        model.addAttribute("startDateTime", startDateTime);
+        model.addAttribute("daysBetween", daysBetween);
         return "adminView/home";
     }
 
@@ -120,9 +122,8 @@ public class adminController {
             @RequestParam String afternoonTime,
             @RequestParam String eveningTime,
             @RequestParam Long id,
-            RedirectAttributes redirectAttributes
-    ) {
-        log.info("id = {}", id);
+            RedirectAttributes redirectAttributes)
+    {
         // 유저를 데이터베이스에서 찾아옴
         Optional<User> findUser = userService.findUserById(id);
 
@@ -170,7 +171,8 @@ public class adminController {
     {
         // 사용자를 찾아서 모델에 추가
         Optional<User> userOptional = userService.findUserById(id);
-        if (userOptional.isPresent()) {
+        if (userOptional.isPresent())
+        {
             User user = userOptional.get();
             model.addAttribute("user", user);
             model.addAttribute("bottleId", user.getBottleId());
