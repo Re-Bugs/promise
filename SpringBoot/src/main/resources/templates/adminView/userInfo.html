@@ -140,132 +140,178 @@
             font-size: 20px;
             font-weight: bold;
         }
+        .info-text {
+            text-align: center;
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
-<body>
+    <body>
 
-<div class="container">
-    <h1>사용자 정보</h1>
+        <div class="container">
+            <h1>사용자 정보</h1>
 
-    <!-- 성공 메시지 출력 부분 추가 -->
-    <div th:if="${message}" class="alert">
-        <p th:text="${message}"></p>
-    </div>
-
-    <!-- 유저 정보 섹션 -->
-    <div class="section">
-        <h2>기본 정보</h2>
-        <div class="form-group">
-            <p><strong>이름:</strong> <span th:text="${user.name}"></span></p>
-            <p><strong>나이:</strong> <span th:text="${user.age}"></span></p>
-            <p><strong>약통코드:</strong> <span th:text="${user.bottleId}"></span></p>
-            <p><strong>알림 타입:</strong> <span th:text="${user.notificationValue}"></span></p>
-            <p><strong>아침 알림 시각:</strong> <span th:text="${user.morningTime}"></span></p>
-            <p><strong>점심 알림 시각:</strong> <span th:text="${user.afternoonTime}"></span></p>
-            <p><strong>저녁 알림 시각:</strong> <span th:text="${user.eveningTime}"></span></p>
-        </div>
-    </div>
-
-    <!-- 알림 수정 섹션 (admin일 경우에만 표시) -->
-    <div class="section" th:if="${user.role == T(com.onlypromise.promise.domain.enumeration.Role).admin}">
-        <h2>알림 시각 수정</h2>
-        <form th:action="@{/admin/time_update}" method="post">
-            <input type="hidden" name="id" th:value="${user.id}" />
-
-            <div class="form-group">
-                <label for="morningTime">아침 시간:</label>
-                <input type="time" id="morningTime" name="morningTime" th:value="${#strings.substring(user.morningTime.toString(), 0, 5)}">
+            <!-- 성공 메시지 출력 부분 추가 -->
+            <div th:if="${message}" class="alert">
+                <p th:text="${message}"></p>
             </div>
 
-            <div class="form-group">
-                <label for="afternoonTime">점심 시간:</label>
-                <input type="time" id="afternoonTime" name="afternoonTime" th:value="${#strings.substring(user.afternoonTime.toString(), 0, 5)}">
+            <!-- 유저 정보 섹션 -->
+            <div class="section">
+                <h2>기본 정보</h2>
+                <div class="form-group">
+                    <p><strong>이름:</strong> <span th:text="${user.name}"></span></p>
+                    <p><strong>나이:</strong> <span th:text="${user.age}"></span></p>
+                    <p><strong>약통코드:</strong> <span th:text="${user.bottleId}"></span></p>
+                    <p><strong>알림 타입:</strong> <span th:text="${user.notificationValue}"></span></p>
+                    <p><strong>아침 알림 시각:</strong> <span th:text="${user.morningTime}"></span></p>
+                    <p><strong>점심 알림 시각:</strong> <span th:text="${user.afternoonTime}"></span></p>
+                    <p><strong>저녁 알림 시각:</strong> <span th:text="${user.eveningTime}"></span></p>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="eveningTime">저녁 시간:</label>
-                <input type="time" id="eveningTime" name="eveningTime" th:value="${#strings.substring(user.eveningTime.toString(), 0, 5)}">
+            <!-- 알림 수정 섹션 (admin일 경우에만 표시) -->
+            <div class="section" th:if="${user.role == T(com.onlypromise.promise.domain.enumeration.Role).admin}">
+                <h2>알림 시각 수정</h2>
+                <form th:action="@{/admin/time_update}" method="post">
+                    <input type="hidden" name="id" th:value="${user.id}" />
+
+                    <div class="form-group">
+                        <label for="morningTime">아침 시간:</label>
+                        <input type="time" id="morningTime" name="morningTime" th:value="${#strings.substring(user.morningTime.toString(), 0, 5)}">
+                        <div class="info-text" th:text="'아침 시간 : 오전 4시 1분 ~ 오전 10시'"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="afternoonTime">점심 시간:</label>
+                        <input type="time" id="afternoonTime" name="afternoonTime" th:value="${#strings.substring(user.afternoonTime.toString(), 0, 5)}">
+                        <div class="info-text" th:text="'점심 시간 : 오전 10시 1분 ~ 오후 3시'"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="eveningTime">저녁 시간:</label>
+                        <input type="time" id="eveningTime" name="eveningTime" th:value="${#strings.substring(user.eveningTime.toString(), 0, 5)}">
+                        <div class="info-text" th:text="'저녁 시간 : 오후 3시 1분 ~ 오후 11시 59분'"></div>
+                    </div>
+                    <button type="submit">시간 수정</button>
+                </form>
+
+                <br>
+
+                <h2>수동 약물 추가</h2>
+                <form th:action="@{/admin/add_medicine}" method="get">
+                    <input type="hidden" name="id" th:value="${user.id}">
+                    <button type="submit">수동 약품 추가</button>
+                </form>
             </div>
-            <button type="submit">시간 수정</button>
-        </form>
 
-        <br>
+            <!-- 알림 리스트 섹션 -->
+            <div class="section">
+                <h2>알림 리스트</h2>
+                <div class="scrollable-table">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>약품 이름</th>
+                            <th>하루 몇회</th>
+                            <th>남은 약품 수</th>
+                            <th>재처방일</th>
+                            <th>아침</th>
+                            <th>점심</th>
+                            <th>저녁</th>
+                            <th>추가일</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="notification : ${notifications}">
+                            <td th:text="${notification.medicine.name}"></td>
+                            <td th:text="${notification.dailyDose}"></td>
+                            <td th:text="${notification.remainingDose}"></td>
+                            <td th:text="${notification.renewalDate}"></td>
+                            <td th:text="${notification.morning} ? 'Yes' : 'No'"></td>
+                            <td th:text="${notification.afternoon} ? 'Yes' : 'No'"></td>
+                            <td th:text="${notification.evening} ? 'Yes' : 'No'"></td>
+                            <td th:text="${#temporals.format(notification.createdAt, 'yyyy-MM-dd')}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-        <h2>수동 약물 추가</h2>
-        <form th:action="@{/admin/add_medicine}" method="get">
-            <input type="hidden" name="id" th:value="${user.id}">
-            <button type="submit">수동 약품 추가</button>
-        </form>
-    </div>
+            <!-- 복약 로그 섹션 -->
+            <div class="section">
+                <h2>복약 로그</h2>
 
-    <!-- 알림 리스트 섹션 -->
-    <div class="section">
-        <h2>알림 리스트</h2>
-        <div class="scrollable-table">
-            <table>
-                <thead>
-                <tr>
-                    <th>약품 이름</th>
-                    <th>하루 몇회</th>
-                    <th>남은 약품 수</th>
-                    <th>재처방일</th>
-                    <th>아침</th>
-                    <th>점심</th>
-                    <th>저녁</th>
-                    <th>추가일</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="notification : ${notifications}">
-                    <td th:text="${notification.medicine.name}"></td>
-                    <td th:text="${notification.dailyDose}"></td>
-                    <td th:text="${notification.remainingDose}"></td>
-                    <td th:text="${notification.renewalDate}"></td>
-                    <td th:text="${notification.morning} ? 'Yes' : 'No'"></td>
-                    <td th:text="${notification.afternoon} ? 'Yes' : 'No'"></td>
-                    <td th:text="${notification.evening} ? 'Yes' : 'No'"></td>
-                    <td th:text="${#temporals.format(notification.createdAt, 'yyyy-MM-dd')}"></td>
-                </tr>
-                </tbody>
-            </table>
+                <!-- 날짜 네비게이션 -->
+                <div class="date-navigation">
+                    <a th:href="@{|/admin/${user.id}?date=${previousDate}|}">&larr;</a>
+                    <span th:text="${#temporals.format(targetDate, 'yyyy-MM-dd')}"></span>
+                    <a th:href="@{|/admin/${user.id}?date=${nextDate}|}">&rarr;</a>
+                </div>
+
+                <div class="scrollable-table">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>약품 이름</th>
+                            <th>상태</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- 복용한 약물 표시 -->
+                        <tr th:each="medication : ${medicationStatus.taken}" class="taken">
+                            <td th:text="${medication.medicineName}"></td>
+                            <td>복용함</td>
+                        </tr>
+                        <!-- 복용하지 않은 약물 표시 -->
+                        <tr th:each="medication : ${medicationStatus.notTaken}" class="not-taken">
+                            <td th:text="${medication.medicineName}"></td>
+                            <td>미복용</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <!-- 복약 로그 섹션 -->
-    <div class="section">
-        <h2>복약 로그</h2>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const morningTimeInput = document.getElementById('morningTime');
+                const afternoonTimeInput = document.getElementById('afternoonTime');
+                const eveningTimeInput = document.getElementById('eveningTime');
+                const submitButton = document.querySelector('button[type="submit"]');
 
-        <!-- 날짜 네비게이션 -->
-        <div class="date-navigation">
-            <a th:href="@{|/admin/${user.id}?date=${previousDate}|}">&larr;</a>
-            <span th:text="${#temporals.format(targetDate, 'yyyy-MM-dd')}"></span>
-            <a th:href="@{|/admin/${user.id}?date=${nextDate}|}">&rarr;</a>
-        </div>
+                // 버튼 클릭 시 유효성 검사
+                submitButton.addEventListener('click', function (event) {
+                    // 아침 시간 검증
+                    const morningTime = morningTimeInput.value;
+                    if (morningTime < "04:01" || morningTime > "10:00") {
+                        alert("아침 시간은 오전 4시 1분부터 오전 10시까지입니다.");
+                        event.preventDefault(); // 폼 제출 방지
+                        return;
+                    }
 
-        <div class="scrollable-table">
-            <table>
-                <thead>
-                <tr>
-                    <th>약품 이름</th>
-                    <th>상태</th>
-                </tr>
-                </thead>
-                <tbody>
-                <!-- 복용한 약물 표시 -->
-                <tr th:each="medication : ${medicationStatus.taken}" class="taken">
-                    <td th:text="${medication.medicineName}"></td>
-                    <td>복용함</td>
-                </tr>
-                <!-- 복용하지 않은 약물 표시 -->
-                <tr th:each="medication : ${medicationStatus.notTaken}" class="not-taken">
-                    <td th:text="${medication.medicineName}"></td>
-                    <td>미복용</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+                    // 점심 시간 검증
+                    const afternoonTime = afternoonTimeInput.value;
+                    if (afternoonTime < "10:01" || afternoonTime > "15:00") {
+                        alert("점심 시간은 오전 10시 1분부터 오후 3시까지입니다.");
+                        event.preventDefault(); // 폼 제출 방지
+                        return;
+                    }
 
-</body>
+                    // 저녁 시간 검증
+                    const eveningTime = eveningTimeInput.value;
+                    if (eveningTime < "15:01" || eveningTime > "23:59") {
+                        alert("저녁 시간은 오후 3시 1분부터 오후 11시 59분까지입니다.");
+                        event.preventDefault(); // 폼 제출 방지
+                        return;
+                    }
+
+                });
+            });
+        </script>
+    </body>
 </html>
+

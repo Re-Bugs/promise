@@ -1,220 +1,211 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>promise - 관리자 페이지</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f7fc;
-            margin: 0;
-            padding: 0;
-            color: #333;
-        }
-
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            font-weight: 600;
-            margin-top: 20px;
-        }
-
-        .container {
-            width: 90%;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-top: 30px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            table-layout: fixed; /* 컬럼 너비를 동일하게 설정 */
-        }
-
-        th, td {
-            border: none;
-            padding: 12px;
-            text-align: center;
-        }
-
-        th {
-            background-color: #34495e;
-            color: white;
-            font-weight: 500;
-            text-transform: uppercase;
-        }
-
-        td {
-            background-color: #ecf0f1;
-            border-bottom: 1px solid #bdc3c7;
-            cursor: pointer; /* 커서가 포인터로 변함 */
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover td {
-            background-color: #d5dae0;
-        }
-
-        td a {
-            color: #3498db;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        td a:hover {
-            text-decoration: underline;
-        }
-
-        @media (max-width: 768px) {
-            table, th, td {
-                font-size: 14px;
-                padding: 8px;
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>promise - 관리자 페이지</title>
+        <style>
+            body {
+                font-family: 'Arial', sans-serif;
+                background-color: #f4f7fc;
+                margin: 0;
+                padding: 0;
+                color: #333;
             }
-        }
 
-        /* 프로그래스 바 스타일 */
-        .progress-container {
-            margin-top: 40px;
-            text-align: center;
-            width: 90%;
-            max-width: 1000px;
-            background-color: #fff; /* 배경색 흰색으로 설정 */
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin: 20px auto;
-        }
+            h1 {
+                text-align: center;
+                color: #2c3e50;
+                font-weight: 600;
+                margin-top: 20px;
+            }
 
-        .progress-bar {
-            width: 80%;
-            background-color: #ecf0f1;
-            border-radius: 20px;
-            overflow: hidden;
-            height: 30px;
-            margin: 0 auto;
-            position: relative;
-        }
+            .container {
+                width: 90%;
+                max-width: 1000px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #fff;
+                border-radius: 12px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                margin-top: 30px;
+            }
 
-        .progress-bar-inner {
-            background-color: #3498db;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 0%; /* 퍼센트 값에 따라 변경될 예정 */
-            transition: width 0.4s ease;
-        }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+                table-layout: fixed; /* 컬럼 너비를 동일하게 설정 */
+            }
 
-        /* 프로그래스 바 중앙에 글씨를 배치하는 스타일 */
-        .progress-bar-text {
-            position: absolute;
-            width: 100%;
-            text-align: center;
-            line-height: 30px; /* 프로그래스 바 높이와 동일하게 맞춤 */
-            color: black; /* 텍스트를 검정색으로 설정 */
-            font-weight: bold;
-        }
+            th, td {
+                border: none;
+                padding: 12px;
+                text-align: center;
+            }
 
-        .percent-label {
-            font-size: 18px;
-            margin-top: 10px;
-            color: #2c3e50;
-        }
+            th {
+                background-color: #34495e;
+                color: white;
+                font-weight: 500;
+                text-transform: uppercase;
+            }
 
-        /* 새로운 설명 텍스트 클래스 */
-        .info-text {
-            text-align: center;
-            font-size: 16px;
-            color: #7f8c8d;
-            margin-bottom: 10px;
-        }
+            td {
+                background-color: #ecf0f1;
+                border-bottom: 1px solid #bdc3c7;
+                cursor: pointer; /* 커서가 포인터로 변함 */
+            }
 
-    </style>
+            tr:last-child td {
+                border-bottom: none;
+            }
 
-    <script>
-        // 자바스크립트를 사용하여 행을 클릭하면 페이지가 이동하도록 구현
-        document.addEventListener('DOMContentLoaded', function () {
-            const rows = document.querySelectorAll('tr[data-href]');
+            tr:hover td {
+                background-color: #d5dae0;
+            }
 
-            rows.forEach(row => {
-                row.addEventListener('click', function () {
-                    window.location.href = this.dataset.href;
+            td a {
+                color: #3498db;
+                text-decoration: none;
+                font-weight: 600;
+            }
+
+            td a:hover {
+                text-decoration: underline;
+            }
+
+            @media (max-width: 768px) {
+                table, th, td {
+                    font-size: 14px;
+                    padding: 8px;
+                }
+            }
+
+            /* 프로그래스 바 스타일 */
+            .progress-container {
+                margin-top: 40px;
+                text-align: center;
+                width: 90%;
+                max-width: 1000px;
+                background-color: #fff; /* 배경색 흰색으로 설정 */
+                border-radius: 12px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+                margin: 20px auto;
+            }
+
+            .progress-bar {
+                width: 80%;
+                background-color: #ecf0f1;
+                border-radius: 20px;
+                overflow: hidden;
+                height: 30px;
+                margin: 0 auto;
+                position: relative;
+            }
+
+            .progress-bar-inner {
+                background-color: #3498db;
+                height: 100%;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 0%; /* 퍼센트 값에 따라 변경될 예정 */
+                transition: width 0.4s ease;
+            }
+
+            /* 프로그래스 바 중앙에 글씨를 배치하는 스타일 */
+            .progress-bar-text {
+                position: absolute;
+                width: 100%;
+                text-align: center;
+                line-height: 30px; /* 프로그래스 바 높이와 동일하게 맞춤 */
+                color: black; /* 텍스트를 검정색으로 설정 */
+                font-weight: bold;
+            }
+            .info-text {
+                text-align: center;
+                font-size: 16px;
+                color: #7f8c8d;
+                margin-bottom: 10px;
+            }
+
+        </style>
+
+        <script>
+            // 자바스크립트를 사용하여 행을 클릭하면 페이지가 이동하도록 구현
+            document.addEventListener('DOMContentLoaded', function () {
+                const rows = document.querySelectorAll('tr[data-href]');
+
+                rows.forEach(row => {
+                    row.addEventListener('click', function () {
+                        window.location.href = this.dataset.href;
+                    });
                 });
             });
-        });
-    </script>
+        </script>
+    </head>
 
-</head>
-<body>
+    <body>
+        <div class="container">
+            <!-- 새로운 타이틀과 이미지 섹션 추가 -->
+            <h1 style="text-align: center; color: #2c3e50; font-weight: 600;">약속</h1>
+            <div style="text-align: center;">
+                <img src="/images/promise.png" alt="의사와 환자의 약속" style="max-width: 25%; height: auto; border-radius: 8px;">
+            </div>
+            <div class="info-text" style="font-size: 18px; font-weight: bold; color: #34495e;">의사와 환자의 약속(藥束)</div>
 
-<div class="container">
-    <!-- 새로운 타이틀과 이미지 섹션 추가 -->
-    <h1 style="text-align: center; color: #2c3e50; font-weight: 600;">약속</h1>
-    <div style="text-align: center;">
-        <img src="/images/promise.png" alt="의사와 환자의 약속" style="max-width: 25%; height: auto; border-radius: 8px;">
-    </div>
-    <div class="info-text" style="font-size: 18px; font-weight: bold; color: #34495e;">의사와 환자의 약속(藥束)</div>
+            <br>
 
-    <br>
+            <!-- 기존 사용자 정보 테이블 섹션 -->
+            <div class="info-text" th:text="'사용자를 선택하면 상세 정보를 확인할 수 있음'"></div>
+            <div class="info-text" th:text="'관찰 시작일 : ' + ${startDateTime}"></div>
 
-    <!-- 기존 사용자 정보 테이블 섹션 -->
-    <div class="info-text" th:text="'사용자를 선택하면 상세 정보를 확인할 수 있음'"></div>
-    <div class="info-text" th:text="'관찰 시작일 : ' + ${startDateTime}"></div>
-
-    <table>
-        <thead>
-        <tr>
-            <th>역할</th>
-            <th>이름</th>
-            <th>나이</th>
-            <th>약통 코드</th>
-            <th>복약한 약물 수</th>
-            <th>등록된 약물 수</th>
-            <th>복약 순응도</th>
-        </tr>
-        </thead>
-        <tbody>
-        <!-- 유저 정보 리스트 출력 -->
-        <tr th:each="user : ${userInfo}" th:data-href="@{/admin/{id}(id=${user.id})}">
-            <!-- 행 클릭 시 이동하도록 이벤트 설정 -->
-            <td th:text="${user.role}"></td>
-            <td th:text="${user.name}"></td>
-            <td th:text="${user.age}"></td>
-            <td th:text="${user.bottleId}"></td>
-            <td th:text="${user.logSize}"></td>
-            <td th:text="${user.totalMedicine}"></td>
-            <td th:text="${user.percent} + '%'"></td>
-        </tr>
-        </tbody>
-    </table>
-    <br>
-    <div class="info-text" th:text="'관찰 기간 : ' + ${daysBetween} + '일'"></div>
-    <div class="info-text" th:text="'개인 복약 순응도 계산식 : 복약한 약물 수 / (등록된 약물 수 * 관찰기간)'"></div>
-</div>
+            <table>
+                <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>역할</th>
+                    <th>이름</th>
+                    <th>나이</th>
+                    <th>약통 코드</th>
+                    <th>복약한 약물 수</th>
+                    <th>등록된 약물 수</th>
+                    <th>복약 순응도</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- 유저 정보 리스트 출력 -->
+                <tr th:each="user : ${userInfo}" th:data-href="@{/admin/{id}(id=${user.id})}"> <!-- 행 클릭 시 이동하도록 이벤트 설정 -->
+                    <td th:text="${user.id}"></td>
+                    <td th:text="${user.role}"></td>
+                    <td th:text="${user.name}"></td>
+                    <td th:text="${user.age}"></td>
+                    <td th:text="${user.bottleId}"></td>
+                    <td th:text="${user.logSize}"></td>
+                    <td th:text="${user.totalMedicine}"></td>
+                    <td th:text="${user.percent} + '%'"></td>
+                </tr>
+                </tbody>
+            </table>
+            <br>
+            <div class="info-text" th:text="'관찰 기간 : ' + ${daysBetween} + '일'"></div>
+            <div class="info-text" th:text="'개인 복약 순응도 계산식 : 복약한 약물 수 / (등록된 약물 수 * 관찰기간)'"></div>
+        </div>
 
 
-<!-- 프로그래스 바 섹션 -->
-<div class="progress-container">
-    <div class="progress-bar">
-        <!-- 프로그래스 바 내부 -->
-        <div class="progress-bar-inner" th:style="'width:' + ${totalPercent} + '%'"></div>
-        <!-- 프로그래스 바 중앙에 퍼센트 텍스트 배치 -->
-        <div class="progress-bar-text" th:text="${'평균 복약 순응도 : ' + totalPercent + '%'}"></div>
-    </div>
-    <br>
-    <div class="info-text" th:text="'평균 복약 순응도 계산식 : 모든 user의 복약 순응도 합산 값 / 모든 user 수'"></div>
-    <div class="info-text" th:text="'- 관리자(테스트) 계정의 복약 순응도는 반영하지 않음 -'"></div>
-</div>
-
-</body>
+        <!-- 프로그래스 바 섹션 -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <!-- 프로그래스 바 내부 -->
+                <div class="progress-bar-inner" th:style="'width:' + ${totalPercent} + '%'"></div>
+                <!-- 프로그래스 바 중앙에 퍼센트 텍스트 배치 -->
+                <div class="progress-bar-text" th:text="${'평균 복약 순응도 : ' + totalPercent + '%'}"></div>
+            </div>
+            <br>
+            <div class="info-text" th:text="'평균 복약 순응도 계산식 : 모든 user의 복약 순응도 합산 값 / 모든 user 수'"></div>
+            <div class="info-text" th:text="'- 관리자(테스트) 계정의 복약 순응도는 반영하지 않음 -'"></div>
+        </div>
+    </body>
 </html>

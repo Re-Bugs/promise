@@ -78,7 +78,7 @@ public class adminController {
             }
             dtoList.add(newDto);
         }
-        totalPercent = Double.parseDouble(df.format((totalPercent - dtoList.get(10).getPercent() - dtoList.get(11).getPercent()) / (dtoList.size() - 2))); //관리자(테스트) 계정의 복약 순응도는 반영 안함
+        totalPercent = Double.parseDouble(df.format((totalPercent - dtoList.get(0).getPercent() - dtoList.get(1).getPercent()) / (dtoList.size() - 2))); //관리자(테스트) 계정의 복약 순응도는 반영 안함
         model.addAttribute("userInfo", dtoList);
         model.addAttribute("totalPercent", totalPercent);
         model.addAttribute("startDateTime", startDateTime);
