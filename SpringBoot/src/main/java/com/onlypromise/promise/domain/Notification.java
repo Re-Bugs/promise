@@ -55,7 +55,7 @@ public class Notification {
     //Notification 입장에서 MedicineLog와 1:N 관계
     //하나의 알림(약물)은 여러 복용기록을 가질 수 있다.
     @OneToMany(mappedBy = "notification", fetch = FetchType.LAZY) //연관관계 주인이 아님, 지연로딩
-    private List<MedicationLog> medicationLogs = new ArrayList<>();
+    private List<MedicationLog> medicationLogs;
 
     //연관관계 편의 메서드(알림에서 약물 추가)
     public void addMedicine(Medicine medicine)
