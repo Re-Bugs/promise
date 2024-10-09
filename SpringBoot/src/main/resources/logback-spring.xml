@@ -1,7 +1,7 @@
 <configuration>
     <appender name="ROLLING-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>/log/%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern> <!-- .gz 추가 -->
+            <fileNamePattern>./log/%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern> <!-- .gz 추가 -->
             <maxFileSize>50MB</maxFileSize>
             <maxHistory>60</maxHistory> <!-- 최대 보관 기간 -->
             <totalSizeCap>10GB</totalSizeCap> <!-- 전체 로그 파일의 총 크기 제한 -->

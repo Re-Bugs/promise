@@ -14,6 +14,7 @@ services:
       - /home/ubuntu/promise/promise-435018-10ecba9c1524.json:/home/ubuntu/promise/promise-435018-10ecba9c1524.json
       - /etc/localtime:/etc/localtime:ro
       - /usr/share/zoneinfo/Asia/Seoul:/etc/timezone:ro
+      - /home/ubuntu/promise/log:/spring-boot/log
 networks:
   promise-network:
     driver: bridge
