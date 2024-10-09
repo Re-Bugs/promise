@@ -53,13 +53,13 @@ public class User {
 
     // 시간 필드 추가
     @Column(name = "morning_time", nullable = false)
-    private LocalTime morningTime;
+    private LocalTime morningTime = LocalTime.of(8, 0);
 
     @Column(name = "afternoon_time", nullable = false)
-    private LocalTime afternoonTime;
+    private LocalTime afternoonTime = LocalTime.of(13, 0);
 
     @Column(name = "evening_time", nullable = false)
-    private LocalTime eveningTime;
+    private LocalTime eveningTime = LocalTime.of(18, 0);
 
     // User와 Notification은 1:N 관계
     // 한 명의 사용자는 여러 알림을 받을 수 있다.
