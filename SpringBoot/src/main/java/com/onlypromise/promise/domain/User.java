@@ -53,6 +53,7 @@ public class User {
     private String zipcode;
 
     // 시간 필드 추가
+    // @Builder.Default 지정해주어야 기본값 반영됨
     @Column(name = "morning_time", nullable = false)
     @Builder.Default
     private LocalTime morningTime = LocalTime.of(8, 0);
