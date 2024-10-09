@@ -2,14 +2,12 @@ package com.onlypromise.promise.domain;
 
 import com.onlypromise.promise.domain.enumeration.NotificationValue;
 import com.onlypromise.promise.domain.enumeration.Role;
-import jakarta.annotation.PostConstruct;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -71,11 +69,4 @@ public class User {
     // 한 명의 사용자는 여러 알림을 받을 수 있다.
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY) // 연관관계 주인이 아님, 지연로딩
     private List<Notification> notifications;
-
-    @PostLoad
-    public void logInitialValues() {
-        log.info("morning : {}", this.morningTime);
-        log.info("afternoon : {}", this.afternoonTime);
-        log.info("evening : {}", this.eveningTime);
-    }
 }
