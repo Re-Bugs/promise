@@ -1,21 +1,20 @@
 package com.onlypromise.promise.controller.web.admin;
 
+import com.onlypromise.promise.DTO.MedicationDTO;
 import com.onlypromise.promise.DTO.MedicineDTO;
 import com.onlypromise.promise.DTO.api.DailyTakenDTO;
 import com.onlypromise.promise.DTO.web.AdminHomeDTO;
 import com.onlypromise.promise.domain.Medicine;
 import com.onlypromise.promise.domain.Notification;
 import com.onlypromise.promise.domain.User;
-import com.onlypromise.promise.service.MedicationLogService;
-import com.onlypromise.promise.service.MedicineService;
-import com.onlypromise.promise.service.NotificationService;
-import com.onlypromise.promise.service.UserService;
+import com.onlypromise.promise.service.*;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.text.DecimalFormat;
@@ -38,6 +37,8 @@ public class adminController {
     private final NotificationService notificationService;
     private final MedicationLogService medicationLogService;
     private final MedicineService medicineService;
+    private final OcrProcessor ocrProcessor;
+    private final VisionService visionService;
 
 
     @GetMapping("/home")
@@ -122,14 +123,21 @@ public class adminController {
             @RequestParam String afternoonTime,
             @RequestParam String eveningTime,
             @RequestParam Long id,
-            RedirectAttributes redirectAttributes)
+            RedirectAttributes redirectAttributes,
+            HttpSession session)
     {
-        // 유저를 데이터베이스에서 찾아옴
-        Optional<User> findUser = userService.findUserById(id);
+        User user = (User) session.getAttribute("user");
+        if(user == null) return "redirect:/login";
+
+        if(id != user.getId())
+        {
+            redirectAttributes.addFlashAttribute("errorMessage", "다른 관리자의 계정에 알림 시각을 변경 할 수 없습니다.");
+            return "redirect:/admin/" + id;
+        }
 
         // 입력된 시간을 LocalTime으로 변환하여 User 객체에 설정
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-        User updateUser = findUser.get().toBuilder().morningTime(LocalTime.parse(morningTime, timeFormatter))
+        User updateUser = user.toBuilder().morningTime(LocalTime.parse(morningTime, timeFormatter))
                 .afternoonTime(LocalTime.parse(afternoonTime, timeFormatter))
                 .eveningTime(LocalTime.parse(eveningTime, timeFormatter))
                 .build();
@@ -144,21 +152,25 @@ public class adminController {
 
     // 수동 약품 추가 검색 페이지로 이동하는 GET 메서드
     @GetMapping("/add_medicine")
-    public String getSearchMedicine(Model model, @RequestParam Long id)
+    public String getSearchMedicine(Model model, @RequestParam Long id, RedirectAttributes redirectAttributes, HttpSession session)
     {
-        // 현재 사용자의 유효성을 확인하고, 필요한 데이터를 가져옴
-        Optional<User> userOptional = userService.findUserById(id);
+        User user = (User)session.getAttribute("user");
 
-        if (userOptional.isPresent())
+        if (user != null)
         {
-            User user = userOptional.get();
+            if(user.getId() != id)
+            {
+                redirectAttributes.addFlashAttribute("errorMessage", "다른 관리자의 계정에 수동 약물 추가를 할 수 없습니다.");
+                return "redirect:/admin/" + id;
+            }
+
             model.addAttribute("user", user);
-            model.addAttribute("bottleId", user.getBottleId());  // 사용자 보틀 ID 가져오기
+            model.addAttribute("bottleId", user.getBottleId());
         }
         else
         {
-            model.addAttribute("error", "사용자를 찾을 수 없습니다.");
-            return "redirect:/test/info/" + id;
+            redirectAttributes.addFlashAttribute("errorMessage", "사용자를 찾을 수 없습니다.");
+            return "redirect:/admin/info/" + id;
         }
 
         // 약품 추가 페이지로 이동
@@ -167,69 +179,89 @@ public class adminController {
 
     // 약품 검색 요청을 처리하는 메서드
     @GetMapping("/search_medicine")
-    public String searchMedicine(@RequestParam Long id, @RequestParam String identifier, Model model)
+    public String searchMedicine( @RequestParam String identifier, Model model, HttpSession session)
     {
-        // 사용자를 찾아서 모델에 추가
-        Optional<User> userOptional = userService.findUserById(id);
-        if (userOptional.isPresent())
+        User user = (User) session.getAttribute("user");
+        if (user != null)
         {
-            User user = userOptional.get();
             model.addAttribute("user", user);
-            model.addAttribute("bottleId", user.getBottleId());
 
             // 약품 이름 또는 코드로 약품을 검색
             Optional<List<MedicineDTO>> medicinesOptional = medicineService.findMedicineByNameOrProductCode(identifier);
             if (medicinesOptional.isPresent() && !medicinesOptional.get().isEmpty()) model.addAttribute("medicines", medicinesOptional.get()); // 검색된 약품 리스트 추가
             else model.addAttribute("error", "해당 약품을 찾을 수 없습니다.");
         }
-        else
-        {
-            model.addAttribute("error", "사용자를 찾을 수 없습니다.");
-            return "redirect:/admin/" + id;
-        }
+        else return "redirect:/login";
 
         return "adminView/addMedicine"; // 검색 결과를 보여주는 페이지로 이동
     }
 
     // 약품 추가 폼에서 약품을 저장하는 POST 메서드
     @PostMapping("/add_medicine")
-    public String addMedicine(@RequestParam(required = false) String bottleId,
-                              @RequestParam Long medicineId,
+    public String addMedicine(@RequestParam Long medicineId,
                               @RequestParam short totalDays,
                               @RequestParam(required = false) boolean morning,
                               @RequestParam(required = false) boolean afternoon,
                               @RequestParam(required = false) boolean evening,
-                              @RequestParam Long id,
-                              RedirectAttributes redirectAttributes)
+                              RedirectAttributes redirectAttributes,
+                              HttpSession session)
     {
-        // bottleId가 없을 경우 에러 처리
-        if (bottleId == null || bottleId.isEmpty())
-        {
-            redirectAttributes.addFlashAttribute("error", "약통 ID를 찾을 수 없습니다.");
-            return "redirect:/admin/" + id;
-        }
-
-        // 약물 추가 로직
-        Optional<User> findUser = userService.findUserById(id);
-        if (findUser.isEmpty())
-        {
-            redirectAttributes.addFlashAttribute("error", "유저 정보를 찾을 수 없습니다.");
-            return "redirect:/admin/" + id;
-        }
+        User user = (User) session.getAttribute("user");
+        if (user == null) return "redirect:/login";
 
         Optional<Medicine> findMedicine = medicineService.findMedicineById(medicineId);
         if (findMedicine.isEmpty())
         {
-            redirectAttributes.addFlashAttribute("error", "약물을 찾을 수 없습니다.");
-            return "redirect:/admin/" + id;
+            redirectAttributes.addFlashAttribute("errorMessage", "약물을 찾을 수 없습니다.");
+            return "redirect:/admin/" + user.getId();
         }
 
         Medicine medicine = findMedicine.get();
 
         // 알림 생성
-        notificationService.createNotification(bottleId, medicine.getId(), totalDays, morning, afternoon, evening);
+        notificationService.createNotification(user, medicine.getId(), totalDays, morning, afternoon, evening);
         redirectAttributes.addFlashAttribute("message", "약물이 성공적으로 추가되었습니다.");
 
-        return "redirect:/admin/" + id;
+        return "redirect:/admin/" + user.getId();
+    }
+
+    @GetMapping("/upload")
+    public String showAdminUploadForm(@RequestParam long id, HttpSession session, RedirectAttributes redirectAttributes) {
+        User user = (User) session.getAttribute("user");
+        if(user == null) return "redirect:/login";
+        if(id != user.getId())
+        {
+            redirectAttributes.addFlashAttribute("errorMessage", "다른 관리자의 계정에 처방전 인식을 할 수 없습니다.");
+            return "redirect:/admin/" + id;
+        }
+        return "adminView/imageUpload";
+    }
+
+    @PostMapping("/extract-text")
+    public String extractTextFromImage(MultipartFile file, RedirectAttributes redirectAttributes, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) return "redirect://login";
+
+        try
+        {
+            String extractedText = visionService.extractTextFromImage(file);
+            List<MedicationDTO> dtoList = ocrProcessor.buildMedicationDtoList(extractedText);
+            List<com.onlypromise.promise.DTO.api.MedicineDTO> validDtoList = ocrProcessor.filterAndBuildValidDtoList(dtoList, user);
+            List<String> warningMessages = ocrProcessor.saveNotifications(user, validDtoList);
+
+            // 경고 메시지를 리스트로 설정
+            if (!warningMessages.isEmpty())
+            {
+                redirectAttributes.addFlashAttribute("warningMessage", warningMessages);
+            }
+
+            redirectAttributes.addFlashAttribute("message", "처방전 인식이 성공적으로 완료되었습니다.");
+        }
+        catch (Exception e)
+        {
+            log.error("OCR error = {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "오류가 발생했습니다. 처방전 사진을 다시 찍어주세요.");
+        }
+        return "redirect:/admin/" + user.getId();
     }
 }

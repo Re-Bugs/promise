@@ -84,19 +84,11 @@ public class NotificationService {
     }
 
     @Transactional
-    public void createNotification(String bottleId, Long medicineId, short total, boolean morning, boolean afternoon, boolean evening) {
-        // bottleId로 User 찾기
-        Optional<User> userOptional = userRepository.findByBottleId(bottleId);
-        if (userOptional.isEmpty()) {
-            throw new IllegalArgumentException("User not found with bottleId: " + bottleId);
-        }
-        User user = userOptional.get();
-
+    public void createNotification(User user, Long medicineId, short total, boolean morning, boolean afternoon, boolean evening)
+    {
         // 약물 ID로 Medicine 찾기
         Optional<Medicine> medicineOptional = medicineRepository.findById(medicineId);
-        if (medicineOptional.isEmpty()) {
-            throw new IllegalArgumentException("Medicine not found with ID: " + medicineId);
-        }
+        if (medicineOptional.isEmpty()) throw new IllegalArgumentException("Medicine not found with ID: " + medicineId);
         Medicine medicine = medicineOptional.get();
 
         // DailyDose 계산 (아침, 점심, 저녁 중 체크된 개수에 따라 결정)
@@ -132,6 +124,11 @@ public class NotificationService {
     }
 
     public void delete(Notification notification)
+    {
+        notificationRepository.delete(notification);
+    }
+
+    public void update(Notification notification)
     {
         notificationRepository.delete(notification);
     }

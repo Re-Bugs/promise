@@ -25,14 +25,14 @@ public class MedicationLogService {
     private final UserRepository userRepository;
 
     // bottleId로 유저 찾고 복용 상태 업데이트(API)
-    public String updateMedicationStatus(String bottleId)
+    public int updateMedicationStatus(String bottleId)
     {
         Optional<User> userOptional = userRepository.findByBottleId(bottleId);
 
         if (userOptional.isEmpty())
         {
             log.warn("User not found with bottleId: {}", bottleId);
-            return "bottleId not found.";
+            return 1;
         }
 
         User user = userOptional.get();
@@ -51,13 +51,13 @@ public class MedicationLogService {
             {
                 hasMatchingNotification = true;
 
-                if (samePeriod(user, notification, currentTimePeriod, currentTime)) return "You already have a history of taking it at that time."; // 중복 복용 거절 메시지
+                if (samePeriod(user, notification, currentTimePeriod, currentTime)) return 2; // 중복 복용
 
                 // 남은 약물 수 감소 및 저장
-                updateNotificationRemainingDose(notification);
+                if (notification.getRemainingDose() == 0) return 3; // 약물이 모두 소진됨
 
-                // 투약 기록 추가 (정상적으로 복용한 경우)
-                addMedicationLog(user, notification, currentTime);
+                updateNotificationRemainingDose(notification); // 약물 상태 업데이트
+                addMedicationLog(user, notification, currentTime); // 투약 기록 추가 (정상적으로 복용한 경우)
             }
         }
 
@@ -65,10 +65,10 @@ public class MedicationLogService {
         if (!hasMatchingNotification)
         {
             log.warn("No medication scheduled for {} time for bottleId: {}", currentTimePeriod, bottleId);
-            return "No medication scheduled for this time period.";
+            return 4;
         }
 
-        return "success";
+        return 0; //성공시 0 리턴
     }
 
     // 시간대 판단 로직
@@ -109,15 +109,10 @@ public class MedicationLogService {
     // 남은 약물 수 감소 및 저장
     private void updateNotificationRemainingDose(Notification notification)
     {
-        if(notification.getRemainingDose() == 1)
-        {
-            log.info("약물이 소진됨 : {}, {}", notification.getUser().getName(), notification.getMedicine().getName());
-            notificationRepository.delete(notification); //알림 삭제
-        }
-        else
+        if (notification.getRemainingDose() > 0)
         {
             Notification updatedNotification = notification.toBuilder()
-                    .remainingDose((short) (notification.getRemainingDose() - 1)) //약물 남은 수 1 감소
+                    .remainingDose((short) (notification.getRemainingDose() - 1))
                     .build();
             notificationRepository.save(updatedNotification);
         }

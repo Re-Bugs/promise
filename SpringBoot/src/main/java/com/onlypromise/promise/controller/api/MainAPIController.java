@@ -31,16 +31,32 @@ public class MainAPIController {
     @PostMapping("/dosage/{bottleId}")
     public ResponseEntity<Map<String, String>> updateMedicationStatusByBottleId(@PathVariable String bottleId)
     {
-        String responseMessage = medicationLogService.updateMedicationStatus(bottleId);
+        int responseMessage = medicationLogService.updateMedicationStatus(bottleId);
 
         // JSON 응답을 위한 Map 생성
         Map<String, String> response = new HashMap<>();
-        response.put("message", responseMessage);
 
-        if (responseMessage.equals("You already have a history of taking it at that time.")) return ResponseEntity.status(HttpStatus.CONFLICT).body(response); // 중복 투약
-        else if(responseMessage.equals("No medication scheduled for this time period.")) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response); // 해당 시간대에 복용해야하는 약물 없음
-        else if (responseMessage.equals("bottleId not found.")) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response); // 잘못된 약통 코드
-        else return ResponseEntity.status(HttpStatus.OK).body(response); // 200 OK
+        switch(responseMessage)
+        {
+            case 0:
+                response.put("message", "success");
+                return ResponseEntity.ok(response);
+            case 1:
+                response.put("message", "Bottle ID not found.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            case 2:
+                response.put("message", "You already have a history of taking it at that time.");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+            case 3:
+                response.put("message", "Medication fully consumed.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            case 4:
+                response.put("message", "No medication scheduled for this time period.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            default:
+                response.put("message", "Server error.");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 
     @GetMapping("/lookup/{bottleId}")
@@ -49,13 +65,15 @@ public class MainAPIController {
         Map<String, Object> response = new HashMap<>();
 
         // bottleId로 유저 정보 가져오기
-        User user = userService.findUserByBottleId(bottleId).orElse(null);
+        Optional<User> findUser = userService.findUserByBottleId(bottleId);
 
-        if (user == null)
+        if (findUser.isEmpty())
         {
             response.put("message", "User not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
+
+        User user = findUser.get();
 
         // 사용자의 Notification 정보 가져오기
         List<Notification> notifications = userService.findNotificationsByUser(user);

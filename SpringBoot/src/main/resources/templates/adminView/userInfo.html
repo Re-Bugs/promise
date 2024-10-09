@@ -14,12 +14,13 @@
 
         .container {
             width: 90%;
-            max-width: 800px;
-            margin: 40px auto;
-            background-color: #f8f9fa; /* 조금 더 밝은 배경색 */
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: 0 auto;
             padding: 20px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
         }
 
         h1, h2 {
@@ -30,13 +31,22 @@
 
         .alert {
             color: white;
-            background-color: #28a745;
             padding: 15px;
             text-align: center;
             margin-bottom: 20px;
             border-radius: 4px;
         }
 
+        .alert-success {
+            background-color: #28a745; /* 성공 메시지 색상 */
+        }
+
+        .alert-error {
+            background-color: #dc3545; /* 에러 메시지 색상 */
+        }
+        .alert-warning {
+            background-color: #ffc107; /* 경고 메시지 색상 */
+        }
         .section {
             padding: 20px;
             background-color: #ffffff; /* 섹션 배경을 조금 더 눈에 띄게 */
@@ -151,11 +161,28 @@
     <body>
 
         <div class="container">
-            <h1>사용자 정보</h1>
+            <h1 style="text-align: center; color: #2c3e50; font-weight: 600;">약속</h1>
+            <div style="text-align: center;">
+                <a th:href="@{/admin/home}" style="text-decoration: none;">
+                    <img src="/images/promise.png" alt="의사와 환자의 약속" style="max-width: 25%; height: auto; border-radius: 8px;">
+                    <div class="info-text" style="font-size: 18px; font-weight: bold; color: #34495e;">의사와 환자의 약속(藥束)</div>
+                </a>
+            </div>
 
-            <!-- 성공 메시지 출력 부분 추가 -->
-            <div th:if="${message}" class="alert">
+
+            <!-- 성공 메시지 출력 -->
+            <div th:if="${message}" class="alert alert-success">
                 <p th:text="${message}"></p>
+            </div>
+
+            <!-- 경고 메시지 출력 -->
+            <div th:if="${warningMessage}" class="alert alert-warning">
+                <p th:each="msg : ${warningMessage}" th:text="${msg}" style="margin: 5px 0;"></p>
+            </div>
+
+            <!-- 에러 메시지 출력 -->
+            <div th:if="${errorMessage}" class="alert alert-error">
+                <p th:text="${errorMessage}"></p>
             </div>
 
             <!-- 유저 정보 섹션 -->
@@ -197,15 +224,25 @@
                     </div>
                     <button type="submit">시간 수정</button>
                 </form>
+            </div>
 
-                <br>
+            <div class="section" th:if="${user.role == T(com.onlypromise.promise.domain.enumeration.Role).admin}">
+                <h2>처방전 인식</h2>
+                <form th:action="@{/admin/upload}" method="get">
+                    <input type="hidden" name="id" th:value="${user.id}">
+                    <button type="submit">처방전 인식</button>
+                </form>
+            </div>
 
+
+            <div class="section" th:if="${user.role == T(com.onlypromise.promise.domain.enumeration.Role).admin}">
                 <h2>수동 약물 추가</h2>
                 <form th:action="@{/admin/add_medicine}" method="get">
                     <input type="hidden" name="id" th:value="${user.id}">
                     <button type="submit">수동 약품 추가</button>
                 </form>
             </div>
+
 
             <!-- 알림 리스트 섹션 -->
             <div class="section">
@@ -254,22 +291,22 @@
                 <div class="scrollable-table">
                     <table>
                         <thead>
-                        <tr>
-                            <th>약품 이름</th>
-                            <th>상태</th>
-                        </tr>
+                            <tr>
+                                <th>약품 이름</th>
+                                <th>상태</th>
+                            </tr>
                         </thead>
                         <tbody>
-                        <!-- 복용한 약물 표시 -->
-                        <tr th:each="medication : ${medicationStatus.taken}" class="taken">
-                            <td th:text="${medication.medicineName}"></td>
-                            <td>복용함</td>
-                        </tr>
-                        <!-- 복용하지 않은 약물 표시 -->
-                        <tr th:each="medication : ${medicationStatus.notTaken}" class="not-taken">
-                            <td th:text="${medication.medicineName}"></td>
-                            <td>미복용</td>
-                        </tr>
+                            <!-- 복용한 약물 표시 -->
+                            <tr th:each="medication : ${medicationStatus.taken}" class="taken">
+                                <td th:text="${medication.medicineName}"></td>
+                                <td>복용함</td>
+                            </tr>
+                            <!-- 복용하지 않은 약물 표시 -->
+                            <tr th:each="medication : ${medicationStatus.notTaken}" class="not-taken">
+                                <td th:text="${medication.medicineName}"></td>
+                                <td>미복용</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
