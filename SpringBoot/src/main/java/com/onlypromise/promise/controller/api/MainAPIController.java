@@ -31,12 +31,12 @@ public class MainAPIController {
     @PostMapping("/dosage/{bottleId}")
     public ResponseEntity<Map<String, String>> updateMedicationStatusByBottleId(@PathVariable String bottleId)
     {
-        int responseMessage = medicationLogService.updateMedicationStatus(bottleId);
+        int responseCode = medicationLogService.updateMedicationStatus(bottleId);
 
         // JSON 응답을 위한 Map 생성
         Map<String, String> response = new HashMap<>();
 
-        switch(responseMessage)
+        switch(responseCode)
         {
             case 0:
                 response.put("message", "success");

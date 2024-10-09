@@ -22,6 +22,7 @@
     .upload-container h1 {
       font-size: 24px;
       margin-bottom: 20px;
+      text-align: center;
     }
     .custom-file-input {
       padding: 10px;
@@ -34,25 +35,29 @@
     }
     .btn-upload {
       width: 100%;
-      padding: 10px;
-      background-color: #4CAF50; /* 녹색으로 변경 */
-      color: #fff;
+      display: block;
+      padding: 10px 15px;
+      background-color: black;
+      color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 4px;
+      cursor: pointer;
       font-size: 16px;
+      margin: 20px auto;
     }
     .btn-upload:hover {
-      background-color: #45a049; /* hover 시 어두운 녹색 */
+      background-color: #333;
     }
   </style>
 </head>
+
 <body>
-<div class="upload-container">
-  <h1>이미지에서 텍스트 추출</h1>
-  <form action="/admin/extract-text" method="post" enctype="multipart/form-data">
-    <input type="file" id="file" name="file" accept="image/*" class="custom-file-input" required>
-    <button type="submit" class="btn-upload">업로드 및 텍스트 추출</button>
-  </form>
-</div>
+  <div class="upload-container">
+      <h1>처방전 인식</h1>
+      <form action="/admin/extract-text" method="post" enctype="multipart/form-data">
+        <input type="file" id="file" name="file" accept="image/*" class="custom-file-input" required>
+        <button type="submit" class="btn-upload">전송</button>
+      </form>
+  </div>
 </body>
 </html>

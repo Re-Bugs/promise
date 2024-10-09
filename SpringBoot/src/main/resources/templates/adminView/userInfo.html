@@ -156,6 +156,104 @@
             color: #7f8c8d;
             margin-bottom: 10px;
         }
+        .button-group {
+            display: flex;
+            justify-content: space-between; /* 버튼 간격 조정 */
+            gap: 10px; /* 버튼 사이 간격 */
+        }
+        .button-group form {
+            flex: 1;
+            margin: 0;
+        }
+        .button-group button {
+            width: 100%;
+            padding: 10px 0;
+            background-color: black;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-align: center;
+        }
+        .user-info-table-horizontal {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+        }
+
+        .user-info-table-horizontal th, .user-info-table-horizontal td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .user-info-table-horizontal th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .user-info-table-horizontal td {
+            background-color: #ffffff;
+        }
+        .time-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        .label-input {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .label-input label {
+            font-weight: bold;
+        }
+
+        .time-input {
+            width: 80px; /* 텍스트박스 너비 고정 */
+            padding: 5px;
+            font-size: 16px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .info-text {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        .submit-button {
+            width: 100%;
+            max-width: 150px;
+            padding: 10px;
+            background-color: black;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .submit-button:hover {
+            background-color: #333;
+        }
+
     </style>
 </head>
     <body>
@@ -185,62 +283,88 @@
                 <p th:text="${errorMessage}"></p>
             </div>
 
-            <!-- 유저 정보 섹션 -->
             <div class="section">
-                <h2>기본 정보</h2>
-                <div class="form-group">
-                    <p><strong>이름:</strong> <span th:text="${user.name}"></span></p>
-                    <p><strong>나이:</strong> <span th:text="${user.age}"></span></p>
-                    <p><strong>약통코드:</strong> <span th:text="${user.bottleId}"></span></p>
-                    <p><strong>알림 타입:</strong> <span th:text="${user.notificationValue}"></span></p>
-                    <p><strong>아침 알림 시각:</strong> <span th:text="${user.morningTime}"></span></p>
-                    <p><strong>점심 알림 시각:</strong> <span th:text="${user.afternoonTime}"></span></p>
-                    <p><strong>저녁 알림 시각:</strong> <span th:text="${user.eveningTime}"></span></p>
-                </div>
+                <table class="user-info-table-horizontal">
+                    <thead>
+                    <tr>
+                        <th>이름</th>
+                        <th>나이</th>
+                        <th>약통코드</th>
+                        <th>알림 타입</th>
+                        <th>아침 알림 시각</th>
+                        <th>점심 알림 시각</th>
+                        <th>저녁 알림 시각</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td th:text="${user.name}"></td>
+                        <td th:text="${user.age}"></td>
+                        <td th:text="${user.bottleId}"></td>
+                        <td th:text="${user.notificationValue}"></td>
+                        <td th:text="${user.morningTime}"></td>
+                        <td th:text="${user.afternoonTime}"></td>
+                        <td th:text="${user.eveningTime}"></td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
 
             <!-- 알림 수정 섹션 (admin일 경우에만 표시) -->
             <div class="section" th:if="${user.role == T(com.onlypromise.promise.domain.enumeration.Role).admin}">
                 <h2>알림 시각 수정</h2>
-                <form th:action="@{/admin/time_update}" method="post">
+                <form th:action="@{/admin/time_update}" method="post" class="time-form">
                     <input type="hidden" name="id" th:value="${user.id}" />
 
+                    <!-- 아침 시간 -->
                     <div class="form-group">
-                        <label for="morningTime">아침 시간:</label>
-                        <input type="time" id="morningTime" name="morningTime" th:value="${#strings.substring(user.morningTime.toString(), 0, 5)}">
-                        <div class="info-text" th:text="'아침 시간 : 오전 4시 1분 ~ 오전 10시'"></div>
+                        <div class="label-input">
+                            <label for="morningTime">아침 시간 : </label>
+                            <input type="text" id="morningTime" name="morningTime" th:value="${user.morningTime}" placeholder="HH:MM" class="time-input">
+                        </div>
+                        <div class="info-text">아침 시간: 4시 1분 ~ 10시</div>
                     </div>
 
+                    <!-- 점심 시간 -->
                     <div class="form-group">
-                        <label for="afternoonTime">점심 시간:</label>
-                        <input type="time" id="afternoonTime" name="afternoonTime" th:value="${#strings.substring(user.afternoonTime.toString(), 0, 5)}">
-                        <div class="info-text" th:text="'점심 시간 : 오전 10시 1분 ~ 오후 3시'"></div>
+                        <div class="label-input">
+                            <label for="afternoonTime">점심 시간 : </label>
+                            <input type="text" id="afternoonTime" name="afternoonTime" th:value="${user.afternoonTime}" placeholder="HH:MM" class="time-input">
+                        </div>
+                        <div class="info-text">점심 시간: 10시 1분 ~ 15시</div>
                     </div>
 
+                    <!-- 저녁 시간 -->
                     <div class="form-group">
-                        <label for="eveningTime">저녁 시간:</label>
-                        <input type="time" id="eveningTime" name="eveningTime" th:value="${#strings.substring(user.eveningTime.toString(), 0, 5)}">
-                        <div class="info-text" th:text="'저녁 시간 : 오후 3시 1분 ~ 오후 11시 59분'"></div>
+                        <div class="label-input">
+                            <label for="eveningTime">저녁 시간 : </label>
+                            <input type="text" id="eveningTime" name="eveningTime" th:value="${user.eveningTime}" placeholder="HH:MM" class="time-input">
+                        </div>
+                        <div class="info-text">저녁 시간: 15시 1분 ~ 오후 23시 59분</div>
                     </div>
-                    <button type="submit">시간 수정</button>
+
+                    <button type="submit" class="submit-button">시간 수정</button>
                 </form>
             </div>
 
             <div class="section" th:if="${user.role == T(com.onlypromise.promise.domain.enumeration.Role).admin}">
-                <h2>처방전 인식</h2>
-                <form th:action="@{/admin/upload}" method="get">
-                    <input type="hidden" name="id" th:value="${user.id}">
-                    <button type="submit">처방전 인식</button>
-                </form>
-            </div>
+                <h2>유틸리티</h2>
+                <div class="button-group">
+                    <form th:action="@{/admin/upload}" method="get">
+                        <input type="hidden" name="id" th:value="${user.id}">
+                        <button type="submit">처방전 인식</button>
+                    </form>
 
+                    <form th:action="@{/admin/dosage}" method="post">
+                        <input type="hidden" name="id" th:value="${user.id}">
+                        <button type="submit">복용 완료 요청</button>
+                    </form>
 
-            <div class="section" th:if="${user.role == T(com.onlypromise.promise.domain.enumeration.Role).admin}">
-                <h2>수동 약물 추가</h2>
-                <form th:action="@{/admin/add_medicine}" method="get">
-                    <input type="hidden" name="id" th:value="${user.id}">
-                    <button type="submit">수동 약품 추가</button>
-                </form>
+                    <form th:action="@{/admin/add_medicine}" method="get">
+                        <input type="hidden" name="id" th:value="${user.id}">
+                        <button type="submit">수동 약품 추가</button>
+                    </form>
+                </div>
             </div>
 
 

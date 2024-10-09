@@ -19,5 +19,4 @@ public class PromiseApplication {
 		// JVM의 기본 시간대를 Asia/Seoul로 설정
 		TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
 	}
-
 }

@@ -264,4 +264,43 @@ public class adminController {
         }
         return "redirect:/admin/" + user.getId();
     }
+
+    @PostMapping("/dosage")
+    public String dosage(@RequestParam long id, RedirectAttributes redirectAttributes, HttpSession session)
+    {
+        User user = (User) session.getAttribute("user");
+
+        if(user.getId() != id)
+        {
+            redirectAttributes.addFlashAttribute("errorMessage", "다른 관리자 계정에 약물 복용 기능을 사용할 수 없습니다.");
+            return "redirect:/admin/" + id;
+        }
+
+        int status = medicationLogService.updateMedicationStatus(user.getBottleId());
+        String message;
+
+        switch(status)
+        {
+            case 0:
+                message = "약물 복용을 기록하였습니다.";
+                break;
+            case 1:
+                message = "계정의 약통코드를 찾을 수 없습니다.";
+                break;
+            case 2:
+                message = "현재 시간대에 이미 복용 기록이 있습니다.";
+                break;
+            case 3:
+                message = "약품이 모두 소진되어 복용기록을 남길 수 없습니다.";
+                break;
+            case 4:
+                message = "현재 시간에 복용해야 할 약품이 없습니다.";
+                break;
+            default:
+                message = "서버에 오류가 발생했습니다.";
+        }
+
+        redirectAttributes.addFlashAttribute(status == 0 ? "message" : "errorMessage", message);
+        return "redirect:/admin/" + id;
+    }
 }
