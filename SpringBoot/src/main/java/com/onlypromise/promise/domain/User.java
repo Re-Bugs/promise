@@ -53,16 +53,19 @@ public class User {
 
     // 시간 필드 추가
     @Column(name = "morning_time", nullable = false)
+    @Builder.Default
     private LocalTime morningTime = LocalTime.of(8, 0);
 
     @Column(name = "afternoon_time", nullable = false)
+    @Builder.Default
     private LocalTime afternoonTime = LocalTime.of(13, 0);
 
     @Column(name = "evening_time", nullable = false)
+    @Builder.Default
     private LocalTime eveningTime = LocalTime.of(18, 0);
 
     // User와 Notification은 1:N 관계
     // 한 명의 사용자는 여러 알림을 받을 수 있다.
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY) // 연관관계 주인이 아님, 지연로딩
-    private List<Notification> notifications = new ArrayList<>();
+    private List<Notification> notifications;
 }
