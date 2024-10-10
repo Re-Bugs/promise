@@ -1,17 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <configuration>
-    <appender name="ROLLING-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>./log/%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern> <!-- .gz 추가 -->
-            <maxFileSize>50MB</maxFileSize>
-            <maxHistory>60</maxHistory> <!-- 최대 보관 기간 -->
-            <totalSizeCap>10GB</totalSizeCap> <!-- 전체 로그 파일의 총 크기 제한 -->
-        </rollingPolicy>
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
-    </appender>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
 
-    <root level="info">
-        <appender-ref ref="ROLLING-FILE" />
-    </root>
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %clr(%5level) %cyan(%logger) - %msg%n"/>
+    <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %5level %logger - %msg%n"/>
+
+    <!--local-->
+    <springProfile name="local">
+        <include resource="console-appender.xml"/>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <!--prod-->
+    <springProfile name="prod">
+        <include resource="file-info-appender.xml"/>
+        <include resource="file-error-appender.xml"/>
+
+        <root level="INFO">
+            <appender-ref ref="FILE-INFO"/>
+            <appender-ref ref="FILE-ERROR"/>
+        </root>
+    </springProfile>
+
 </configuration>

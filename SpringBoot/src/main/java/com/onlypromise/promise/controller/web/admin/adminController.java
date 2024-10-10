@@ -4,8 +4,10 @@ import com.onlypromise.promise.DTO.MedicationDTO;
 import com.onlypromise.promise.DTO.MedicineDTO;
 import com.onlypromise.promise.DTO.api.DailyTakenDTO;
 import com.onlypromise.promise.DTO.web.AdminHomeDTO;
+import com.onlypromise.promise.DTO.web.reportAdminDTO;
 import com.onlypromise.promise.domain.Medicine;
 import com.onlypromise.promise.domain.Notification;
+import com.onlypromise.promise.domain.Report;
 import com.onlypromise.promise.domain.User;
 import com.onlypromise.promise.service.*;
 import jakarta.servlet.http.HttpSession;
@@ -39,6 +41,7 @@ public class adminController {
     private final MedicineService medicineService;
     private final OcrProcessor ocrProcessor;
     private final VisionService visionService;
+    private final ReportService reportService;
 
 
     @GetMapping("/home")
@@ -80,6 +83,19 @@ public class adminController {
             dtoList.add(newDto);
         }
         totalPercent = Double.parseDouble(df.format((totalPercent - dtoList.get(0).getPercent() - dtoList.get(1).getPercent()) / (dtoList.size() - 2))); //관리자(테스트) 계정의 복약 순응도는 반영 안함
+
+        List<reportAdminDTO> reportList = new ArrayList<>();
+        for(Report r : reportService.findAllReport())
+        {
+            reportAdminDTO newReportDto = new reportAdminDTO();
+            newReportDto.setId(r.getId());
+            newReportDto.setUserName(r.getUser().getName());
+            newReportDto.setTitle(r.getTitle());
+            reportList.add(newReportDto);
+        }
+
+        model.addAttribute("allReport", reportList);
+
         model.addAttribute("userInfo", dtoList);
         model.addAttribute("totalPercent", totalPercent);
         model.addAttribute("startDateTime", startDateTime);
@@ -303,4 +319,23 @@ public class adminController {
         redirectAttributes.addFlashAttribute(status == 0 ? "message" : "errorMessage", message);
         return "redirect:/admin/" + id;
     }
+
+    @GetMapping("/report/{id}")
+    public String reportInfo(@PathVariable long id, RedirectAttributes redirectAttributes, Model model)
+    {
+        Optional<Report> findReport = reportService.findById(id);
+
+        if(findReport.isEmpty())
+        {
+            redirectAttributes.addFlashAttribute("errorMessage", "해당 민원을 찾을 수 없습니다.");
+            return "redirect:/admin/home";
+        }
+
+        Report report = findReport.get();
+
+        model.addAttribute("report", report);
+        return "adminView/reportInfo";
+    }
+
+
 }

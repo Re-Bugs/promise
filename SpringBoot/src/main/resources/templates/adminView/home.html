@@ -81,5 +81,27 @@
             <div class="info-text" th:text="'평균 복약 순응도 계산식 : 모든 user의 복약 순응도 합산 값 / 모든 user 수'"></div>
             <div class="info-text" th:text="'- 관리자(테스트) 계정의 복약 순응도는 반영하지 않음 -'"></div>
         </div>
+
+        <div class="container">
+            <h2>사용자 민원</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>제목</th>
+                    <th>작성자</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <!-- 유저 정보 리스트 출력 -->
+                <tr th:each="report : ${allReport}" th:data-href="@{/admin/report/{id}(id=${report.id})}"> <!-- 행 클릭 시 이동하도록 이벤트 설정 -->
+                    <td th:text="${report.id}"></td>
+                    <td th:text="${report.title}"></td>
+                    <td th:text="${report.userName}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </body>
 </html>

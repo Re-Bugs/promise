@@ -1,0 +1,65 @@
+/* 기존 스타일들 유지 */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: #e9ecef;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 90%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+    text-align: center;
+}
+
+h1, h2 {
+    color: #333;
+    font-weight: 300;
+    text-align: center;
+}
+
+.section {
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #dee2e6;
+    margin-bottom: 20px;
+}
+
+/* 내용 섹션에만 스타일 적용 */
+.content {
+    max-height: 400px; /* 최대 높이 설정 */
+    overflow-y: auto; /* 내용이 길어지면 스크롤 추가 */
+    text-align: justify; /* 양쪽 정렬로 정돈 */
+    line-height: 1.6; /* 줄 간격 늘리기 */
+}
+
+p {
+    margin: 0;
+    font-size: 16px;
+}
+
+/* 버튼 스타일 */
+button {
+    padding: 10px 20px;
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 20px auto;
+    width: 100%;
+    max-width: 150px;
+}
+
+button:hover {
+    background-color: #333;
+}
