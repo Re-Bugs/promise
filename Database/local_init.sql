@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS dur;
 DROP TABLE IF EXISTS medicines;
 DROP TABLE IF EXISTS medication_log;
 DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS reports;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS clinic_location;
 SET FOREIGN_KEY_CHECKS = 1;
@@ -85,4 +86,13 @@ CREATE TABLE clinic_location (
     longitude DOUBLE PRECISION NOT NULL,
     latitude DOUBLE PRECISION NOT NULL,
     PRIMARY KEY (id)
+);
+
+CREATE TABLE reports (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    user_absolute_id BIGINT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_absolute_id) REFERENCES users(id)
 );

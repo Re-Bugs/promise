@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>400 Bad Request</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4xx Error - Request Issue</title>
+    <link rel="stylesheet" href="/css/error/error.css">
 </head>
 <body>
-    <h1>4xx Bad Request</h1>
-    <p>잘못된 요청입니다. 요청을 다시 확인해 주세요.</p>
-    <img th:src="@{/images/error.jpeg}" alt="4xx Error Image" />
+<div class="error-container">
+    <h1>요청에 문제가 발생했습니다.</h1>
+    <p>페이지를 표시할 수 없습니다. 입력한 정보가 올바른지 확인하시고 다시 시도해 주세요.</p>
+    <a href="/" class="btn-home">홈으로 돌아가기</a>
+</div>
 </body>
 </html>

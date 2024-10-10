@@ -3,11 +3,8 @@ package com.onlypromise.promise.controller.web.admin;
 import com.onlypromise.promise.DTO.MedicationDTO;
 import com.onlypromise.promise.DTO.MedicineDTO;
 import com.onlypromise.promise.DTO.api.DailyTakenDTO;
-import com.onlypromise.promise.DTO.web.AdminHomeDTO;
-import com.onlypromise.promise.DTO.web.reportAdminDTO;
 import com.onlypromise.promise.domain.Medicine;
 import com.onlypromise.promise.domain.Notification;
-import com.onlypromise.promise.domain.Report;
 import com.onlypromise.promise.domain.User;
 import com.onlypromise.promise.service.*;
 import jakarta.servlet.http.HttpSession;
@@ -19,22 +16,18 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.text.DecimalFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
 @Controller
-@RequestMapping("/admin")
 @RequiredArgsConstructor
-public class adminController {
-
+@RequestMapping("/admin")
+public class adminUserInfoController {
     private final UserService userService;
     private final NotificationService notificationService;
     private final MedicationLogService medicationLogService;
@@ -42,66 +35,6 @@ public class adminController {
     private final OcrProcessor ocrProcessor;
     private final VisionService visionService;
     private final ReportService reportService;
-
-
-    @GetMapping("/home")
-    public String adminHome(HttpSession session, Model model)
-    {
-        User user = (User) session.getAttribute("user");
-        if(user == null) return "redirect:/login";
-
-        // 2024년 10월 07일 00:00부터 현재까지의 범위 지정
-        LocalDateTime startDateTime = LocalDateTime.of(2024, 10, 7, 0, 0); //관찰 시작일
-        LocalDateTime endDateTime = LocalDateTime.now(); // 현재 시간까지
-
-        // LocalDate로 변환하여 두 날짜의 차이를 구함
-        long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(startDateTime.toLocalDate(), endDateTime.toLocalDate()) + 1; // 관찰 시작일부터 1일차이기 때문에 1을 더함
-
-        List<AdminHomeDTO> dtoList = new ArrayList<>();
-        double totalPercent = 0.0;
-        DecimalFormat df = new DecimalFormat("#.##"); // 소수점 두 자리까지만 표현
-        for(User u : userService.findAllUser())
-        {
-            AdminHomeDTO newDto = new AdminHomeDTO();
-            newDto.setId(u.getId());
-            newDto.setRole(u.getRole());
-            newDto.setName(u.getName());
-            newDto.setAge(u.getAge());
-            newDto.setBottleId(u.getBottleId());
-            int notificationSize = notificationService.findNotificationByUser(u).size();
-            newDto.setTotalMedicine(notificationSize);
-
-            if (daysBetween == 0 || notificationSize == 0) newDto.setPercent(0); // 알림이 없는 경우 0%로 설정
-            else
-            {
-                int logSize = medicationLogService.findByUserAndTimeBetween(u, startDateTime, endDateTime).size();
-                double percent = (logSize / (daysBetween * (double) notificationSize)) * 100;
-                newDto.setLogSize(logSize);
-                newDto.setPercent(Double.parseDouble(df.format(percent)));
-                totalPercent += newDto.getPercent();
-            }
-            dtoList.add(newDto);
-        }
-        totalPercent = Double.parseDouble(df.format((totalPercent - dtoList.get(0).getPercent() - dtoList.get(1).getPercent()) / (dtoList.size() - 2))); //관리자(테스트) 계정의 복약 순응도는 반영 안함
-
-        List<reportAdminDTO> reportList = new ArrayList<>();
-        for(Report r : reportService.findAllReport())
-        {
-            reportAdminDTO newReportDto = new reportAdminDTO();
-            newReportDto.setId(r.getId());
-            newReportDto.setUserName(r.getUser().getName());
-            newReportDto.setTitle(r.getTitle());
-            reportList.add(newReportDto);
-        }
-
-        model.addAttribute("allReport", reportList);
-
-        model.addAttribute("userInfo", dtoList);
-        model.addAttribute("totalPercent", totalPercent);
-        model.addAttribute("startDateTime", startDateTime);
-        model.addAttribute("daysBetween", daysBetween);
-        return "adminView/home";
-    }
 
     @GetMapping("/{id}")
     public String getUserInfo(@PathVariable("id") Long id, @RequestParam(value = "date", required = false) String date, Model model) {
@@ -193,25 +126,6 @@ public class adminController {
         return "adminView/addMedicine";
     }
 
-    // 약품 검색 요청을 처리하는 메서드
-    @GetMapping("/search_medicine")
-    public String searchMedicine( @RequestParam String identifier, Model model, HttpSession session)
-    {
-        User user = (User) session.getAttribute("user");
-        if (user != null)
-        {
-            model.addAttribute("user", user);
-
-            // 약품 이름 또는 코드로 약품을 검색
-            Optional<List<MedicineDTO>> medicinesOptional = medicineService.findMedicineByNameOrProductCode(identifier);
-            if (medicinesOptional.isPresent() && !medicinesOptional.get().isEmpty()) model.addAttribute("medicines", medicinesOptional.get()); // 검색된 약품 리스트 추가
-            else model.addAttribute("error", "해당 약품을 찾을 수 없습니다.");
-        }
-        else return "redirect:/login";
-
-        return "adminView/addMedicine"; // 검색 결과를 보여주는 페이지로 이동
-    }
-
     // 약품 추가 폼에서 약품을 저장하는 POST 메서드
     @PostMapping("/add_medicine")
     public String addMedicine(@RequestParam Long medicineId,
@@ -239,6 +153,25 @@ public class adminController {
         redirectAttributes.addFlashAttribute("message", "약물이 성공적으로 추가되었습니다.");
 
         return "redirect:/admin/" + user.getId();
+    }
+
+    // 약품 검색 요청을 처리하는 메서드
+    @GetMapping("/search_medicine")
+    public String searchMedicine( @RequestParam String identifier, Model model, HttpSession session)
+    {
+        User user = (User) session.getAttribute("user");
+        if (user != null)
+        {
+            model.addAttribute("user", user);
+
+            // 약품 이름 또는 코드로 약품을 검색
+            Optional<List<MedicineDTO>> medicinesOptional = medicineService.findMedicineByNameOrProductCode(identifier);
+            if (medicinesOptional.isPresent() && !medicinesOptional.get().isEmpty()) model.addAttribute("medicines", medicinesOptional.get()); // 검색된 약품 리스트 추가
+            else model.addAttribute("error", "해당 약품을 찾을 수 없습니다.");
+        }
+        else return "redirect:/login";
+
+        return "adminView/addMedicine"; // 검색 결과를 보여주는 페이지로 이동
     }
 
     @GetMapping("/upload")
@@ -319,23 +252,4 @@ public class adminController {
         redirectAttributes.addFlashAttribute(status == 0 ? "message" : "errorMessage", message);
         return "redirect:/admin/" + id;
     }
-
-    @GetMapping("/report/{id}")
-    public String reportInfo(@PathVariable long id, RedirectAttributes redirectAttributes, Model model)
-    {
-        Optional<Report> findReport = reportService.findById(id);
-
-        if(findReport.isEmpty())
-        {
-            redirectAttributes.addFlashAttribute("errorMessage", "해당 민원을 찾을 수 없습니다.");
-            return "redirect:/admin/home";
-        }
-
-        Report report = findReport.get();
-
-        model.addAttribute("report", report);
-        return "adminView/reportInfo";
-    }
-
-
 }
