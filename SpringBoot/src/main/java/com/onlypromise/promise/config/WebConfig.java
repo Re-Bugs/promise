@@ -22,9 +22,9 @@ public class WebConfig implements WebMvcConfigurer {
     //외부 이미지 접근
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // "/image/**" 경로 요청은 "file:현재 작업 디렉토리 경로/image/"에서 파일을 찾도록 매핑
-        registry.addResourceHandler("/image/**")
-                .addResourceLocations("file:" + System.getProperty("user.dir") + "/image/");
+        // "/report-images/**" 경로 요청은 "file:현재 작업 디렉토리 경로/report-images/"에서 파일을 찾도록 매핑
+        registry.addResourceHandler("/report-images/**")
+                .addResourceLocations("file:" + System.getProperty("user.dir") + "/report-images/");
     }
 
 //    @Override

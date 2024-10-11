@@ -104,5 +104,6 @@ SpringBoot/src/main/resources/application.yml
 SpringBoot/src/main/resources/application-local.yml
 SpringBoot/src/main/resources/application-prod.yml
 SpringBoot/log
+SpringBoot/report-images
 data/
 Database/ignore
