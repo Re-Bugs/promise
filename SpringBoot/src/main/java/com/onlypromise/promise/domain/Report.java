@@ -2,7 +2,9 @@ package com.onlypromise.promise.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
+
+import java.time.LocalDateTime;
+
 
 @Getter
 @Entity
@@ -10,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder(toBuilder = true) // 객체 수정 허용
-@Slf4j
 public class Report {
 
     @Id
@@ -23,9 +24,16 @@ public class Report {
     @JoinColumn(name = "user_absolute_id", nullable = false)
     private User user;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "image_id", nullable = true)
+    private Image image;
+
     @Column(nullable = false)
     private String title;
 
     @Column(nullable = false)
     private String content;
+
+    @Column(name = "create_at", columnDefinition = "TIMESTAMP", nullable = false)
+    private LocalDateTime createAt;
 }

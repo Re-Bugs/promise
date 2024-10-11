@@ -5,7 +5,6 @@ import com.onlypromise.promise.domain.enumeration.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -16,7 +15,6 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder(toBuilder = true) // 객체 수정 허용
-@Slf4j
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

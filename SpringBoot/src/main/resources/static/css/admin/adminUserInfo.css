@@ -51,13 +51,14 @@ h1, h2 {
 
 table {
     width: 100%;
+    table-layout: fixed; /* 열 너비를 균등하게 설정 */
     border-collapse: collapse;
     margin-top: 20px;
 }
 
 th, td {
     padding: 10px;
-    text-align: left;
+    text-align: center; /* 중앙 정렬 */
     border-bottom: 1px solid #eee;
 }
 

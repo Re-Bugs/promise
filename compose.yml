@@ -15,6 +15,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /usr/share/zoneinfo/Asia/Seoul:/etc/timezone:ro
       - /home/ubuntu/promise/log:/spring-boot/log
+      - /home/ubuntu/promise/report-images:/spring-boot/report-images
 networks:
   promise-network:
     driver: bridge

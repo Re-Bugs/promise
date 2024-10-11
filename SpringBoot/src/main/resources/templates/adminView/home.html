@@ -90,6 +90,7 @@
                     <th>번호</th>
                     <th>제목</th>
                     <th>작성자</th>
+                    <th>날짜</th>
                 </tr>
                 </thead>
 
@@ -99,6 +100,7 @@
                     <td th:text="${report.id}"></td>
                     <td th:text="${report.title}"></td>
                     <td th:text="${report.userName}"></td>
+                    <td th:text="${report.creatAt}"></td>
                 </tr>
                 </tbody>
             </table>

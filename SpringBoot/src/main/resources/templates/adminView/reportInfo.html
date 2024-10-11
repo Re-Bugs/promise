@@ -12,19 +12,36 @@
     <h1>민원 상세 정보</h1>
 
     <div class="section">
-        <h2>제목</h2>
-        <p th:text="${report.title}">제목 정보</p>
-    </div>
-
-    <div class="section">
-        <h2>작성자</h2>
-        <p th:text="${report.user.name}">작성자 이름</p>
+        <h2>기본 정보</h2>
+        <table class="user-info-table-horizontal">
+            <thead>
+            <tr>
+                <th>작성자</th>
+                <th>제목</th>
+                <th>날짜</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td th:text="${report.user.name}">작성자 이름</td>
+                <td th:text="${report.title}">제목 정보</td>
+                <td th:text="${report.createAt}">날짜 정보</td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 
     <div class="section">
         <h2>내용</h2>
         <div class="content">
             <p th:text="${report.content}">내용 정보</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>첨부 이미지</h2>
+        <div class="content">
+            <img th:src="@{/image/{imageName}(imageName=${report.image.name})}" alt="첨부 이미지" style="max-width:100%; height:auto;"/>
         </div>
     </div>
 

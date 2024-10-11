@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,12 +71,14 @@ public class adminHomeController {
         totalPercent = Double.parseDouble(df.format((totalPercent - dtoList.get(0).getPercent() - dtoList.get(1).getPercent()) / (dtoList.size() - 2))); //관리자(테스트) 계정의 복약 순응도는 반영 안함
 
         List<reportAdminDTO> reportList = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         for(Report r : reportService.findAllReport())
         {
             reportAdminDTO newReportDto = new reportAdminDTO();
             newReportDto.setId(r.getId());
             newReportDto.setUserName(r.getUser().getName());
             newReportDto.setTitle(r.getTitle());
+            newReportDto.setCreatAt(r.getCreateAt().format(formatter));
             reportList.add(newReportDto);
         }
 
