@@ -19,7 +19,7 @@ import java.io.IOException;
 @RequestMapping("/admin/log")
 public class adminLogController {
 
-    private final String LOG_DIRECTORY = "/home/ubuntu/promise/log";
+    private final String LOG_DIRECTORY = "/spring-boot/log";
 
     @GetMapping("/view")
     public String viewLogFile(@RequestParam String fileName, Model model) {

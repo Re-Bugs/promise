@@ -31,7 +31,7 @@ public class adminHomeController {
     private final MedicationLogService medicationLogService;
     private final ReportService reportService;
 
-    private final String LOG_DIRECTORY = "/home/ubuntu/promise/log";
+    private final String LOG_DIRECTORY = "/spring-boot/log";
 
     @GetMapping("/home")
     public String adminHome(HttpSession session, Model model)
