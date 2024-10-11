@@ -10,6 +10,7 @@ import com.onlypromise.promise.service.MedicineService;
 import com.onlypromise.promise.service.NotificationService;
 import com.onlypromise.promise.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import java.time.LocalDate;
 import java.util.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -45,15 +47,19 @@ public class MainAPIController {
                 response.put("message", "Bottle ID not found.");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             case 2:
+                log.warn("중복 복용 요청 : {}", bottleId);
                 response.put("message", "You already have a history of taking it at that time.");
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
             case 3:
+                log.warn("약물 소진 : {}", bottleId);
                 response.put("message", "Medication fully consumed.");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             case 4:
+                log.warn("예정되지 않은 복용 요청 : {}", bottleId);
                 response.put("message", "No medication scheduled for this time period.");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             default:
+                log.error("약물 복용 요청 에러 발생");
                 response.put("message", "Server error.");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
@@ -140,6 +146,7 @@ public class MainAPIController {
     {
         Map<String, String> response = new HashMap<>();
         response.put("message", "Invalid date format. Please use YYYY-MM-DD.");
+        log.warn("잘못된 날짜 요청 오류 발생");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 }

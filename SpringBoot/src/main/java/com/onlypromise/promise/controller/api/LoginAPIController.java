@@ -6,6 +6,7 @@ import com.onlypromise.promise.domain.User;
 import com.onlypromise.promise.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -31,6 +33,7 @@ public class LoginAPIController {
             User updateUser = findUser.get().toBuilder().name(loginDTO.getName()).age(loginDTO.getAge()).build();
             userService.save(updateUser);
             response.put("message", "success");
+            log.info("유저 로그인 : {}, 이름 : {}", updateUser.getId(), updateUser.getName());
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
             response.put("message", "user not found");

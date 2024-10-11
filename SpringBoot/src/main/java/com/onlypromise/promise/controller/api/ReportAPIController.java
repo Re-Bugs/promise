@@ -49,7 +49,9 @@ public class ReportAPIController {
             if (imageFile != null && !imageFile.isEmpty())
             {
                 String extension = getFileExtension(imageFile.getOriginalFilename());
-                if (!isImageFile(extension)) {
+                if (!isImageFile(extension)) //이미지 파일인지 검사
+                {
+                    log.info("user_absolute_id : {}, name : {}, 잘못된 이미지 확장자 : {}", user.getId(), user.getName(), extension);
                     response.put("message", "invalid image file");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
                 }
@@ -72,6 +74,7 @@ public class ReportAPIController {
                         .build();
 
                 reportService.saveImage(image);
+                log.info("user_absolute_id : {}, name : {}, file path : {}, 민원 접수됨", user.getId(), user.getName(), absolutePath);
             }
 
             Report newReport = Report.builder()

@@ -47,6 +47,7 @@ public class OcrApiController {
 
             response.put("data", validDtoList);
             response.put("warningMessage", warningMessages);
+            log.info("처방전 인식 성공 user_absolute_id : {}", user.getId());
             return ResponseEntity.ok(response);
 
         }

@@ -34,7 +34,6 @@ public class adminUserInfoController {
     private final MedicineService medicineService;
     private final OcrProcessor ocrProcessor;
     private final VisionService visionService;
-    private final ReportService reportService;
 
     @GetMapping("/{id}")
     public String getUserInfo(@PathVariable("id") Long id, @RequestParam(value = "date", required = false) String date, Model model) {

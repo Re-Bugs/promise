@@ -3,6 +3,7 @@ package com.onlypromise.promise.controller.api;
 import com.onlypromise.promise.domain.User;
 import com.onlypromise.promise.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -62,11 +63,13 @@ public class AlarmAPIController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
+        User user = findUser.get();
+
         try
         {
             // LocalTime 변환 및 업데이트
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-            User updateUser = findUser.get().toBuilder()
+            User updateUser = user.toBuilder()
                     .morningTime(LocalTime.parse(morningTime, timeFormatter))
                     .afternoonTime(LocalTime.parse(afternoonTime, timeFormatter))
                     .eveningTime(LocalTime.parse(eveningTime, timeFormatter))
@@ -74,12 +77,14 @@ public class AlarmAPIController {
 
             userService.save(updateUser);
 
+            log.info("user_absolute_id : {}, morning : {}, afternoon : {}, evening : {} 알림시간 업데이트 됨", updateUser.getId(), updateUser.getMorningTime(), updateUser.getAfternoonTime(), updateUser.getEveningTime());
             response.put("message", "success");
             return ResponseEntity.status(HttpStatus.OK).body(response);
 
         }
         catch (DateTimeParseException e)
         {
+            log.warn("user_absolute_id : {}, 잘못된 알림시각 요청", user.getId());
             // 시간 형식이 잘못된 경우 처리
             response.put("message", "Invalid time format. Please use HH:mm format.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
@@ -87,6 +92,7 @@ public class AlarmAPIController {
         catch (Exception e)
         {
             // 기타 예외 처리
+            log.error("알림 시각 변경 오류", e);
             response.put("message", "An unexpected error occurred.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }

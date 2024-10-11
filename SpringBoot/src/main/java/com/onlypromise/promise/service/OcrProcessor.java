@@ -89,7 +89,7 @@ public class OcrProcessor {
 
             if (findMedicine.isEmpty()) //등록되지 않은 약품코드
             {
-                log.info("등록되지 않은 약품코드 = {}", medicineDTO.getMedicineId());
+                log.warn("등록되지 않은 약품코드 = {}", medicineDTO.getMedicineId());
                 warningMessages.add(medicineDTO.getMedicineId() + " 이러한 약품코드를 찾을 수 없습니다.");
                 continue;
             }
@@ -144,7 +144,6 @@ public class OcrProcessor {
             for (String meal : meals)
             {
                 meal = meal.trim();
-                log.info(meal);
                 if (meal.equals("아침")) notificationBuilder.morning(true);
                 else if (meal.equals("점심")) notificationBuilder.afternoon(true);
                 else if (meal.equals("저녁")) notificationBuilder.evening(true);

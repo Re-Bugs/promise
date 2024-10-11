@@ -24,17 +24,11 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final MedicationLogRepository medicationLogRepository;
-    private final UserRepository userRepository;
     private final MedicineRepository medicineRepository;
 
     @Transactional
     public void save(Notification notification) {
         notificationRepository.save(notification);
-    }
-
-    // 사용자와 약물로 알림 조회
-    public Optional<Notification> findByUserAndMedicine(User user, Medicine medicine) {
-        return notificationRepository.findByUserAndMedicine(user, medicine);
     }
 
     // 복용 및 미복용 조회
@@ -121,15 +115,5 @@ public class NotificationService {
     public List<Notification> findNotificationByUser(User user)
     {
         return notificationRepository.findByUser(user);
-    }
-
-    public void delete(Notification notification)
-    {
-        notificationRepository.delete(notification);
-    }
-
-    public void update(Notification notification)
-    {
-        notificationRepository.delete(notification);
     }
 }
