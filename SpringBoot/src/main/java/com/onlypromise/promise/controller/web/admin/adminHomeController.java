@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,6 +30,8 @@ public class adminHomeController {
     private final NotificationService notificationService;
     private final MedicationLogService medicationLogService;
     private final ReportService reportService;
+
+    private final String LOG_DIRECTORY = "/home/ubuntu/promise/log";
 
     @GetMapping("/home")
     public String adminHome(HttpSession session, Model model)
@@ -82,8 +85,17 @@ public class adminHomeController {
             reportList.add(newReportDto);
         }
 
-        model.addAttribute("allReport", reportList);
+        File logDir = new File(LOG_DIRECTORY);
+        List<String> logFiles = new ArrayList<>();
 
+        // log 디렉토리에서 모든 로그 파일을 찾기
+        if (logDir.exists() && logDir.isDirectory())
+        {
+            for (File file : logDir.listFiles()) if (file.isFile() && file.getName().startsWith("info-")) logFiles.add(file.getName());
+        }
+
+        model.addAttribute("logFiles", logFiles);
+        model.addAttribute("allReport", reportList);
         model.addAttribute("userInfo", dtoList);
         model.addAttribute("totalPercent", totalPercent);
         model.addAttribute("startDateTime", startDateTime);

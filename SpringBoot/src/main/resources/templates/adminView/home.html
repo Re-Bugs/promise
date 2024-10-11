@@ -105,5 +105,29 @@
                 </tbody>
             </table>
         </div>
+
+
+        <!-- 로그파일 출력 섹션 -->
+        <div class="container">
+            <h2>로그파일 확인</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>로그 파일 이름</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="logFile, iterStat : ${logFiles}"
+                    th:data-href="@{/admin/log/view(fileName=${logFile})}"
+                    onclick="window.location.href = this.getAttribute('data-href');"
+                    style="cursor: pointer;">
+                    <td th:text="${iterStat.index + 1}"></td>
+                    <td th:text="${logFile}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
     </body>
 </html>
