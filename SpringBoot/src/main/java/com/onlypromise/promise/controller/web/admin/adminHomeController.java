@@ -92,6 +92,7 @@ public class adminHomeController {
         if (logDir.exists() && logDir.isDirectory())
         {
             for (File file : logDir.listFiles()) if (file.isFile() && file.getName().startsWith("info-")) logFiles.add(file.getName());
+            log.info("로그파일 개수 : {}", logFiles.size());
         }
 
         model.addAttribute("logFiles", logFiles);
