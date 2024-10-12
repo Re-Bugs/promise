@@ -31,6 +31,9 @@ local.properties
 *.log
 *.keystore
 *.hprof
+release/
+output-metadata.json
+baselineProfiles/
 
 # macOS
 .DS_Store

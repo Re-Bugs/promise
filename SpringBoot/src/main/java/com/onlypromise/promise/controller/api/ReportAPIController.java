@@ -75,7 +75,7 @@ public class ReportAPIController {
                         .build();
 
                 reportService.saveImage(image);
-                log.info("user PK : {}, 이름 : {}, 사진 저장 경로 : {}, 민원 접수됨", user.getId(), user.getName(), absolutePath);
+                log.info("민원 접수 - user PK : {}, 이름 : {}, 사진 저장 경로 : {}", user.getId(), user.getName(), absolutePath);
 
                 Report newReport = Report.builder()
                         .user(user)
