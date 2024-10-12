@@ -53,6 +53,7 @@ jobs:
         username: ${{ secrets.PROMISE_EC2_USERNAME }}
         key: ${{ secrets.PROMISE_EC2_PRIVATE_KEY }}
         script: |
+          echo "${{ secrets.PROMISE_COMPOSE_YML }}" > /home/ubuntu/promise/compose.yml
           cd /home/ubuntu/promise
           docker compose down
           docker compose pull

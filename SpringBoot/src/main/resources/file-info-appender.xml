@@ -4,7 +4,7 @@
             <pattern>${FILE_LOG_PATTERN}</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>./log/info-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <fileNamePattern>./log/info-%d{yyyy-MM-dd}.%i.log</fileNamePattern> <!--.gz 제거-->
             <maxFileSize>50MB</maxFileSize>
             <maxHistory>60</maxHistory>
             <totalSizeCap>5GB</totalSizeCap>
