@@ -32,24 +32,32 @@ public class OcrProcessor {
     private static final Pattern DAY_NUMBER_PATTERN = Pattern.compile("하루\\s*(1|2|3)\\s*[회번]");
     private static final Pattern MEAL_PATTERN = Pattern.compile("(아침|점심|저녁)");
 
-    public List<MedicationDTO> buildMedicationDtoList(String extractedText)
-    {
+    public List<MedicationDTO> buildMedicationDtoList(String extractedText) {
         List<String> nineDigitNumbers = extractNineDigitNumbers(extractedText);
         List<String> dayAndMealSet = extractDayAndMealSet(extractedText);
         List<String> twoDigitNumbers = extractValidTwoDigitNumbers(extractedText);
         List<String> dailyDosageTimes = extractDayNumber(extractedText);
-        List<String> mealTimes = extractMealTimesFromList(dayAndMealSet);
+        List<List<String>> allMealTimes = new ArrayList<>();
+
+        // 모든 약물에 대한 식사 시간을 추출
+        for (String mealSet : dayAndMealSet)
+        {
+            List<String> mealTimes = extractMealTimesFromList(Collections.singletonList(mealSet));
+            allMealTimes.add(mealTimes); // 각 약물에 대한 식사 시간을 리스트에 추가
+        }
 
         List<MedicationDTO> dtoList = new ArrayList<>();
         int size = nineDigitNumbers.size();
 
-        for (int i = 0; i < size; ++i)
-        {
+        for (int i = 0; i < size; ++i) {
             MedicationDTO dto = new MedicationDTO();
             dto.setMedicationCode(nineDigitNumbers.get(i));
             dto.setTotalDosageDays(getValueOrDefault(twoDigitNumbers, i, "0"));
             dto.setDailyDosageTimes(getValueOrDefault(dailyDosageTimes, i, "0"));
-            dto.setMealTimes(List.of(getValueOrDefault(mealTimes, i, "없음")));
+
+            // 해당 약물에 대한 모든 식사 시간을 추가
+            if (i < allMealTimes.size()) dto.setMealTimes(allMealTimes.get(i));
+            else dto.setMealTimes(List.of("없음"));
 
             dtoList.add(dto);
         }
@@ -89,7 +97,7 @@ public class OcrProcessor {
 
             if (findMedicine.isEmpty()) //등록되지 않은 약품코드
             {
-                log.warn("등록되지 않은 약품코드 = {}", medicineDTO.getMedicineId());
+                log.warn("등록되지 않은 약품코드 = {} user PK {}, 이름 : {}", medicineDTO.getMedicineId(), user.getId(), user.getName());
                 warningMessages.add(medicineDTO.getMedicineId() + " 이러한 약품코드를 찾을 수 없습니다.");
                 continue;
             }
@@ -109,7 +117,7 @@ public class OcrProcessor {
                         .build();
 
                 notificationRepository.save(updateNotification);
-                log.info("user Absolute ID : {} - 처방전 재인식 = {}", user.getId(), notification.getMedicine().getName());
+                log.info("이미 등록된 약품 코드 - user PK : {} 약물 이름 : {}", user.getId(), notification.getMedicine().getName());
                 warningMessages.add(notification.getMedicine().getName() + "은 이미 알림에 등록되어서 재처방일과 남은 약물 수를 업데이트 하였습니다.");
                 continue;
             }
@@ -117,39 +125,41 @@ public class OcrProcessor {
             DailyDose dailyDose = convertToDailyDose(medicineDTO.getDailyDosageTimes()); //일일 복용횟수
             List<String> mealTimes = medicineDTO.getMealTimes(); //하루 언제 복용해야하는지
 
-            Notification notificationUpdate1 = Notification.builder() //하루 언제 복용해야하는지를 제외하고 알림 객체 생성
-                    .user(user)
-                    .medicine(medicine)
-                    .dailyDose(dailyDose)
-                    .createdAt(LocalDate.now())
-                    .renewalDate(LocalDate.now().plusDays(Integer.parseInt(medicineDTO.getTotalDosageDays())))
-                    .remainingDose((short) Integer.parseInt(medicineDTO.getTotalDosageDays()))
-                    .total((short) Integer.parseInt(medicineDTO.getTotalDosageDays()))
-                    .build();
+            for (String mealtime : mealTimes)
+            {
+                log.info("mealTime : {}", mealtime);
 
-            Notification notificationUpdate2 = setNotificationTimes(notificationUpdate1, mealTimes); //알림 객체에 하루 언제 복용해야하는지 매핑
+                Notification.NotificationBuilder notificationBuilder = Notification.builder()
+                        .user(user)
+                        .medicine(medicine)
+                        .dailyDose(dailyDose)
+                        .createdAt(LocalDate.now())
+                        .renewalDate(LocalDate.now().plusDays(Integer.parseInt(medicineDTO.getTotalDosageDays())))
+                        .remainingDose((short) Integer.parseInt(medicineDTO.getTotalDosageDays()))
+                        .total((short) Integer.parseInt(medicineDTO.getTotalDosageDays()));
 
-            notificationRepository.save(notificationUpdate2); //저장
+                switch (mealtime) {
+                    case "아침":
+                        notificationBuilder.morning(true);
+                        break;
+                    case "점심":
+                        notificationBuilder.afternoon(true);
+                        break;
+                    case "저녁":
+                        notificationBuilder.evening(true);
+                        break;
+                    default:
+                        log.warn("인식할 수 없는 복용시간 : {}, user PK : {}, 이름 : {}", mealtime, user.getId(), user.getName());
+                        warningMessages.add(mealtime + " 이러한 복용시간은 처리할 수 없습니다.");
+                        continue;
+                }
+
+                Notification notification = notificationBuilder.build();
+                notificationRepository.save(notification); // 저장
+            }
+            log.info("처방전 인식 약물 저장 성공 - user PK : {}, 이름 : {}", user.getId(), user.getName());
         }
         return warningMessages;
-    }
-
-    private Notification setNotificationTimes(Notification notification, List<String> mealTimes)
-    {
-        Notification.NotificationBuilder notificationBuilder = notification.toBuilder().morning(false).afternoon(false).evening(false);
-
-        for (String mealTime : mealTimes)
-        {
-            String[] meals = mealTime.split(",");
-            for (String meal : meals)
-            {
-                meal = meal.trim();
-                if (meal.equals("아침")) notificationBuilder.morning(true);
-                else if (meal.equals("점심")) notificationBuilder.afternoon(true);
-                else if (meal.equals("저녁")) notificationBuilder.evening(true);
-            }
-        }
-        return notificationBuilder.build();
     }
 
     private DailyDose convertToDailyDose(String dailyDosageTimes)
@@ -229,15 +239,13 @@ public class OcrProcessor {
         return dayNumbers;
     }
 
-    private List<String> extractMealTimesFromList(List<String> lines)
-    {
+    private List<String> extractMealTimesFromList(List<String> lines) {
         List<String> mealTimes = new ArrayList<>();
-        for (String line : lines)
-        {
+        for (String line : lines) {
             Matcher mealMatcher = MEAL_PATTERN.matcher(line);
             List<String> mealsInLine = new ArrayList<>();
             while (mealMatcher.find()) mealsInLine.add(mealMatcher.group(1));
-            if (!mealsInLine.isEmpty()) mealTimes.add(String.join(",", mealsInLine));
+            mealTimes.addAll(mealsInLine);// 개별 항목으로 추가
         }
         return mealTimes;
     }

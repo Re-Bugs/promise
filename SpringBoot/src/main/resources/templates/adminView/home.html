@@ -43,8 +43,8 @@
                         <th>이름</th>
                         <th>나이</th>
                         <th>약통 코드</th>
-                        <th>복약한 약물 수</th>
-                        <th>등록된 약물 수</th>
+                        <th>복용 완료 알림 수</th>
+                        <th>등록된 알림 수</th>
                         <th>복약 순응도</th>
                     </tr>
                 </thead>
@@ -65,7 +65,7 @@
             </table>
             <br>
             <div class="info-text" th:text="'관찰 기간 : ' + ${daysBetween} + '일'"></div>
-            <div class="info-text" th:text="'개인 복약 순응도 계산식 : 복약한 약물 수 / (등록된 약물 수 * 관찰기간)'"></div>
+            <div class="info-text" th:text="'개인 복약 순응도 계산식 : 복용완료 알림 수 / (등록된 알림 수 * 관찰기간)'"></div>
         </div>
 
 

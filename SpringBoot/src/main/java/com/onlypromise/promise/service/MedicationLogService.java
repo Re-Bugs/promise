@@ -31,7 +31,7 @@ public class MedicationLogService {
 
         if (userOptional.isEmpty())
         {
-            log.warn("User not found with bottleId: {}", bottleId);
+            log.warn("MedicationLogService - updateMedicationStatus 메서드 - 찾을 수 없는 약통코드: {}", bottleId);
             return 1;
         }
 
@@ -58,7 +58,7 @@ public class MedicationLogService {
                 }
 
                 // 남은 약물 수 감소 및 저장
-                if (notification.getRemainingDose() == 0)
+                if (notification.getRemainingDose() <= 0)
                 {
                     log.warn("약물 소진됨 - ,  유저 PK : {}, 유저 이름 : {}", user.getId(), user.getName());
                     return 3; // 약물이 모두 소진됨
@@ -104,26 +104,26 @@ public class MedicationLogService {
     private boolean samePeriod(User user, Notification notification, String timePeriod, LocalDateTime currentTime)
     {
         LocalDate today = currentTime.toLocalDate();
-        List<MedicationLog> logs = medicationLogRepository.findByUserAndNotificationAndTimeBetween(
-                user,
-                notification,
-                today.atStartOfDay(),
-                today.plusDays(1).atStartOfDay()
-        );
+        List<MedicationLog> logs = medicationLogRepository.findByUserAndNotificationAndTimeBetween(user, notification, today.atStartOfDay(), today.plusDays(1).atStartOfDay());
 
-        // 같은 시간대에 복용 기록이 있는지 확인
-        return logs.stream().anyMatch(log -> determineTimePeriod(log.getTime()).equals(timePeriod));
+        return logs.stream().anyMatch(log -> determineTimePeriod(log.getTime()).equals(timePeriod)); // 같은 시간대에 복용 기록이 있는지 확인
     }
 
     // 남은 약물 수 감소 및 저장
-    private void updateNotificationRemainingDose(Notification notification)
-    {
-        if (notification.getRemainingDose() > 0)
+    private void updateNotificationRemainingDose(Notification notification) {
+        // 해당 약물과 관련된 모든 알림을 조회
+        List<Notification> notificationsForMedicine = notificationRepository.findAllByUserAndMedicine(notification.getUser(), notification.getMedicine());
+
+        // 해당 약물의 모든 알림에서 남은 약물 수 감소
+        for (Notification notif : notificationsForMedicine)
         {
-            Notification updatedNotification = notification.toBuilder()
-                    .remainingDose((short) (notification.getRemainingDose() - 1))
-                    .build();
-            notificationRepository.save(updatedNotification);
+            if (notif.getRemainingDose() > 0)
+            {
+                Notification updatedNotification = notif.toBuilder()
+                        .remainingDose((short) (notif.getRemainingDose() - 1))
+                        .build();
+                notificationRepository.save(updatedNotification);
+            }
         }
     }
 

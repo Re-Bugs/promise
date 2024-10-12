@@ -38,9 +38,7 @@ public class adminUserInfoController {
     @GetMapping("/{id}")
     public String getUserInfo(@PathVariable("id") Long id, @RequestParam(value = "date", required = false) String date, Model model) {
         Optional<User> findUser = userService.findUserById(id);
-        if (findUser.isEmpty()) {
-            return "redirect:/admin/home";
-        }
+        if (findUser.isEmpty()) return "redirect:/admin/home";
 
         User user = findUser.get();
         List<Notification> notifications = notificationService.findNotificationByUser(user);

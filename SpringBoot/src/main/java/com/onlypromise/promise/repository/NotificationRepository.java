@@ -16,6 +16,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     // 사용자와 약물 조합으로 알림 조회
     Optional<Notification> findByUserAndMedicine(User user, Medicine medicine);
 
-
+    // 사용자와 약물 조합으로 모든 알림 조회
+    List<Notification> findAllByUserAndMedicine(User user, Medicine medicine);
 
 }
