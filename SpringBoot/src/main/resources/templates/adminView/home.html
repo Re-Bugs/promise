@@ -39,7 +39,7 @@
                 <thead>
                     <tr>
                         <th>번호</th>
-                        <th>역할</th>
+                        <th>권한</th>
                         <th>이름</th>
                         <th>나이</th>
                         <th>약통 코드</th>
@@ -79,7 +79,7 @@
             </div>
             <br>
             <div class="info-text" th:text="'평균 복약 순응도 계산식 : 모든 user의 복약 순응도 합산 값 / 모든 user 수'"></div>
-            <div class="info-text" th:text="'- 관리자(테스트) 계정의 복약 순응도는 반영하지 않음 -'"></div>
+            <div class="info-text" th:text="'- 권한이 admin인 계정의 복약 순응도는 반영하지 않음 -'"></div>
         </div>
 
         <div class="container">

@@ -119,7 +119,7 @@ public class OcrProcessor {
 
                     notificationRepository.save(updatedNotification);
                 }
-                log.info("이미 등록된 약품 코드 - user PK : {} 약물 이름 : {}", user.getId(), medicine.getName());
+                log.info("이미 등록된 약품 코드 - user PK : {}, 이름 : {}, 약물 이름 : {}", user.getId(), user.getName(), medicine.getName());
                 warningMessages.add(medicine.getName() + "은 이미 알림에 등록되어 재처방일과 남은 약물 수를 업데이트 했습니다.");
                 continue;
             }
@@ -196,6 +196,7 @@ public class OcrProcessor {
         log.info("Total Dosage Days: {}", dto.getTotalDosageDays());
         log.info("Daily Dosage Times: {}", dto.getDailyDosageTimes());
         log.info("Meal Times: {}", dto.getMealTimes());
+        log.info("------------------------------------------");
     }
 
     // 추출 메서드

@@ -53,14 +53,14 @@ public class MedicationLogService {
 
                 if (samePeriod(user, notification, currentTimePeriod, currentTime))
                 {
-                    log.warn("중복 복용 요청 : {},  유저 PK : {}, 유저 이름 : {}", currentTimePeriod, user.getId(), user.getName());
+                    log.warn("중복 복용 요청 : {},  유저 PK : {}, 이름 : {}", currentTimePeriod, user.getId(), user.getName());
                     return 2; // 중복 복용
                 }
 
                 // 남은 약물 수 감소 및 저장
                 if (notification.getRemainingDose() <= 0)
                 {
-                    log.warn("약물 소진됨 - ,  유저 PK : {}, 유저 이름 : {}", user.getId(), user.getName());
+                    log.warn("약물 소진됨 - ,  유저 PK : {}, 이름 : {}", user.getId(), user.getName());
                     return 3; // 약물이 모두 소진됨
                 }
 
@@ -72,12 +72,18 @@ public class MedicationLogService {
         // 일치하는 시간대에 약물이 없을 때 오류 메시지 반환
         if (!hasMatchingNotification)
         {
-            log.warn("예정되지 않은 복용 요청 : {},  유저 PK : {}, 유저 이름 : {}", currentTimePeriod, user.getId(), user.getName());
+            log.warn("예정되지 않은 복용 요청 : {},  유저 PK : {}, 이름 : {}", currentTimePeriod, user.getId(), user.getName());
             return 4;
         }
 
-        log.info("복용완료 : {},  유저 PK : {}, 유저 이름 : {}", currentTimePeriod, user.getId(), user.getName());
+        log.info("복용완료 : {},  유저 PK : {}, 이름 : {}", currentTimePeriod, user.getId(), user.getName());
         return 0; //성공시 0 리턴
+    }
+
+    // 지정된 날짜 범위의 복약 로그를 가져오는 메서드
+    public List<MedicationLog> findByUserAndTimeBetween(User user, LocalDateTime startTime, LocalDateTime endTime)
+    {
+        return medicationLogRepository.findByUserAndTimeBetween(user, startTime, endTime);
     }
 
     // 시간대 판단 로직
@@ -137,10 +143,5 @@ public class MedicationLogService {
                 .status(true)
                 .build();
         medicationLogRepository.save(medicationLog);
-    }
-
-    public List<MedicationLog> findByUserAndTimeBetween(User user, LocalDateTime startTime, LocalDateTime endTime)
-    {
-        return medicationLogRepository.findByUserAndTimeBetween(user, startTime, endTime);
     }
 }
