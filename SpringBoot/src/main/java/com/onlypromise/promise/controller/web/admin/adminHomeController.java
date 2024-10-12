@@ -73,7 +73,7 @@ public class adminHomeController {
             }
             dtoList.add(newDto);
         }
-        totalPercent = Double.parseDouble(df.format((totalPercent - dtoList.get(0).getPercent() - dtoList.get(1).getPercent()) / (dtoList.size() - 2))); //관리자(테스트) 계정의 복약 순응도는 반영 안함
+        totalPercent = Double.parseDouble(df.format((totalPercent - dtoList.get(0).getPercent() - dtoList.get(1).getPercent() - dtoList.get(2).getPercent()) / (dtoList.size() - 3))); //관리자(테스트) 계정의 복약 순응도는 반영 안함
 
         List<reportAdminDTO> reportList = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");

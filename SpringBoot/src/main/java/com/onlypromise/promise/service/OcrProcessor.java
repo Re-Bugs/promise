@@ -103,22 +103,24 @@ public class OcrProcessor {
             }
 
             Medicine medicine = findMedicine.get();
-            Optional<Notification> findNotification = notificationRepository.findByUserAndMedicine(user, medicine);
+            List<Notification> notifications = notificationRepository.findAllByUserAndMedicine(user, medicine);
 
-            if (findNotification.isPresent()) //이미 등록되어있는 약품코드
+            if (!notifications.isEmpty()) // 이미 등록되어 있는 약물
             {
-                Notification notification = findNotification.get();
-                short remainingDose = notification.getRemainingDose();
                 int totalDosageDays = Integer.parseInt(medicineDTO.getTotalDosageDays());
 
-                Notification updateNotification = notification.toBuilder()
-                        .renewalDate(LocalDate.now().plusDays(totalDosageDays))
-                        .remainingDose((short) (remainingDose + totalDosageDays))
-                        .build();
+                // 모든 관련 알림의 남은 약물 수 업데이트
+                for (Notification notification : notifications)
+                {
+                    Notification updatedNotification = notification.toBuilder()
+                            .renewalDate(LocalDate.now().plusDays(totalDosageDays))
+                            .remainingDose((short) (notification.getRemainingDose() + totalDosageDays))
+                            .build();
 
-                notificationRepository.save(updateNotification);
-                log.info("이미 등록된 약품 코드 - user PK : {} 약물 이름 : {}", user.getId(), notification.getMedicine().getName());
-                warningMessages.add(notification.getMedicine().getName() + "은 이미 알림에 등록되어서 재처방일과 남은 약물 수를 업데이트 하였습니다.");
+                    notificationRepository.save(updatedNotification);
+                }
+                log.info("이미 등록된 약품 코드 - user PK : {} 약물 이름 : {}", user.getId(), medicine.getName());
+                warningMessages.add(medicine.getName() + "은 이미 알림에 등록되어 재처방일과 남은 약물 수를 업데이트 했습니다.");
                 continue;
             }
 
