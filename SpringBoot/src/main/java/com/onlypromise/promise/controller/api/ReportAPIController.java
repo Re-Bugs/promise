@@ -46,7 +46,7 @@ public class ReportAPIController {
             User user = findUser.get();
             Image image = null;
 
-            if (imageFile != null && !imageFile.isEmpty())
+            if (imageFile != null && !imageFile.isEmpty()) //이미지 파일이 있는 경우
             {
                 String extension = getFileExtension(imageFile.getOriginalFilename());
                 if (!isImageFile(extension)) //이미지 파일인지 검사
@@ -75,19 +75,31 @@ public class ReportAPIController {
 
                 reportService.saveImage(image);
                 log.info("user_absolute_id : {}, name : {}, file path : {}, 민원 접수됨", user.getId(), user.getName(), absolutePath);
+
+                Report newReport = Report.builder()
+                        .user(user)
+                        .title(reportDTO.getTitle())
+                        .content(reportDTO.getContent())
+                        .image(image)
+                        .createAt(LocalDateTime.now())
+                        .build();
+
+                reportService.save(newReport);
+                response.put("message", "success");
+                return ResponseEntity.status(HttpStatus.OK).body(response);
             }
 
+            //이미지 파일이 없는 경우
             Report newReport = Report.builder()
                     .user(user)
                     .title(reportDTO.getTitle())
                     .content(reportDTO.getContent())
-                    .image(image)
                     .createAt(LocalDateTime.now())
                     .build();
 
             reportService.save(newReport);
             response.put("message", "success");
-
+            log.info("user_absolute_id : {}, name : {}, 민원 접수됨", user.getId(), user.getName());
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
         catch (Exception e)

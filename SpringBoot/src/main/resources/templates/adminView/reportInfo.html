@@ -38,10 +38,13 @@
         </div>
     </div>
 
-    <div class="section">
+    <div th:if="${report.getImage() != null}" class="section">
         <h2>첨부 이미지</h2>
         <div class="content">
             <img th:src="@{/report-images/{imageName}(imageName=${report.image.name})}" alt="첨부 이미지" style="max-width:100%; height:auto;"/>
+        </div>
+        <div class="content">
+            <p th:text="${report.getImage().getPath()}">파일 경로 정보</p>
         </div>
     </div>
 

@@ -42,9 +42,11 @@ public class MainAPIController {
         {
             case 0:
                 response.put("message", "success");
+                log.info("약물 복용 성공 : {}", bottleId);
                 return ResponseEntity.ok(response);
             case 1:
                 response.put("message", "Bottle ID not found.");
+                log.warn("찾을 수 없는 약통코드 : {}", bottleId);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             case 2:
                 log.warn("중복 복용 요청 : {}", bottleId);
