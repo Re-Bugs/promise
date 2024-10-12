@@ -20,7 +20,7 @@ import java.io.IOException;
 @RequestMapping("/admin/log")
 public class adminLogController {
 
-    @Value("${app.log.directory}")
+    @Value("${app.log.directory:/spring-boot/log}") //app.log.directory 가 설정되지 않을 경우 기본 경로 설정
     private String LOG_DIRECTORY;
 
     @GetMapping("/view")
