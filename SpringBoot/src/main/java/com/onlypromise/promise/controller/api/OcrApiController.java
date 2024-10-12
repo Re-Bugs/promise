@@ -47,14 +47,15 @@ public class OcrApiController {
 
             response.put("data", validDtoList);
             response.put("warningMessage", warningMessages);
-            log.info("처방전 인식 성공 user_absolute_id : {}", user.getId());
+            log.info("처방전 인식 성공 - user PK : {}, 이름 : {}", user.getId(), user.getName());
             return ResponseEntity.ok(response);
 
         }
         catch (Exception e) {
             // 그 외의 예외 발생 시
+            log.error("처방전 인식 오류 - 약통코드 : {}", bottleId);
             log.error("Error processing OCR extraction: ", e);
-            response.put("error", "An unexpected error occurred");
+            response.put("error", "server error");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }

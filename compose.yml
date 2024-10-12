@@ -3,7 +3,7 @@ services:
     image: leesw0924/promise
     platform: linux/amd64
     ports:
-      - "80:8080"
+      - "80:80"
     depends_on: []
     networks:
       - promise-network

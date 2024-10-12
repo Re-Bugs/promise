@@ -27,16 +27,19 @@ public class NotificationValueAPIController {
     public ResponseEntity<Map<String, Object>> getNotificationValue(@RequestParam String bottleId)
     {
         Map<String, Object> response = new HashMap<>();
-        Optional<User> user = userService.findUserByBottleId(bottleId);
+        Optional<User> findUser = userService.findUserByBottleId(bottleId);
 
-        if (user.isEmpty())
+        if (findUser.isEmpty())
         {
             response.put("message", "User not found");
+            log.warn("알림 값 조회 - 잘못된 약통코드 : {}", bottleId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
-        NotificationValue value = user.get().getNotificationValue();
+        User user = findUser.get();
+        NotificationValue value = user.getNotificationValue();
         response.put("NotificationValue", value);
+        log.info("알림값 조회함 - user PK : {}, 이름 : {}", user.getId(), user.getName());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -49,6 +52,7 @@ public class NotificationValueAPIController {
         if (fintUser.isEmpty())
         {
             response.put("message", "User not found");
+            log.warn("알림 값 변경 - 잘못된 약통코드 : {}", bottleId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
@@ -61,13 +65,13 @@ public class NotificationValueAPIController {
             User updateUser = user.toBuilder().notificationValue(notificationValue).build();
             userService.save(updateUser);  // 변경된 User를 데이터베이스에 저장
             response.put("message", "success");
-            log.info("알림값 변경 요청 : user_absolute_id : {}", updateUser.getId());
+            log.info("알림값 변경 요청 : user PK : {}, 이름 : {}", updateUser.getId(), user.getName());
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
         catch (IllegalArgumentException e)
         {
             // 잘못된 value 값 처리
-            log.warn("잘못된 알림 값 요청 : {}, 값 : {}", user.getId(), value);
+            log.warn("잘못된 알림 값 요청 - user PK : {}, 이름 : {},  값 : {}", user.getId(), user.getName(), value);
             response.put("message", "Invalid Value");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }

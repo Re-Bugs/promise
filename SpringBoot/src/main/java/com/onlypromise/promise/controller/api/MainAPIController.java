@@ -42,22 +42,17 @@ public class MainAPIController {
         {
             case 0:
                 response.put("message", "success");
-                log.info("약물 복용 성공 : {}", bottleId);
                 return ResponseEntity.ok(response);
             case 1:
                 response.put("message", "Bottle ID not found.");
-                log.warn("찾을 수 없는 약통코드 : {}", bottleId);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             case 2:
-                log.warn("중복 복용 요청 : {}", bottleId);
                 response.put("message", "You already have a history of taking it at that time.");
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
             case 3:
-                log.warn("약물 소진 : {}", bottleId);
                 response.put("message", "Medication fully consumed.");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             case 4:
-                log.warn("예정되지 않은 복용 요청 : {}", bottleId);
                 response.put("message", "No medication scheduled for this time period.");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             default:
@@ -78,6 +73,7 @@ public class MainAPIController {
         if (findUser.isEmpty())
         {
             response.put("message", "User not found");
+            log.warn("알림 내역 조회 - 잘못된 약통코드 : {}", bottleId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
@@ -112,6 +108,7 @@ public class MainAPIController {
 
         // 성공 시 데이터 반환
         response.put("notifications", notificationDTOs);
+        log.info("알림내역 확인 - user PK : {}, 이름 : {}", user.getId(), user.getName());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -125,6 +122,7 @@ public class MainAPIController {
         if (findUser.isEmpty())
         {
             response.put("message", "user not found.");
+            log.warn("일일 복용 내역 조회 - 잘못된 약통코드 : {}", bottleId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
@@ -136,6 +134,7 @@ public class MainAPIController {
         // 복용한 약물과 복용하지 않은 약물을 결과에 담기
         response.put("taken", medicationStatus.get("taken"));
         response.put("notTaken", medicationStatus.get("notTaken"));
+        log.info("일일 복용 내용 확인 - user PK : {}, 이름 : {}, 날짜 : {}", user.getId(), user.getName(), date);
 
         // 성공적으로 복용 상태 반환
         return ResponseEntity.status(HttpStatus.OK).body(response);

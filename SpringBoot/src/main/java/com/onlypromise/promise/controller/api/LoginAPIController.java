@@ -37,6 +37,7 @@ public class LoginAPIController {
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
             response.put("message", "user not found");
+            log.info("로그인 실패 - 약통코드 : {}", loginDTO.getBottleId());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 

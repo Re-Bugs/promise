@@ -51,10 +51,18 @@ public class MedicationLogService {
             {
                 hasMatchingNotification = true;
 
-                if (samePeriod(user, notification, currentTimePeriod, currentTime)) return 2; // 중복 복용
+                if (samePeriod(user, notification, currentTimePeriod, currentTime))
+                {
+                    log.warn("중복 복용 요청 : {},  유저 PK : {}, 유저 이름 : {}", currentTimePeriod, user.getId(), user.getName());
+                    return 2; // 중복 복용
+                }
 
                 // 남은 약물 수 감소 및 저장
-                if (notification.getRemainingDose() == 0) return 3; // 약물이 모두 소진됨
+                if (notification.getRemainingDose() == 0)
+                {
+                    log.warn("약물 소진됨 - ,  유저 PK : {}, 유저 이름 : {}", user.getId(), user.getName());
+                    return 3; // 약물이 모두 소진됨
+                }
 
                 updateNotificationRemainingDose(notification); // 약물 상태 업데이트
                 addMedicationLog(user, notification, currentTime); // 투약 기록 추가 (정상적으로 복용한 경우)
@@ -64,10 +72,11 @@ public class MedicationLogService {
         // 일치하는 시간대에 약물이 없을 때 오류 메시지 반환
         if (!hasMatchingNotification)
         {
-            log.warn("No medication scheduled for {} time for bottleId: {}", currentTimePeriod, bottleId);
+            log.warn("예정되지 않은 복용 요청 : {},  유저 PK : {}, 유저 이름 : {}", currentTimePeriod, user.getId(), user.getName());
             return 4;
         }
 
+        log.info("복용완료 : {},  유저 PK : {}, 유저 이름 : {}", currentTimePeriod, user.getId(), user.getName());
         return 0; //성공시 0 리턴
     }
 
