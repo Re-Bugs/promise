@@ -99,9 +99,9 @@ public class MainAPIController {
             newDto.setRemainingDose(notification.getRemainingDose());
             newDto.setDailyDose(notification.getDailyDose().toString());
             newDto.setRenewalDate(notification.getRenewalDate());
-            newDto.setMorning(notification.getMorning());
-            newDto.setAfternoon(notification.getAfternoon());
-            newDto.setEvening(notification.getEvening());
+            newDto.setMorning(notification.getMorning() != null ? notification.getMorning() : false);
+            newDto.setAfternoon(notification.getAfternoon() != null ? notification.getAfternoon() : false);
+            newDto.setEvening(notification.getEvening() != null ? notification.getEvening() : false);
 
             notificationDTOs.add(newDto);
         }

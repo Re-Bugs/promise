@@ -17,7 +17,7 @@ public class NotificationDTO {
     private short remainingDose;
     private LocalDate renewalDate;
     private String dailyDose;
-    private boolean morning = false;
-    private boolean afternoon = false;
-    private boolean evening = false;
+    private boolean morning;
+    private boolean afternoon;
+    private boolean evening;
 }
