@@ -1,5 +1,7 @@
 package com.onlypromise.promise.controller.web.admin;
 
+import com.onlypromise.promise.domain.User;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,8 +26,11 @@ public class adminLogController {
     private String LOG_DIRECTORY;
 
     @GetMapping("/view")
-    public String viewLogFile(@RequestParam String fileName, Model model)
+    public String viewLogFile(@RequestParam String fileName, Model model, HttpSession session)
     {
+        User user = (User) session.getAttribute("user");
+        if(user == null) return "redirect:/login";
+
         File logFile = new File(LOG_DIRECTORY, fileName);
 
         // 로그 파일 내용 읽기
