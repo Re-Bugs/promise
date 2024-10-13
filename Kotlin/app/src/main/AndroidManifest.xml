@@ -46,6 +46,9 @@
         <!-- HistoryActivity 설정 -->
         <activity android:name=".HistoryActivity" android:exported="true"/>
 
+        <!-- ReportActivity 설정 -->
+        <activity android:name=".ReportActivity" android:exported="true"/>
+
         <!-- 알람 리시버 설정 -->
         <receiver android:name=".utils.AlarmReceiver" />
 

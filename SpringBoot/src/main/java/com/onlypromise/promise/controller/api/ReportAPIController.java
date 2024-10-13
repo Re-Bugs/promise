@@ -52,7 +52,7 @@ public class ReportAPIController {
                 String extension = getFileExtension(imageFile.getOriginalFilename());
                 if (!isImageFile(extension)) //이미지 파일인지 검사
                 {
-                    log.info("잘못된 이미지 확장자 : {}, user PK : {}, 이름 : {}", extension, user.getId(), user.getName());
+                    log.warn("잘못된 이미지 확장자 : {}, user PK : {}, 이름 : {}", extension, user.getId(), user.getName());
                     response.put("message", "invalid image file");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
                 }

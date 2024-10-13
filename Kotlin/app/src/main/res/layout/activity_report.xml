@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="#FFFFFF">
+
+    <!-- 불편 및 문의 제목 -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="불편 및 문의"
+        android:textColor="@android:color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- 제목 입력란 -->
+    <EditText
+        android:id="@+id/etSubject"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="민원 및 불편 제목을 입력해주세요."
+        android:textColorHint="#AAAAAA"
+        android:inputType="text"
+        android:textColor="@android:color/black"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
+    <!-- 내용 입력란 -->
+    <EditText
+        android:id="@+id/etContent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:hint="구체적인 내용을 입력해주세요.\n 이미지 하나를 첨부할 수도 있습니다."
+        android:textColorHint="#AAAAAA"
+        android:inputType="textMultiLine"
+        android:minHeight="150dp"
+        android:textColor="@android:color/black"
+        app:layout_constraintTop_toBottomOf="@id/etSubject"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btnAttachImage"
+        android:layout_marginTop="16dp"
+        app:layout_constraintHeight_default="spread"/>
+
+    <!-- 이미지 파일 첨부 버튼 -->
+    <Button
+        android:id="@+id/btnAttachImage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="이미지 파일 첨부"
+        android:textColor="@android:color/white"
+        app:layout_constraintTop_toBottomOf="@id/etContent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btnSubmit"
+        app:layout_constraintHeight_default="wrap"
+        android:layout_marginTop="16dp"/>
+
+    <!-- 제출 버튼 -->
+    <Button
+        android:id="@+id/btnSubmit"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="제출"
+        android:textColor="@android:color/white"
+        app:layout_constraintTop_toBottomOf="@id/btnAttachImage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btnBack"
+        app:layout_constraintHeight_default="wrap"
+        android:layout_marginTop="4dp"/>
+
+    <!-- 뒤로가기 버튼 -->
+    <Button
+        android:id="@+id/btnBack"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="뒤로가기"
+        android:textColor="@android:color/white"
+        app:layout_constraintTop_toBottomOf="@id/btnSubmit"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="4dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -100,6 +100,12 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
+
+        // 민원 접수 버튼 초기화 및 클릭 이벤트 설정
+        val reportButton = findViewById<Button>(R.id.reportButton)
+        reportButton.setOnClickListener {
+            startActivity(Intent(this, ReportActivity::class.java))
+        }
     }
 
     // 알림 권한 요청 함수

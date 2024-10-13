@@ -19,4 +19,6 @@ object ApiClient {
     fun <T> createService(service: Class<T>): T {
         return retrofit.create(service)
     }
+
+    val reportService: ReportService = createService(ReportService::class.java)
 }
