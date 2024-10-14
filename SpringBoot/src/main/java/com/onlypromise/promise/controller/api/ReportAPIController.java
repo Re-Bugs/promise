@@ -38,7 +38,7 @@ public class ReportAPIController {
         if (findUser.isEmpty())
         {
             response.put("message", "user not found");
-            log.warn("민원 접수 - 잘못된 약통 코드 : {}", reportDTO.getBottleId());
+            log.warn("민원 접수(API) - 잘못된 약통 코드 : {}", reportDTO.getBottleId());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
@@ -52,7 +52,7 @@ public class ReportAPIController {
                 String extension = getFileExtension(imageFile.getOriginalFilename());
                 if (!isImageFile(extension)) //이미지 파일인지 검사
                 {
-                    log.warn("잘못된 이미지 확장자 : {}, user PK : {}, 이름 : {}", extension, user.getId(), user.getName());
+                    log.warn("잘못된 이미지 확장자(API) : {}, user PK : {}, 이름 : {}", extension, user.getId(), user.getName());
                     response.put("message", "invalid image file");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
                 }
@@ -75,7 +75,7 @@ public class ReportAPIController {
                         .build();
 
                 reportService.saveImage(image);
-                log.info("민원 접수 - user PK : {}, 이름 : {}, 사진 저장 경로 : {}", user.getId(), user.getName(), absolutePath);
+                log.info("민원 접수(API) - user PK : {}, 이름 : {}, 사진 저장 경로 : {}", user.getId(), user.getName(), absolutePath);
 
                 Report newReport = Report.builder()
                         .user(user)
@@ -100,7 +100,7 @@ public class ReportAPIController {
 
             reportService.save(newReport);
             response.put("message", "success");
-            log.info("민원 접수 - user PK : {}, 이름 : {}", user.getId(), user.getName());
+            log.info("민원 접수(API) - user PK : {}, 이름 : {}", user.getId(), user.getName());
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
         catch (Exception e)
@@ -117,7 +117,7 @@ public class ReportAPIController {
     {
         Map<String, String> errors = new HashMap<>();
 
-        log.error("민원 접수 오류 발생");
+        log.error("민원 접수 오류 발생(API)");
         // 검증 오류 발생한 필드와 메시지를 응답에 포함
         for (FieldError error : ex.getBindingResult().getFieldErrors()) errors.put("message", error.getDefaultMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);

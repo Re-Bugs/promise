@@ -38,6 +38,7 @@ public class MainAPIController {
         // JSON 응답을 위한 Map 생성
         Map<String, String> response = new HashMap<>();
 
+        log.info("복용 완료 요청(API)");
         switch(responseCode)
         {
             case 0:
@@ -73,7 +74,7 @@ public class MainAPIController {
         if (findUser.isEmpty())
         {
             response.put("message", "User not found");
-            log.warn("알림 내역 조회 - 잘못된 약통코드 : {}", bottleId);
+            log.warn("알림 내역 조회(API) - 잘못된 약통코드 : {}", bottleId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
@@ -108,7 +109,7 @@ public class MainAPIController {
 
         // 성공 시 데이터 반환
         response.put("notifications", notificationDTOs);
-        log.info("알림내역 확인 - user PK : {}, 이름 : {}", user.getId(), user.getName());
+        log.info("알림내역 확인(API) - user PK : {}, 이름 : {}", user.getId(), user.getName());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -122,7 +123,7 @@ public class MainAPIController {
         if (findUser.isEmpty())
         {
             response.put("message", "user not found.");
-            log.warn("일일 복용 내역 조회 - 잘못된 약통코드 : {}", bottleId);
+            log.warn("일일 복용 내역 조회(API) - 잘못된 약통코드 : {}", bottleId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
@@ -134,7 +135,7 @@ public class MainAPIController {
         // 복용한 약물과 복용하지 않은 약물을 결과에 담기
         response.put("taken", medicationStatus.get("taken"));
         response.put("notTaken", medicationStatus.get("notTaken"));
-        log.info("일일 복용 내용 확인 - user PK : {}, 이름 : {}, 날짜 : {}", user.getId(), user.getName(), date);
+        log.info("일일 복용 내용 확인(API) - user PK : {}, 이름 : {}, 날짜 : {}", user.getId(), user.getName(), date);
 
         // 성공적으로 복용 상태 반환
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -147,7 +148,7 @@ public class MainAPIController {
     {
         Map<String, String> response = new HashMap<>();
         response.put("message", "Invalid date format. Please use YYYY-MM-DD.");
-        log.warn("잘못된 날짜 요청 오류 발생");
+        log.warn("잘못된 날짜 요청 오류 발생(API)");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 }

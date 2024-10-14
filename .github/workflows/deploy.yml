@@ -56,3 +56,4 @@ jobs:
           echo "${{ secrets.PROMISE_COMPOSE_YML }}" > /home/ubuntu/promise/compose.yml
           cd /home/ubuntu/promise
           docker compose up -d --pull always
+          docker image prune -f

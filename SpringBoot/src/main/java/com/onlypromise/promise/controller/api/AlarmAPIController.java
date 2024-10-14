@@ -32,7 +32,7 @@ public class AlarmAPIController {
         if(findUser.isEmpty())
         {
             response.put("message", "User not found");
-            log.warn("알림 시각 조회 - 잘못된 약통코드 : {}", bottleId);
+            log.warn("알림 시각 조회(API) - 잘못된 약통코드 : {}", bottleId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
@@ -61,7 +61,7 @@ public class AlarmAPIController {
         if (findUser.isEmpty())
         {
             response.put("message", "User not found");
-            log.warn("알림 시각 변경 - 잘못된 약통코드 : {}", bottleId);
+            log.warn("알림 시각 변경(API) - 잘못된 약통코드 : {}", bottleId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
@@ -79,14 +79,14 @@ public class AlarmAPIController {
 
             userService.save(updateUser);
 
-            log.info("user PK : {}, morning : {}, afternoon : {}, evening : {} 알림시간 업데이트 됨", updateUser.getId(), updateUser.getMorningTime(), updateUser.getAfternoonTime(), updateUser.getEveningTime());
+            log.info("알림 시각 업데이트(API) - user PK : {}, 이름 : {} 아침 알림 시각 : {}, 점심 알림 시각 : {}, 저녁 알림 시각 : {}", updateUser.getId(), updateUser.getName(), updateUser.getMorningTime(), updateUser.getAfternoonTime(), updateUser.getEveningTime());
             response.put("message", "success");
             return ResponseEntity.status(HttpStatus.OK).body(response);
 
         }
         catch (DateTimeParseException e)
         {
-            log.warn("잘못된 알림 시각 요청 - user PK : {}, 이름 : {}", user.getId(), user.getName());
+            log.warn("잘못된 알림 시각 요청(API) - user PK : {}, 이름 : {}", user.getId(), user.getName());
             // 시간 형식이 잘못된 경우 처리
             response.put("message", "Invalid time format. Please use HH:mm format.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
@@ -94,7 +94,7 @@ public class AlarmAPIController {
         catch (Exception e)
         {
             // 기타 예외 처리
-            log.error("알림 시각 변경 오류 발생 - user PK : {}, 이름 : {}", user.getId(), user.getName());
+            log.error("알림 시각 변경 오류 발생(API) - user PK : {}, 이름 : {}", user.getId(), user.getName());
             log.error("알림 시각 변경 오류", e);
             response.put("message", "server error");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);

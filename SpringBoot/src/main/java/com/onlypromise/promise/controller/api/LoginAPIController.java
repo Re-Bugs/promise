@@ -33,11 +33,11 @@ public class LoginAPIController {
             User updateUser = findUser.get().toBuilder().name(loginDTO.getName()).age(loginDTO.getAge()).build();
             userService.save(updateUser);
             response.put("message", "success");
-            log.info("유저 로그인 : {}, 이름 : {}", updateUser.getId(), updateUser.getName());
+            log.info("로그인(API) : {}, 이름 : {}", updateUser.getId(), updateUser.getName());
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
             response.put("message", "user not found");
-            log.info("로그인 실패 - 약통코드 : {}", loginDTO.getBottleId());
+            log.info("로그인 실패(API) - 약통코드 : {}", loginDTO.getBottleId());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 

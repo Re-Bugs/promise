@@ -38,7 +38,7 @@ public class adminHomeController {
     private final DateTimeFormatter dtoFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final DateTimeFormatter logFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    private final LocalDateTime startDateTime = LocalDateTime.of(2024, 10, 7, 0, 0); //관찰 시작일
+    private final LocalDateTime startDateTime = LocalDateTime.of(2024, 10, 14, 0, 0); //관찰 시작일
     private final LocalDateTime endDateTime = LocalDateTime.now(); // 현재 시간까지
 
     @Value("${app.log.directory:/spring-boot/log}") //app.log.directory 가 설정되지 않을 경우 기본 경로 설정
